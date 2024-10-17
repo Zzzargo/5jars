@@ -1,8 +1,8 @@
 ﻿#pragma once
+using namespace std;
 #include <fstream>
 #include <iostream>
 #include <ctime>
-using namespace std;
 
 class Cont
 {
