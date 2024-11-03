@@ -1,0 +1,4 @@
+3
+Nevoi 0.6 6
+Placeri 0.3 3
+Economii 0.1 1

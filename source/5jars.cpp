@@ -1,105 +1,83 @@
-﻿#include "Cont.h"
+﻿#include "account.h"
 
 int main() {
-    char bucla;
-    double total = 0.0;
-    Cont N("resources/n.txt", "Nevoi", 0.6), P("resources/p.txt", "Placeri", 0.3), E("resources/e.txt", "Economii", 0.1);
+    vector<Account> accounts; // vector containing Account objects(accounts)
+
+    // Reading accounts
+    ifstream accounts_reader;
+    accounts_reader.open("../resources/accounts.txt");
+
+    if (!accounts_reader.is_open()) {
+        cerr << "Error: Unable to open the accounts file." << endl;
+        return 1; // Exit the program with an error code
+    }
+
+    unsigned short num_of_accounts;
+    accounts_reader >> num_of_accounts;
+
+    unsigned short i = 0;
+    while (i < num_of_accounts) {
+        string name;
+        double coef;
+        double balance;
+        accounts_reader >> name;
+        accounts_reader >> coef;
+        accounts_reader >> balance;
+        accounts.emplace_back(i, name, coef, balance); // Construct a new account with the ID = i and append it to the vector
+        i++;
+    }
+    accounts_reader.close();
     ofstream fout;
     ifstream fin;
 
-    do
-    {
-        N.afisare();
-        P.afisare();
-        E.afisare();
-        fin.open("resources/t.txt");
-        if (fin.is_open()) {
-            fin >> total;
-            fin.close();
-        }
-        cout << "Total: " << total << endl;
+    cout << "WELCOME HOME, MASTER" << endl;
 
-        cout << "Selectati operatia dorita: " << endl;
-        cout << "1 - Venit nou" << endl;
-        cout << "2 - Consum" << endl;
-        unsigned short op;
+    while (true) {
+        double total = 0.0;
+        for (i = 0; i < num_of_accounts; i++) {
+            accounts[i].display(); // Display all accounts, building the total
+            total += accounts[i].get_balance();
+        }
+        cout << "What do you want to do?" << endl;
+        cout << "1 - Income" << endl;
+        cout << "2 - Withdrawal" << endl;
+        cout << "q - quit" << endl;
+        char op;
         cin >> op;
         cout << endl;
-        double suma;
 
-        switch (op)
+        double sum;
+
+        switch ((int)op)
         {
-        case 1:
-        {
-            cout << "Suma: ";
-            cin >> suma;
-            N.venit(suma);
-            P.venit(suma);
-            E.venit(suma);
-            total += suma;
-            fout.open("resources/t.txt");
-            if (fout.is_open()) {
-                fout << total;
-                fout.close();
+        case '1':
+            cout << "Sum: ";
+            cin >> sum;
+            for (i = 0; i < num_of_accounts; i++) {
+                accounts[i].income(sum);
             }
-            fout.open("resources/log.txt", ios::app);
-            if (fout.is_open()) {
-                time_t acum = time(0);
-                char* data_ora = ctime(&acum);
-                fout << data_ora << " + " << suma << " ";
-                string detalii;
-                cout << "Detalii: ";
-                cin >> detalii;
-                fout << detalii << endl;
-                fout.close();
-            }
+            total += sum;
             break;
-        }
-        case 2:
-        {
-            cout << "Alegeti contul: " << endl;
-            cout << "1 - Nevoi" << endl;
-            cout << "2 - Placeri" << endl;
-            cout << "3 - Economii" << endl;
-            unsigned short alegere;
-            cin >> alegere;
-            switch (alegere)
-            {
-            case 1:
-            {
-                cout << "Suma: ";
-                cin >> suma;
-                N.consum(suma);
-                break;
+
+        case '2':
+            cout << "Which account do you want to withdraw from?" << endl;
+            for (i = 0; i < num_of_accounts; i++) {
+                cout << i << " - " << accounts[i].get_name() << endl; // Get accounts by their ID
             }
-            case 2:
-            {
-                cout << "Suma: ";
-                cin >> suma;
-                P.consum(suma);
-                break;
-            }
-            case 3:
-            {
-                cout << "Suma: ";
-                cin >> suma;
-                E.consum(suma);
-                break;
-            }
-            default:
-                cout << "Cont invalid" << endl;
-                break;
-            }
-        }
+
+            unsigned short choice;
+            cin >> choice;
+            cout << "How much would you like to withdraw from " << accounts[choice].get_name() << " ? ";
+            cin >> sum;
+            accounts[choice].withdrawal(sum);
             break;
+
+        case 'q':
+            exit(0);
         default:
-            cout << "Operatie invalida" << endl;
+            cout << "Invalid operation. Try again." << endl << "To quit, type 'q' and press ENTER." << endl;
             break;
         }
-
-        cout << "Doriti sa executati o alta operatie? (y/n) ";
-        cin >> bucla;
-        cout << endl;
-    } while (bucla == 'y');
+    }
     return 0;
 }
