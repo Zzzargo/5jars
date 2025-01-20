@@ -1,16 +1,11 @@
 ﻿#pragma once
 #include <iostream>
-#include <fstream>
-#include <vector>
-#include <ctime>
-
 using namespace std;
 
-class Account
-{
+class Account {
 private:
-    unsigned short id;
     string name;
+    unsigned short id;
     double coef;
     double balance;
 
@@ -20,6 +15,7 @@ public:
     double get_coef();
     double get_balance();
     string get_name();
-    void income(double sum);
+    void shared_income(double sum);
+    void deposit(double sum);
     void withdrawal(double sum);
 };

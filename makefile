@@ -1,8 +1,10 @@
-CFLAGS=-Wall -Wextra
+CFLAGS=-Wall -Wextra -g
 .PHONY:run clean
 
-run:
-	g++ $(CFLAGS) source/5jars.cpp source/Cont.cpp -o 5jars.exe
-	./5jars.exe
+build: source/5jars.cpp source/account.cpp
+	g++ $(CFLAGS) source/5jars.cpp source/account.cpp source/user.cpp -o login.exe
+run: login.exe
+	./login.exe
+# figure out a way to insert arguments
 clean:
 	rm -f 5jars
