@@ -96,6 +96,5 @@ void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, 
     string accounts_file, string users_file) {
     Account account(arg_id, arg_name, arg_coef, arg_balance);
     accounts.emplace_back(account);
-    // Update the number of accounts in users file and add a new line in the accounts file
-    
+    // TODO: Update the number of accounts in users file and add a new line in the accounts file
 }

@@ -95,7 +95,7 @@ void handle_new_account(User &curr_user, string accounts_file, string users_file
     curr_user.add_account(curr_user.num_accounts, name, coefficient, 0.0, accounts_file, users_file);
 }
 
-int app() {
+int main() {
     cout << "Welcome!\nPlease enter your name or type 'register' to register a new user: ";
     string name;
     cin >> name;
