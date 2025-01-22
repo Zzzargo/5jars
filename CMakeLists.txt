@@ -16,7 +16,7 @@ set(PROJECT_SOURCES
         source/main.cpp
         source/mainwindow.cpp
         source/mainwindow.h
-        source/mainwindow.ui
+        source/login.ui
         source/account.h
         source/account.cpp
         source/user.h

@@ -2,10 +2,12 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "user.h"
+#include "account.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class MainWindow;
+class LoginWindow;
 }
 QT_END_NAMESPACE
 
@@ -18,9 +20,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_btn_login_clicked();
 
 private:
-    Ui::MainWindow *ui;
+    Ui::LoginWindow *ui;
 };
 #endif // MAINWINDOW_H
