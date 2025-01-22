@@ -8,11 +8,6 @@ User::User(unsigned arg_id, string arg_name, string arg_username, string arg_pas
     num_accounts = arg_num_accounts;
 }
 
-void User::createAccount(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance) {
-    Account account(arg_id, arg_name, arg_coef, arg_balance);
-    accounts.emplace_back(account);
-}
-
 bool User::login(string arg_username, string arg_password) {
     if (username == arg_username && password == arg_password) {
         return true;
@@ -67,6 +62,40 @@ string User::get_account_name(unsigned short id) {
     return accounts[id].get_name();
 }
 
+double User::get_account_coefficient(unsigned short id) {
+    return accounts[id].get_coef();
+}
+
 void User::withdrawal_from(unsigned  short id, double sum) {
     accounts[id].withdrawal(sum);
+}
+
+void User::update_accounts(string file) {
+    fstream accounts_file;
+    accounts_file.open(file);
+    if (!accounts_file.is_open()) {
+        cerr << "Error: Unable to open the accounts file." << endl;
+        exit(EXIT_FAILURE);
+    }
+    string line;
+    while (getline(accounts_file, line)) {
+        if (line == User::username) {
+            break;  // Found where to start writing
+        }
+    }
+    for (size_t i = 0; i < num_accounts; i++) {  // Get the accounts
+        accounts_file << accounts[i].get_name() << " " << accounts[i].get_coef() << " " << accounts[i].get_balance();
+        if (i < num_accounts - 1) {
+            accounts_file << endl;
+        }
+    }
+    accounts_file.close();
+}
+
+void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
+    string accounts_file, string users_file) {
+    Account account(arg_id, arg_name, arg_coef, arg_balance);
+    accounts.emplace_back(account);
+    // Update the number of accounts in users file and add a new line in the accounts file
+    
 }

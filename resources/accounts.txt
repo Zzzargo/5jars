@@ -1,8 +1,5 @@
-zzzargoman
-Nevoi 0.6 6
-Placeri 0.3 3
-Economii 0.1 1
-uazon
-Nevoi 0.6 6
-Placeri 0.3 3
-Economii 0.1 1
+zargo
+BT 0.8 144
+Rev 0.2 56test
+testacc1 0.5 0
+testacc2 0.5 000

@@ -9,9 +9,7 @@ private:
     unsigned id;
     string username;
     string password;
-
     vector<Account> accounts;
-    void createAccount(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance);
 public:
     string name;
     unsigned num_accounts;
@@ -23,5 +21,9 @@ public:
     void display_accounts();  // Get the accounts from the user object
     void income(double sum);
     string get_account_name(unsigned short id);
+    double get_account_coefficient(unsigned short id);
     void withdrawal_from(unsigned  short id, double sum);
+    void update_accounts(string file);
+    void add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
+        string accounts_file, string users_file);
 };

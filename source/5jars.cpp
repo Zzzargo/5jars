@@ -11,7 +11,7 @@ vector <User> read_users(string filename) {
     ifstream users_reader;
     users_reader.open(filename);
     if (!users_reader.is_open()) {
-        cerr << "Error: Unable to open the users file." << endl;
+        cerr << "Error: Unable to open the users file." << "\n";
         exit(EXIT_FAILURE);
     }
     vector <User> users;
@@ -50,86 +50,132 @@ bool auth(string name, vector <User> &users) {
             cout << "Password: ";
             cin >> password;
             if (users[i].login(username, password)) {
-                cout << "Welcome, " << name << "!" << endl;
+                cout << "Welcome, " << name << "!" << "\n";
                 return true;
             } else {
-                cout << "Incorrect username or password." << endl;
+                cout << "Incorrect username or password." << "\n";
             }
         }
     }
     return false;
 }
 
-int main(int argc, char *argv[]) {
-    if (argc == 1) {  // Need to register or log in
-        cout << "Welcome, guest!" << endl;
-    } else {
-        if (argc != 2) {
-            cerr << "Usage: " << argv[0] << " <user> or " << argv[0] << " to enter guest mode" << endl;
-            exit(EXIT_FAILURE);
-        }
-        vector <User> users = read_users("./resources/users.txt");
-        User curr_user;
-        user_finder_pair result = user_found(argv[1], users);  // Used to not call user_found() twice
-        if (result.found) {
-            size_t found_user_index = result.index;
-            cout << "Trying to authenticate as " << argv[1] << endl;
-            if (auth(argv[1], users)) {
-                curr_user = users[found_user_index];
-            } else {
-                cout << "Authentication failed." << endl;
-                exit(EXIT_FAILURE);
-            }
+void handle_withdrawal(User &curr_user) {
+    cout << "Which account do you want to withdraw from?\n";
+    for (size_t i = 0; i < curr_user.num_accounts; i++) {
+        cout << i << " - " << curr_user.get_account_name(i) << "\n"; // Get accounts by their ID
+    }
+
+    unsigned short choice;
+    cin >> choice;
+    if (choice >= curr_user.num_accounts) {
+        cout << "Invalid account.\n";
+    }
+    cout << "How much would you like to withdraw from " << curr_user.get_account_name(choice) << " ? ";
+    double sum = 0.0;
+    cin >> sum;
+    curr_user.withdrawal_from(choice, sum);
+    curr_user.update_accounts("./resources/accounts.txt");
+}
+
+void handle_new_account(User &curr_user, string accounts_file, string users_file) {
+    string name;
+    double coefficient = 0.0;
+    cout << "New account name: ";
+    cin >> name;
+    cout << "New account coefficient: ";
+    cin >> coefficient;
+    double sum_of_other_coefficients = 0.0;
+    for (size_t i = 0; i < curr_user.num_accounts; i++) {
+        sum_of_other_coefficients += curr_user.get_account_coefficient(i);
+    }
+    if (sum_of_other_coefficients + coefficient > 1.0) {
+        cout << "Sum of all accounts' coefficients is too big. Try again with a smaller coefficient.\n";
+    }
+    curr_user.add_account(curr_user.num_accounts, name, coefficient, 0.0, accounts_file, users_file);
+}
+
+int app() {
+    cout << "Welcome!\nPlease enter your name or type 'register' to register a new user: ";
+    string name;
+    cin >> name;
+    if (name == "register") {
+
+    }
+    vector <User> users = read_users("./resources/users.txt");
+    User curr_user;
+    user_finder_pair result = user_found(name, users);  // Used to not call user_found() twice
+    if (result.found) {
+        size_t found_user_index = result.index;
+        cout << "Trying to authenticate as " << name << "...\n";
+        if (auth(name, users)) {
+            curr_user = users[found_user_index];
         } else {
-            cout << "User not found." << endl;
+            cout << "Authentication failed." << "\n";
             exit(EXIT_FAILURE);
         }
-        // User set. Now we can do stuff
-        curr_user.read_accounts("./resources/accounts.txt");
-        while (true) {
-            double total = 0.0;
-            curr_user.display_accounts(); // Display all accounts, building the total
-            cout << "What do you want to do?" << endl;
-            cout << "1 - Income" << endl;
-            cout << "2 - Withdrawal" << endl;
-            cout << "q - quit" << endl;
-            char op;
-            cin >> op;
-            cout << endl;
+    } else {
+        cout << "User not found." << "\n";
+        exit(EXIT_FAILURE);
+    }
+    // User set. Now we can do stuff
+    curr_user.read_accounts("./resources/accounts.txt");
+    while (true) {
+        curr_user.display_accounts(); // Display all accounts, building the total
+        cout << "What do you want to do?\n";
+        cout << "1 - Income\n";
+        cout << "2 - Withdrawal\n";
+        cout << "c - change user\n";
+        cout << "n - new account\n";
+        cout << "q - quit\n";
+        char op;
+        cin >> op;
 
-            double sum;  // We'll need this for everything
-
-            switch (op) {
-                case '1': {
-                    cout << "Sum: ";
-                    cin >> sum;
-                    for (size_t i = 0; i < curr_user.num_accounts; i++) {
-                        curr_user.income(sum);
+        switch (op) {
+            case '1': {
+                cout << "Sum: ";
+                double sum;
+                cin >> sum;
+                curr_user.income(sum);
+                curr_user.update_accounts("./resources/accounts.txt");
+                break;
+            }
+            case '2': {
+                handle_withdrawal(curr_user);
+                break;
+            }
+            case 'c': {
+                cout << "Name: ";
+                string new_name;
+                cin >> new_name;
+                user_finder_pair result = user_found(new_name, users);
+                if (result.found) {
+                    size_t found_user_index = result.index;
+                    cout << "Trying to authenticate as " << new_name << "...\n";
+                    if (auth(new_name, users)) {
+                        curr_user = users[found_user_index];
+                        curr_user.read_accounts("./resources/accounts.txt");
+                    } else {
+                        cout << "Authentication failed." << "\n";
+                        exit(EXIT_FAILURE);
                     }
-                    total += sum;
-                    break;
+                } else {
+                    cout << "User not found." << "\n";
+                    exit(EXIT_FAILURE);
                 }
-                case '2': {
-                    cout << "Which account do you want to withdraw from?" << endl;
-                    for (size_t i = 0; i < curr_user.num_accounts; i++) {
-                        cout << i << " - " << curr_user.get_account_name(i) << endl; // Get accounts by their ID
-                    }
-
-                    unsigned short choice;
-                    cin >> choice;
-                    cout << "How much would you like to withdraw from " << curr_user.get_account_name(choice) << " ? ";
-                    cin >> sum;
-                    curr_user.withdrawal_from(choice, sum);
-                    break;
-                }
-                case 'q': {
-                    cout << "Goodbye!";
-                    exit(0);
-                }
-                default: {
-                    cout << "Invalid operation. Try again." << endl << "To quit, type 'q' and press ENTER." << endl;
-                    break;
-                }
+                break;
+            }
+            case 'n': {
+                handle_new_account(curr_user, "./resources/accounts.txt", "./resources/users.txt");
+                break;
+            }
+            case 'q': {
+                cout << "Goodbye!\n";
+                exit(0);
+            }
+            default: {
+                cout << "Invalid operation. Try again.\n" << "To quit, type 'q' and press ENTER.\n";
+                break;
             }
         }
     }
