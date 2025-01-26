@@ -1,10 +1,5 @@
-Mon Oct 14 19:13:56 2024
- + 1000 test1
-Mon Oct 14 19:14:10 2024
- - 600 test2
-Mon Oct 14 19:14:22 2024
- - 300 test3
-Mon Oct 14 19:14:31 2024
- - 100 test4
-Mon Oct 14 19:17:15 2024
- + 0 -
+1737826781 - test withdrew 30 from test2.
+2025/01/25 19:46:56 - test deposited 100.
+2025/01/25 19:47:11 - test withdrew 50 from test1.
+2025/01/25 19:47:17 - test withdrew 30 from test2.
+2025/01/25 19:47:41 - Vasea deposited 100.

@@ -4,6 +4,14 @@
 #include <fstream>
 #include <sstream>
 
+#include <ctime>
+#include <iomanip>
+#include <chrono>
+
+#define INCOME 0
+#define WITHDRAWAL 1
+#define LOG_FILE "./resources/log.txt"
+
 class User {
 private:
     unsigned id;
@@ -23,7 +31,9 @@ public:
     string get_account_name(unsigned short id);
     double get_account_coefficient(unsigned short id);
     void withdrawal_from(unsigned  short id, double sum);
-    void update_accounts(string file);
+    void update_users(string file);
+    void update_accounts(string file, bool new_account = false);  // When called with true, adds a new line and prevents overwriting
     void add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
         string accounts_file, string users_file);
+    void log_op(int operation, unsigned short acc_id, double sum, string log_file);
 };

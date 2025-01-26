@@ -1,6 +1,8 @@
 ﻿#include "user.h"
-#include <ctime>
 #include <cstring>
+
+#define USERS_FILE "./resources/users.txt"
+#define ACCOUNTS_FILE "./resources/accounts.txt"
 
 typedef struct user_finder_pair {  // Used for the finder function
     bool found;
@@ -91,6 +93,7 @@ void handle_new_account(User &curr_user, string accounts_file, string users_file
     }
     if (sum_of_other_coefficients + coefficient > 1.0) {
         cout << "Sum of all accounts' coefficients is too big. Try again with a smaller coefficient.\n";
+        return;
     }
     curr_user.add_account(curr_user.num_accounts, name, coefficient, 0.0, accounts_file, users_file);
 }
@@ -102,7 +105,7 @@ int main() {
     if (name == "register") {
 
     }
-    vector <User> users = read_users("./resources/users.txt");
+    vector <User> users = read_users(USERS_FILE);
     User curr_user;
     user_finder_pair result = user_found(name, users);  // Used to not call user_found() twice
     if (result.found) {
@@ -119,7 +122,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
     // User set. Now we can do stuff
-    curr_user.read_accounts("./resources/accounts.txt");
+    curr_user.read_accounts(ACCOUNTS_FILE);
     while (true) {
         curr_user.display_accounts(); // Display all accounts, building the total
         cout << "What do you want to do?\n";
@@ -137,7 +140,7 @@ int main() {
                 double sum;
                 cin >> sum;
                 curr_user.income(sum);
-                curr_user.update_accounts("./resources/accounts.txt");
+                curr_user.update_accounts(ACCOUNTS_FILE);
                 break;
             }
             case '2': {
@@ -154,7 +157,7 @@ int main() {
                     cout << "Trying to authenticate as " << new_name << "...\n";
                     if (auth(new_name, users)) {
                         curr_user = users[found_user_index];
-                        curr_user.read_accounts("./resources/accounts.txt");
+                        curr_user.read_accounts(ACCOUNTS_FILE);
                     } else {
                         cout << "Authentication failed." << "\n";
                         exit(EXIT_FAILURE);
@@ -166,7 +169,7 @@ int main() {
                 break;
             }
             case 'n': {
-                handle_new_account(curr_user, "./resources/accounts.txt", "./resources/users.txt");
+                handle_new_account(curr_user, ACCOUNTS_FILE, USERS_FILE);
                 break;
             }
             case 'q': {

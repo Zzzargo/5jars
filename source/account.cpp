@@ -12,6 +12,10 @@ void Account::display()
     cout << name << ": " << balance << endl;
 }
 
+unsigned short Account::get_id() {
+    return id;
+}
+
 double Account::get_coef() {
     return coef;
 }
@@ -26,16 +30,13 @@ string Account::get_name() {
 
 void Account::shared_income(double sum) {
     balance += sum * coef;
-    cout << "OPERATION SUCCESSFUL" << endl;
 }
 
 void Account::deposit(double sum) {
     balance += sum;
-    cout << "OPERATION SUCCESSFUL" << endl;
 }
 
 void Account::withdrawal(double sum)
 {
     balance -= sum;
-    cout << "OPERATION SUCCESSFUL" << endl;
 }
