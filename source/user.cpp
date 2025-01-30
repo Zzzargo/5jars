@@ -1,11 +1,17 @@
 #include "user.h"
 
-User::User(unsigned arg_id, string arg_name, string arg_username, string arg_password, unsigned arg_num_accounts) {
+User::User(unsigned arg_id, string arg_username, string arg_password, unsigned arg_num_accounts) {
     id = arg_id;
-    name = arg_name;
     username = arg_username;
     password = arg_password;
     num_accounts = arg_num_accounts;
+}
+
+bool User::user_finder(string arg_username) {
+    if (arg_username == username) {
+        return true;
+    }
+    return false;
 }
 
 bool User::login(string arg_username, string arg_password) {
@@ -66,6 +72,10 @@ double User::get_account_coefficient(unsigned short id) {
     return accounts[id].get_coef();
 }
 
+double User::get_account_balance(unsigned short id) {
+    return accounts[id].get_balance();
+}
+
 void User::withdrawal_from(unsigned  short id, double sum) {
     accounts[id].withdrawal(sum);
 }
@@ -85,9 +95,7 @@ void User::update_accounts(string file) {
     }
     for (size_t i = 0; i < num_accounts; i++) {  // Get the accounts
         accounts_file << accounts[i].get_name() << " " << accounts[i].get_coef() << " " << accounts[i].get_balance();
-        if (i < num_accounts - 1) {
-            accounts_file << endl;
-        }
+        accounts_file << endl;
     }
     accounts_file.close();
 }

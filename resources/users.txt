@@ -1,2 +1,2 @@
-Vasea zargo pass 2
-test test test 2
+zargo pass 2
+test test 2

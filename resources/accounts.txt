@@ -1,5 +1,6 @@
 zargo
 BT 0.8 144
-Rev 0.2 56test
+Rev 0.2 56
+test
 testacc1 0.5 0
 testacc2 0.5 000
