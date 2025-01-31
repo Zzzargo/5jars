@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>5jars - Log In</string>
+   <string>5jars</string>
   </property>
   <property name="styleSheet">
    <string notr="true">background-color: rgb(36, 31, 49);</string>
@@ -21,13 +21,14 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>0</y>
+      <y>10</y>
       <width>761</width>
-      <height>581</height>
+      <height>551</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(61, 56, 70);</string>
+     <string notr="true">background-color: rgb(61, 56, 70);
+font: 700 12pt &quot;Ubuntu&quot;;</string>
     </property>
     <property name="currentIndex">
      <number>1</number>
@@ -39,8 +40,8 @@
      <widget class="QPushButton" name="btn_login">
       <property name="geometry">
        <rect>
-        <x>303</x>
-        <y>220</y>
+        <x>320</x>
+        <y>270</y>
         <width>89</width>
         <height>25</height>
        </rect>
@@ -52,10 +53,10 @@
      <widget class="QPushButton" name="pushButton_2">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>267</y>
-        <width>89</width>
-        <height>25</height>
+        <x>380</x>
+        <y>338</y>
+        <width>101</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="text">
@@ -65,22 +66,22 @@
      <widget class="QLabel" name="label_auth">
       <property name="geometry">
        <rect>
-        <x>290</x>
-        <y>350</y>
-        <width>101</width>
+        <x>220</x>
+        <y>370</y>
+        <width>261</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>AUTH STATUS</string>
+       <string/>
       </property>
      </widget>
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>174</x>
-        <y>270</y>
-        <width>161</width>
+        <x>190</x>
+        <y>340</y>
+        <width>181</width>
         <height>17</height>
        </rect>
       </property>
@@ -91,9 +92,9 @@
      <widget class="QLabel" name="label_2">
       <property name="geometry">
        <rect>
-        <x>205</x>
-        <y>175</y>
-        <width>67</width>
+        <x>195</x>
+        <y>225</y>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -104,9 +105,9 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>130</y>
-        <width>71</width>
+        <x>190</x>
+        <y>180</y>
+        <width>81</width>
         <height>20</height>
        </rect>
       </property>
@@ -117,11 +118,14 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>60</y>
-        <width>131</width>
-        <height>17</height>
+        <x>270</x>
+        <y>70</y>
+        <width>191</width>
+        <height>21</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">font: 700 16pt &quot;Ubuntu&quot;;</string>
       </property>
       <property name="text">
        <string>Welcome to 5 jars!</string>
@@ -131,8 +135,8 @@
       <property name="geometry">
        <rect>
         <x>290</x>
-        <y>130</y>
-        <width>113</width>
+        <y>180</y>
+        <width>181</width>
         <height>25</height>
        </rect>
       </property>
@@ -141,8 +145,8 @@
       <property name="geometry">
        <rect>
         <x>290</x>
-        <y>170</y>
-        <width>113</width>
+        <y>220</y>
+        <width>181</width>
         <height>25</height>
        </rect>
       </property>
@@ -150,14 +154,14 @@
     </widget>
     <widget class="QWidget" name="DashboardWidget">
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(97, 53, 131);</string>
+      <string notr="true">background-color: rgb(52, 38, 75);</string>
      </property>
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>300</x>
-        <y>80</y>
-        <width>67</width>
+        <x>100</x>
+        <y>30</y>
+        <width>81</width>
         <height>17</height>
        </rect>
       </property>
@@ -168,11 +172,200 @@
      <widget class="QListWidget" name="accounts_list">
       <property name="geometry">
        <rect>
-        <x>70</x>
-        <y>110</y>
+        <x>50</x>
+        <y>60</y>
         <width>171</width>
-        <height>391</height>
+        <height>381</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-color: rgb(97, 53, 131);</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_curruser">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>480</y>
+        <width>181</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Current user:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_logout">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>510</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Log out</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>30</y>
+        <width>91</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Operations:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_income">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>90</y>
+        <width>89</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Income</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_withdrawal">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>170</y>
+        <width>111</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Withdrawal</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="income_sum">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>90</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_income">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>95</y>
+        <width>91</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>How much?</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_withdrawal1">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>144</y>
+        <width>91</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>How much?</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="withdrawal_sum">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>140</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_withdrawal2">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>184</y>
+        <width>51</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>From: </string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="withdrawal_source">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>180</y>
+        <width>121</width>
+        <height>25</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ok_income">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>90</y>
+        <width>31</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="ok_withdrawal">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>180</y>
+        <width>31</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>OK</string>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="progress_income">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
+        <y>90</y>
+        <width>71</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="progress_withdrawal">
+      <property name="geometry">
+       <rect>
+        <x>670</x>
+        <y>180</y>
+        <width>71</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
       </property>
      </widget>
     </widget>
@@ -187,8 +380,24 @@
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menumenu">
+    <property name="title">
+     <string>menu</string>
+    </property>
+   </widget>
+   <addaction name="menumenu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action3">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
+  <action name="action3_2">
+   <property name="text">
+    <string>3</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

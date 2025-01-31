@@ -64,6 +64,10 @@ void User::income(double sum) {
     }
 }
 
+string User::get_username() {
+    return username;
+}
+
 string User::get_account_name(unsigned short id) {
     return accounts[id].get_name();
 }
@@ -80,24 +84,68 @@ void User::withdrawal_from(unsigned  short id, double sum) {
     accounts[id].withdrawal(sum);
 }
 
-void User::update_accounts(string file) {
-    fstream accounts_file;
-    accounts_file.open(file);
-    if (!accounts_file.is_open()) {
-        cerr << "Error: Unable to open the accounts file." << endl;
+void User::update_accounts(string file, bool new_account) {
+    ifstream accounts_reader;
+    vector <string> lines;
+    accounts_reader.open(file);
+    if (!accounts_reader.is_open()) {
+        cerr << "Error: Unable to open the accounts file for reading.\n";
         exit(EXIT_FAILURE);
     }
+    size_t i, j = 0;
     string line;
-    while (getline(accounts_file, line)) {
-        if (line == User::username) {
-            break;  // Found where to start writing
+    for (i = 0; getline(accounts_reader, line); i++) {
+        lines.emplace_back(line);
+        if (lines[i] == username) {  // Found where to start updating
+            break;
         }
     }
-    for (size_t i = 0; i < num_accounts; i++) {  // Get the accounts
-        accounts_file << accounts[i].get_name() << " " << accounts[i].get_coef() << " " << accounts[i].get_balance();
-        accounts_file << endl;
+
+    while (j < num_accounts) {  // For each account of the respective user
+        // Write updated data to the lines vector
+
+        ostringstream oss;
+        oss.imbue(locale("C"));  // Force the C locale (dot as separator for floats)
+        oss << fixed << setprecision(2)
+            << accounts[j].get_name() << " "
+            << accounts[j].get_coef() << " "
+            << accounts[j].get_balance();
+
+        lines.emplace_back(oss.str());
+
+        // line = accounts[j].get_name() + " " + to_string(accounts[j].get_coef()) + " " +
+        //        to_string(accounts[j].get_balance());
+        // lines.emplace_back(line);
+
+        getline(accounts_reader, line);  // Skip file lines we are updating
+        if (new_account && j == num_accounts - 1) {
+            // Case where we prevent incorrectly overwriting a line that had data of another user
+            // Copy the line that had data of another user into the lines vector
+            // If we've reached the end of file prevent doubling the endline character
+            if (line != "\n" && line != "" && line != "\r") {
+                cout <<"REACHED. Line: " << line << "\n";
+                lines.emplace_back(line);
+            }
+        }
+        j++;
     }
-    accounts_file.close();
+    // Read the rest of the file and append it to the lines vector
+    while(getline(accounts_reader, line)) {
+        lines.emplace_back(line);
+    }
+    accounts_reader.close();
+
+    // Write the updated lines to the file
+    ofstream accounts_writer;
+    accounts_writer.open(file);
+    if (!accounts_writer.is_open()) {
+        cerr << "Error: Unable to open the accounts file for writing.\n";
+        exit(EXIT_FAILURE);
+    }
+    for (i = 0; i < lines.size(); i++) {
+        accounts_writer << lines[i] << "\n";
+    }
+    accounts_writer.close();
 }
 
 void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
