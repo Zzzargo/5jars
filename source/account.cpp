@@ -7,11 +7,6 @@ Account::Account (unsigned short arg_id, string arg_name, double arg_coef, doubl
     balance = arg_balance;
 }
 
-void Account::display()
-{
-    cout << name << ": " << balance << endl;
-}
-
 double Account::get_coef() {
     return coef;
 }
@@ -34,8 +29,7 @@ void Account::deposit(double sum) {
     cout << "OPERATION SUCCESSFUL" << endl;
 }
 
-void Account::withdrawal(double sum)
-{
+void Account::withdrawal(double sum) {
     balance -= sum;
     cout << "OPERATION SUCCESSFUL" << endl;
 }

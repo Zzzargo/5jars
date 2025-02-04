@@ -1,6 +1,6 @@
 zargo
-BT 0.80 880.00
-Rev 0.20 220.00
+BT 0.80 40.00
+Rev 0.20 10.00
 test
-testacc1 0.50 500.00
-testacc2 0.50 500.00
+testacc1 0.50 0.00
+testacc2 0.50 0.00

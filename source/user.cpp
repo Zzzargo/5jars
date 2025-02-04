@@ -49,13 +49,25 @@ void User::read_accounts(string file) {
     User::accounts = accounts;
 }
 
-void User::display_accounts() {
-    double total = 0.0;
+Account* User::find_account(string name) {
+    Account *acc = NULL;
     for (size_t i = 0; i < num_accounts; i++) {
-        total += accounts[i].get_balance();
-        accounts[i].display();
+        if (name == accounts[i].get_name()) {
+            acc = &(accounts[i]);  // Found
+        }
     }
-    cout << "Total balance: " << total << endl;
+    return acc;
+}
+
+void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
+                       string accounts_file_path, string users_file_path) {
+    Account account(arg_id, arg_name, arg_coef, arg_balance);
+    accounts.emplace_back(account);
+    num_accounts++;
+    // Update the accounts file
+    update_accounts(accounts_file_path, true);
+    // Update the users file
+    update_users(users_file_path);
 }
 
 void User::income(double sum) {
@@ -64,24 +76,48 @@ void User::income(double sum) {
     }
 }
 
-string User::get_username() {
-    return username;
+string User::get_account_data(unsigned idx) {
+    return accounts[idx].get_name() + ": " + to_string(accounts[idx].get_balance());
 }
 
-string User::get_account_name(unsigned short id) {
-    return accounts[id].get_name();
+void User::withdrawal_from(string name, double sum) {
+    for (size_t i = 0; i < num_accounts; i++) {
+        if (name.compare(accounts[i].get_name()) == 0) {
+            accounts[i].withdrawal(sum);
+        }
+    }
 }
 
-double User::get_account_coefficient(unsigned short id) {
-    return accounts[id].get_coef();
-}
+void User::update_users(string file) {
+    ifstream users_reader;
+    users_reader.open(file);
+    if (!users_reader.is_open()) {
+        cerr << "Error: Unable to open the users file for reading.\n";
+        exit(EXIT_FAILURE);
+    }
 
-double User::get_account_balance(unsigned short id) {
-    return accounts[id].get_balance();
-}
-
-void User::withdrawal_from(unsigned  short id, double sum) {
-    accounts[id].withdrawal(sum);
+    vector <string> lines;
+    string line;
+    // Store the modified copy of the file in the lines vector
+    while (getline(users_reader, line)) {
+        if (line.find(username) != string::npos) {
+            lines.emplace_back(username + " " + password + " " + to_string(num_accounts));
+        } else {
+            lines.emplace_back(line);
+        }
+    }
+    users_reader.close();
+    // Copy the lines vector to the file
+    ofstream users_writer;
+    users_writer.open(file);
+    if (!users_writer.is_open()) {
+        cerr << "Error: Unable to open the users file for writing.\n";
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i = 0; i < lines.size(); i++) {
+        users_writer << lines[i] << "\n";
+    }
+    users_writer.close();
 }
 
 void User::update_accounts(string file, bool new_account) {
@@ -146,12 +182,4 @@ void User::update_accounts(string file, bool new_account) {
         accounts_writer << lines[i] << "\n";
     }
     accounts_writer.close();
-}
-
-void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
-    string accounts_file, string users_file) {
-    Account account(arg_id, arg_name, arg_coef, arg_balance);
-    accounts.emplace_back(account);
-    // Update the number of accounts in users file and add a new line in the accounts file
-    
 }

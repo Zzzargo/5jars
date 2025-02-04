@@ -380,12 +380,13 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menumenu">
+   <widget class="QMenu" name="menu">
     <property name="title">
      <string>menu</string>
     </property>
+    <addaction name="action_new_account"/>
    </widget>
-   <addaction name="menumenu"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action3">
@@ -396,6 +397,11 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
   <action name="action3_2">
    <property name="text">
     <string>3</string>
+   </property>
+  </action>
+  <action name="action_new_account">
+   <property name="text">
+    <string>New Account</string>
    </property>
   </action>
  </widget>
