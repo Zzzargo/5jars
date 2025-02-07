@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);        // Load the UI from mainwindow.ui
 
     // Read the users before all
-    users = read_users("../../resources/users.txt");
+    users = read_users(USERS_FILE);
     // Ensure that the login page is shown first
     ui->stackedWidget->setCurrentIndex(0);
     // Make the password field hidden
@@ -30,14 +30,46 @@ vector <User> MainWindow::read_users(string filename) {
     vector <User> users;
     string line;
     while (getline(users_reader, line)) {
+        // Each line represents a user's data
+        unsigned uid, num_acc;
+        string nickname, username, password;
+
+        // Splitting the line
         stringstream ss(line);
-        string username, password;
-        unsigned short num_accounts;
-        getline(ss, username, ' ');
-        getline(ss, password, ' ');
-        ss >> num_accounts;
-        User user(users.size(), username, password, num_accounts);
-        users.emplace_back(user);
+        string word;
+        // Fields are separated by ':'
+        size_t i = 1;
+        while (getline(ss, word, ':')) {
+            switch (i) {
+                case 1: {
+                    uid = stoi(word);
+                    break;
+                }
+                case 2: {
+                    nickname = word;
+                    break;
+                }
+                case 3: {
+                    username = word;
+                    break;
+                }
+                case 4: {
+                    password = word;
+                    break;
+                }
+                case 5: {
+                    num_acc = stoi(word);
+                    break;
+                }
+            }
+            i++;
+            if (i == 6) {  // i resets each 5 words
+                // Data for a user has been read
+                User u(uid, nickname, username, password, num_acc);
+                users.emplace_back(u);
+                i = 1;
+            }
+        }
     }
     users_reader.close();
     return users;
@@ -53,9 +85,9 @@ bool MainWindow::auth(string username, string password, vector <User> &users, un
 
 void MainWindow::populate_accounts_list() {
     ui->accounts_list->clear();  // Make sure it's empty first
+    vector <string> accounts_info = curr_user->get_accounts_data();
     for (size_t i = 0; i < curr_user->num_accounts; i++) {
-        QString account_info = QString::fromStdString(curr_user->get_account_data(i));
-        ui->accounts_list->addItem(account_info);
+        ui->accounts_list->addItem(QString::fromStdString(accounts_info[i]));
     }
 }
 
@@ -79,7 +111,7 @@ void MainWindow::on_btn_login_clicked() {
             ui->label_auth->setText("Authentication successful!");
 
             // Populate the current user's accounts vector
-            curr_user->read_accounts("../../resources/accounts.txt");
+            curr_user->read_accounts(ACCOUNTS_FILE);
             populate_accounts_list();
 
             // Setup the dashboard page
@@ -96,6 +128,7 @@ void MainWindow::on_btn_login_clicked() {
             ui->ok_withdrawal->hide();
             ui->progress_withdrawal->setValue(0);
             ui->progress_withdrawal->hide();
+            ui->label_bad_account->hide();
 
             // Wait a second( literally :)) )
             QTimer::singleShot(1000, this, [this]() {
@@ -171,7 +204,7 @@ void MainWindow::update_progress_bar(QProgressBar *bar, int &progressValue, QTim
         bar->hide();
         delete timer;  // Cleanup
         populate_accounts_list();  // Update the list
-        curr_user->update_accounts("../../resources/accounts.txt", false);
+        curr_user->update_accounts(ACCOUNTS_FILE, false);
         return;
     }
     progressValue++;
@@ -180,6 +213,9 @@ void MainWindow::update_progress_bar(QProgressBar *bar, int &progressValue, QTim
 
 void MainWindow::on_ok_income_clicked() {
     double sum = ui->income_sum->text().toDouble();
+    if (sum == 0) {
+        return;
+    }
 
     // Reset and prepare progress bar
     ui->progress_income->setValue(0);
@@ -194,6 +230,8 @@ void MainWindow::on_ok_income_clicked() {
     timer->start(10);  // Update every 10ms (100 steps in 1 second)
 
     curr_user->income(sum);
+    curr_user->log_op(INCOME, "income", sum, LOG_FILE);
+
     // Fancy coordination. blabla
     QTimer::singleShot(1000, this, [this]() {
         ui->label_income->hide();
@@ -217,8 +255,23 @@ void MainWindow::on_btn_withdrawal_clicked() {
 
 void MainWindow::on_ok_withdrawal_clicked() {
     double sum = ui->withdrawal_sum->text().toDouble();
+    if (sum == 0) {
+        return;
+    }
+
     QString source = ui->withdrawal_source->text();
     Account *acc = curr_user->find_account(source.toStdString());
+    if (acc == NULL) {
+        // Highlight error
+        ui->withdrawal_source->setStyleSheet("background-color: rgba(255, 0, 0, 100);");
+        ui->label_bad_account->show();
+        QTimer::singleShot(2000, this, [this]() {
+            // Hide the error after 2s
+            ui->withdrawal_source->setStyleSheet("background-color: rgb(52, 38, 75);");
+            ui->label_bad_account->hide();
+        });
+        return;
+    }
 
     // Reset and prepare progress bar
     ui->progress_withdrawal->setValue(0);
@@ -233,6 +286,7 @@ void MainWindow::on_ok_withdrawal_clicked() {
     timer->start(10);  // Update every 10ms (100 steps in 1 second)
 
     curr_user->withdrawal_from(acc->get_name(), sum);
+    curr_user->log_op(WITHDRAWAL, acc->get_name(), sum, LOG_FILE);
 
     // Fancy coordination. blabla
     QTimer::singleShot(1000, this, [this]() {
@@ -274,4 +328,94 @@ void MainWindow::on_withdrawal_source_returnPressed() {
 
 void MainWindow::on_action_new_account_triggered() {
 
+}
+
+void MainWindow::on_btn_register_clicked() {
+    // Reset the login page, just in case
+    ui->line_password->clear();
+    ui->line_username->clear();
+
+    ui->line_register_pass->setEchoMode(QLineEdit::Password);
+    ui->line_register_pass2->setEchoMode(QLineEdit::Password);
+    ui->stackedWidget->setCurrentIndex(2);  // Go to register page
+}
+
+void MainWindow::on_btn_reg_back_clicked() {
+    // Reset the register page
+    ui->line_register_pass->clear();
+    ui->line_register_pass2->clear();
+    ui->line_register_uname->clear();
+    ui->stackedWidget->setCurrentIndex(0);  // Go to login page
+}
+
+void MainWindow::update_users(string file) {
+    // CHANGE THIS TO READ FROM THE PRIVATE MEMBER USERS VECTOR AND WRITE TO FILE
+    ifstream users_reader;
+    users_reader.open(file);
+    if (!users_reader.is_open()) {
+        cerr << "Error: Unable to open the users file for reading.\n";
+        exit(EXIT_FAILURE);
+    }
+
+    vector <string> lines;
+    string line;
+    // Store the modified copy of the file in the lines vector
+    // while (getline(users_reader, line)) {
+    //     if (line.find(username) != string::npos) {
+    //         lines.emplace_back(username + " " + password + " " + to_string(num_accounts));
+    //     } else {
+    //         lines.emplace_back(line);
+    //     }
+    // }
+    users_reader.close();
+    // Copy the lines vector to the file
+    ofstream users_writer;
+    users_writer.open(file);
+    if (!users_writer.is_open()) {
+        cerr << "Error: Unable to open the users file for writing.\n";
+        exit(EXIT_FAILURE);
+    }
+    for (size_t i = 0; i < lines.size(); i++) {
+        users_writer << lines[i] << "\n";
+    }
+    users_writer.close();
+}
+
+void MainWindow::on_btn_new_user_clicked() {
+    QString uname = ui->line_register_uname->text();
+    QString pass = ui->line_register_pass->text();
+    QString pass_confirm = ui->line_register_pass2->text();
+
+    if (pass != pass_confirm) {
+        // Highlight error
+        ui->label_register_success->setText("Passwords don't match!");
+        ui->label_register_success->setStyleSheet("color: red;");
+        ui->line_register_pass->setStyleSheet("background-color: red;");
+        ui->line_register_pass2->setStyleSheet("background-color: red;");
+        QTimer::singleShot(2000, this, [this]() {
+            // Hide the error after 2s
+            ui->label_register_success->clear();
+            ui->label_register_success->setStyleSheet("color: white;");
+            ui->line_register_pass->setStyleSheet("background-color: rgb(61, 56, 70);");
+            ui->line_register_pass2->setStyleSheet("background-color: rgb(61, 56, 70);");
+
+        });
+        return;
+    }
+
+    for (size_t i = 0; i < users.size(); i++) {
+        if (users[i].user_finder(uname.toStdString())) {
+            ui->label_register_success->setText("Username not free");
+            ui->label_register_success->setStyleSheet("color: red;");
+            ui->line_register_uname->setStyleSheet("background-color: red;");
+            QTimer::singleShot(2000, this, [this]() {
+                // Hide the error after 2s
+                ui->label_register_success->clear();
+                ui->label_register_success->setStyleSheet("color: white;");
+                ui->line_register_uname->setStyleSheet("background-color: rgb(61, 56, 70);");
+            });
+        }
+    }
+    // If all checks passed create a new user
+    User u(users.size(), "nick", uname.toStdString(), pass.toStdString(), 0);
 }

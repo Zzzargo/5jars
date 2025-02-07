@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <qlistwidget.h>
 #include <qprogressbar.h>
+#include <QMessageBox>
 #include "user.h"
 
 QT_BEGIN_NAMESPACE
@@ -49,14 +50,22 @@ private slots:
 
     void on_withdrawal_source_returnPressed();
 
+
+    void on_btn_register_clicked();
+
+    void on_btn_reg_back_clicked();
+
+    void on_btn_new_user_clicked();
+
 private:
+    Ui::MainWindow *ui;
     vector <User> users;
+    User *curr_user;
     vector <User> read_users(string filename);
     bool auth(string username, string password, vector <User> &users, unsigned user_index);
-    User *curr_user;
     void populate_accounts_list();
     void update_progress_bar(QProgressBar *bar, int &progressValue, QTimer *timer);
-    Ui::MainWindow *ui;
+    void update_users(string file);
 };
 
 #endif // MAINWINDOW_H

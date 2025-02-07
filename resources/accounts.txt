@@ -1,6 +1,4 @@
-zargo
-BT 0.80 40.00
-Rev 0.20 10.00
-test
-testacc1 0.50 0.00
-testacc2 0.50 0.00
+82:BT:zargo:0.800000:0.000000
+28:Rev:zargo:0.200000:0.000000
+1:testacc1:test:0.500000:0.000000
+2:testacc2:test:0.500000:0.000000
