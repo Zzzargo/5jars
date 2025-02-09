@@ -1,18 +1,24 @@
 ﻿#pragma once
 #include <iostream>
 using namespace std;
+
 #include <QDebug>
+#include <QListWidget>
+// Upgrades, people. Upgrades.
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 class Account {
 private:
-    string name;
-    string owner;
+    QString name;
     unsigned short id;
     double coef;
     double balance;
 
 public:
-    Account (unsigned short arg_id, string arg_name, string arg_owner, double arg_coef, double arg_balance);
+    Account (unsigned short arg_id, QString arg_name, double arg_coef, double arg_balance);
+    QListWidgetItem* to_list_item() const;
     double get_coef();
     double get_balance();
     string get_name();

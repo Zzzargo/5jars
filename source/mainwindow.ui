@@ -31,7 +31,7 @@
 font: 700 12pt &quot;Ubuntu&quot;;</string>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="LoginWidget">
      <property name="styleSheet">
@@ -182,12 +182,12 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
        <string notr="true">border-color: rgb(97, 53, 131);</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_curruser">
+     <widget class="QLabel" name="label_curr_user">
       <property name="geometry">
        <rect>
         <x>50</x>
         <y>480</y>
-        <width>181</width>
+        <width>251</width>
         <height>17</height>
        </rect>
       </property>
@@ -389,7 +389,7 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>192</x>
         <y>180</y>
         <width>81</width>
         <height>20</height>
@@ -402,7 +402,7 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>195</x>
+        <x>196</x>
         <y>225</y>
         <width>81</width>
         <height>17</height>
@@ -511,6 +511,32 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
       </property>
       <property name="text">
        <string>Registering new user</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="line_register_nick">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>140</y>
+        <width>181</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>193</x>
+        <y>142</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Nickname</string>
       </property>
      </widget>
     </widget>

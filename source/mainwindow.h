@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QTimer>
-#include <qlistwidget.h>
 #include <qprogressbar.h>
 #include <QMessageBox>
 #include "user.h"
@@ -59,10 +58,15 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    vector <User> users;
-    User *curr_user;
-    vector <User> read_users(string filename);
-    bool auth(string username, string password, vector <User> &users, unsigned user_index);
+
+    // This is gonna buss
+    QSqlDatabase db;
+    void connect_database();
+
+    User *curr_user = nullptr;
+
+    bool auth(const QString& username, const QString& password);
+
     void populate_accounts_list();
     void update_progress_bar(QProgressBar *bar, int &progressValue, QTimer *timer);
     void update_users(string file);

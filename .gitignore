@@ -125,3 +125,7 @@ CMakeLists.txt.user*
 .rcc/
 .uic/
 /build*/
+
+# Sensitive database info
+*.sql
+*.db
