@@ -31,7 +31,7 @@
 font: 700 12pt &quot;Ubuntu&quot;;</string>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="LoginWidget">
      <property name="styleSheet">
@@ -474,9 +474,9 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
      <widget class="QLabel" name="label_register_success">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>270</x>
         <y>360</y>
-        <width>181</width>
+        <width>221</width>
         <height>20</height>
        </rect>
       </property>
@@ -556,23 +556,25 @@ font: 700 12pt &quot;Ubuntu&quot;;</string>
      <string>menu</string>
     </property>
     <addaction name="action_new_account"/>
+    <addaction name="action_delete_user"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action3">
-   <property name="text">
-    <string>3</string>
-   </property>
-  </action>
-  <action name="action3_2">
-   <property name="text">
-    <string>3</string>
-   </property>
-  </action>
   <action name="action_new_account">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+   </property>
    <property name="text">
     <string>New Account</string>
+   </property>
+  </action>
+  <action name="action_delete_user">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+   </property>
+   <property name="text">
+    <string>Delete User</string>
    </property>
   </action>
  </widget>

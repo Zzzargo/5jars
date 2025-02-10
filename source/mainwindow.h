@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <qprogressbar.h>
 #include <QMessageBox>
+#include <QFormLayout>
 #include "user.h"
 
 QT_BEGIN_NAMESPACE
@@ -24,6 +25,8 @@ private slots:
     void on_btn_login_clicked();
 
     void delete_account(QListWidgetItem *item);
+
+    void change_coefficient(QListWidgetItem *item);
 
     void on_accounts_list_itemDoubleClicked(QListWidgetItem *item);
 
@@ -56,6 +59,16 @@ private slots:
 
     void on_btn_new_user_clicked();
 
+    void on_action_delete_user_triggered();
+
+    void on_line_register_nick_returnPressed();
+
+    void on_line_register_uname_returnPressed();
+
+    void on_line_register_pass_returnPressed();
+
+    void on_line_register_pass2_returnPressed();
+
 private:
     Ui::MainWindow *ui;
 
@@ -64,12 +77,10 @@ private:
     void connect_database();
 
     User *curr_user = nullptr;
-
+    unsigned curr_user_id;
     bool auth(const QString& username, const QString& password);
 
-    void populate_accounts_list();
     void update_progress_bar(QProgressBar *bar, int &progressValue, QTimer *timer);
-    void update_users(string file);
 };
 
 #endif // MAINWINDOW_H

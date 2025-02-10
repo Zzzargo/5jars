@@ -24,7 +24,6 @@ public:
     string get_name();
     string get_owner();
 
-    void shared_income(double sum);
-    void deposit(double sum);
+    void deposit(double sum, bool shared = false);
     void withdrawal(double sum);
 };

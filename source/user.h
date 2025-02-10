@@ -22,8 +22,6 @@ public:
     QString nickname;
     unsigned num_accounts;
 
-    User() {};  // Dummy constructor. Does nothing but is set as default
-    // Real constructor
     User(unsigned arg_id, QString arg_nickname, QString arg_username, QString arg_password, unsigned arg_num_accounts);
 
     void get_accounts();

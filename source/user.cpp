@@ -8,10 +8,9 @@ User::User(unsigned arg_id, QString arg_nickname, QString arg_username, QString 
     num_accounts = arg_num_accounts;
 }
 
-/*      Adds the accounts to the user's accounts vector
-        and the QListWidget
-*/
+/*      Adds the accounts to the user's accounts vector     */
 void User::get_accounts() {
+    accounts.clear();  // When the function is used to update
     QSqlQuery query;
     query.prepare("SELECT * FROM accounts WHERE owner_id = :uid");
     query.bindValue(":uid", id);  // Current user's id
@@ -35,35 +34,25 @@ void User::get_accounts() {
 }
 
 void User::populate_accounts_list(QListWidget *list) {
+    list->clear();  // If it's used to update
     for (size_t i = 0; i < num_accounts; i++) {
         list->addItem(accounts[i].to_list_item());
     }
 }
 
-// void User::add_account(unsigned short arg_id, string arg_name, double arg_coef, double arg_balance,
-//     string accounts_file_path, string users_file_path) {
-//     Account account(arg_id, arg_name, arg_coef, arg_balance);
-//     accounts.emplace_back(account);
-//     num_accounts++;
-//     // Update the accounts file
-//     update_accounts(accounts_file_path, true);
-//     // Update the users file
-//     update_users(users_file_path);
-// }
-
 void User::income(double sum) {
     for (size_t i = 0; i < num_accounts; i++) {
-        accounts[i].shared_income(sum);
+        accounts[i].deposit(sum, true);
     }
 }
 
-void User::withdrawal_from(string name, double sum) {
-    for (size_t i = 0; i < num_accounts; i++) {
-        if (name.compare(accounts[i].get_name()) == 0) {
-            accounts[i].withdrawal(sum);
-        }
-    }
-}
+// void User::withdrawal_from(string name, double sum) {
+//     for (size_t i = 0; i < num_accounts; i++) {
+//         if (name.compare(accounts[i].get_name()) == 0) {
+//             accounts[i].withdrawal(sum);
+//         }
+//     }
+// }
 
 string unix_timestamp_to_humanreadable(time_t timestamp) {
     tm *time = localtime(&timestamp);
@@ -72,24 +61,24 @@ string unix_timestamp_to_humanreadable(time_t timestamp) {
     return oss.str();
 }
 
-// void User::log_op(int operation, string acc_name, double sum, string log_file) {
-//     ofstream log_writer;
-//     log_writer.open(log_file, ios::app);
-//     if (!log_writer.is_open()) {
-//         cerr << "Error: Unable to open the log file for writing.\n";
-//         exit(EXIT_FAILURE);
-//     }
-//     time_t now = time(0);
-//     switch (operation) {
-//         case INCOME: {
-//             log_writer << unix_timestamp_to_humanreadable(now) << " - " << nickname << " deposited " << sum << ".\n";
-//             break;
-//         }
-//         case WITHDRAWAL: {
-//             log_writer << unix_timestamp_to_humanreadable(now) << " - " << nickname << " withdrew " << sum << " from " << acc_name << ".\n";
-//             break;
-//         }
-//     }
-//     cout << "Logged." << endl;
-//     log_writer.close();
-// }
+void User::log_op(int operation, string acc_name, double sum, string log_file) {
+    ofstream log_writer;
+    log_writer.open(log_file, ios::app);
+    if (!log_writer.is_open()) {
+        cerr << "Error: Unable to open the log file for writing.\n";
+        exit(EXIT_FAILURE);
+    }
+    time_t now = time(0);
+    switch (operation) {
+        case INCOME: {
+            log_writer << unix_timestamp_to_humanreadable(now) << " - " << nickname.toStdString() << " deposited " << sum << ".\n";
+            break;
+        }
+        case WITHDRAWAL: {
+            log_writer << unix_timestamp_to_humanreadable(now) << " - " << nickname.toStdString() << " withdrew " << sum << " from " << acc_name << ".\n";
+            break;
+        }
+    }
+    qDebug() << "Logged.";
+    log_writer.close();
+}

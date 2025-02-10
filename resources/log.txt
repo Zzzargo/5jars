@@ -17,3 +17,8 @@
 2025/02/07 11:29:34 - Vasea deposited 100.
 2025/02/07 11:29:42 - Vasea withdrew 80 from BT.
 2025/02/07 11:29:47 - Vasea withdrew 20 from Rev.
+2025/02/10 12:55:13 - Test Account deposited 100.
+2025/02/10 12:55:29 - Test Account deposited 100.
+2025/02/10 13:30:30 - Test Account deposited 100.
+2025/02/10 13:32:47 - Vasea deposited 100.
+2025/02/10 13:34:56 - Vasea deposited 100.
