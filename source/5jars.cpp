@@ -1,8 +1,8 @@
 ﻿#include "user.h"
 #include <cstring>
 
-#define USERS_FILE "./resources/users.txt"
-#define ACCOUNTS_FILE "./resources/accounts.txt"
+#define USERS_FILE "/home/zargo/.custom/5jars/users.txt"
+#define ACCOUNTS_FILE "/home/zargo/.custom/5jars/accounts.txt"
 
 typedef struct user_finder_pair {  // Used for the finder function
     bool found;
@@ -77,7 +77,7 @@ void handle_withdrawal(User &curr_user) {
     double sum = 0.0;
     cin >> sum;
     curr_user.withdrawal_from(choice, sum);
-    curr_user.update_accounts("./resources/accounts.txt");
+    curr_user.update_accounts(ACCOUNTS_FILE);
 }
 
 void handle_new_account(User &curr_user, string accounts_file, string users_file) {

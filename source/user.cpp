@@ -136,7 +136,7 @@ void User::update_users(string file) {
 
     vector <string> lines;
     string line;
-    // Store the modified copty of the file in the lines vector
+    // Store the modified copy of the file in the lines vector
     while (getline(users_reader, line)) {
         if (line.find(username) != string::npos) {
             lines.emplace_back(name + " " + username + " " + password + " " + to_string(num_accounts));

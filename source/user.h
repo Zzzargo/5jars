@@ -10,7 +10,7 @@
 
 #define INCOME 0
 #define WITHDRAWAL 1
-#define LOG_FILE "./resources/log.txt"
+#define LOG_FILE "/home/zargo/.custom/5jars/log.txt"
 
 class User {
 private:
