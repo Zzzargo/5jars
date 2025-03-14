@@ -46,13 +46,11 @@ void User::income(double sum) {
     }
 }
 
-// void User::withdrawal_from(string name, double sum) {
-//     for (size_t i = 0; i < num_accounts; i++) {
-//         if (name.compare(accounts[i].get_name()) == 0) {
-//             accounts[i].withdrawal(sum);
-//         }
-//     }
-// }
+void User::withdrawal_from(unsigned acc_id, double sum) {
+    for (size_t i = 0; i < num_accounts; i++) {
+        accounts[i].withdrawal(acc_id, sum);
+    }
+}
 
 string unix_timestamp_to_humanreadable(time_t timestamp) {
     tm *time = localtime(&timestamp);

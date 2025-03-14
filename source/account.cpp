@@ -11,18 +11,6 @@ QListWidgetItem* Account::to_list_item() const {
     return new QListWidgetItem(name + " - " + QString::number(balance));
 }
 
-// double Account::get_coef() {
-//     return coef;
-// }
-
-// double Account::get_balance() {
-//     return balance;
-// }
-
-// string Account::get_name() {
-//     return name.toStdString();
-// }
-
 void Account::deposit(double sum, bool shared) {
     QSqlDatabase db = QSqlDatabase::database(); // Get the existing connection
     if (!db.isOpen()) {
@@ -42,10 +30,25 @@ void Account::deposit(double sum, bool shared) {
         qDebug() << "Error executing query:" << query.lastError();
         return;
     }
-    qDebug() << "OPERATION SUCCESSFUL";
+    qDebug() << "Income success";
 }
 
-void Account::withdrawal(double sum) {
-    balance -= sum;
-    cout << "OPERATION SUCCESSFUL" << endl;
+void Account::withdrawal(unsigned acc_id, double sum) {
+    if (acc_id == id) {
+        balance -= sum;
+        QSqlDatabase db = QSqlDatabase::database(); // Get the existing connection
+        if (!db.isOpen()) {
+            qDebug() << "Database not open!";
+            return;
+        }
+        QSqlQuery query;
+        query.prepare("UPDATE accounts SET balance = :new_balance WHERE id = :acc_id");
+        query.bindValue(":new_balance", balance);
+        query.bindValue("acc_id", acc_id);
+        if (!query.exec()) {
+            qDebug() << "Error executing query:" << query.lastError();
+            return;
+        }
+        qDebug() << "Withdrawal success";
+    }
 }

@@ -21,7 +21,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::connect_database() {
     db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("../../resources/5jars.db");
+    db.setDatabaseName("/home/zargo/.custom/5jars/5jars.db");
 
     if (!db.open()) {
         qDebug() << "Failed to open database";
@@ -37,7 +37,6 @@ bool MainWindow::auth(const QString& username, const QString& password) {
     QSqlQuery query;
     query.prepare("SELECT password FROM users WHERE username = :username");
     query.bindValue(":username", username);
-
     if (!query.exec()) {
         qDebug() << "Error executing query:" << query.lastError();
         return false;
@@ -99,18 +98,10 @@ void MainWindow::on_btn_login_clicked() {
         ui->label_bad_account->hide();
 
         // Had to do it. Otherwise it was gray and blunt
-        ui->menu->setStyleSheet("QMenu {"
-                            "border: 1px solid #ccc;"
-                            "}"
-                            "QMenu::item {"
-                            "background-color: transparent;"
-                            "}"
-                            "QMenu::item:selected {"
-                            "background-color: rgb(52, 38, 75);"
-                            "}"
-                            "QMenu::item:pressed {"
-                            "background-color: rgb(129, 61, 156);"
-                            "}");
+        ui->menubar->setStyleSheet("QMenuBar {background-color: rgb(52, 38, 75); border-bottom: 1px solid #ccc;}"
+                                   "QMenu {border: 1px solid #ccc;}"
+                                   "QMenu::item:selected {background-color: rgb(52, 38, 75);}"
+                                   "QMenu::item:pressed {background-color: rgb(129, 61, 156);}");
 
         // Wait a second( literally :)) )
         QTimer::singleShot(1000, this, [this]() {
@@ -275,6 +266,7 @@ void MainWindow::on_btn_logout_clicked() {
     curr_user = NULL;
     curr_user_id = 0;
     ui->accounts_list->clear();  // Clear the accounts list
+    ui->menubar->hide();
     ui->stackedWidget->setCurrentIndex(0);  // Get to the login page
 }
 
@@ -359,19 +351,18 @@ void MainWindow::delete_account(QListWidgetItem *item) {
         query.bindValue(":uid", curr_user_id);
         query.bindValue(":acc_name", acc_name);
         if (!query.exec()) {
-            qDebug() << "Error executing query:" << query.lastError().text();
+            qDebug() << "Error executing query (code line 361):" << query.lastError().text();
             return;
         }
         if (!query.next()) {
-            qDebug() << "Error executing query:" << query.lastError().text();
-            return;
+            qDebug() << "Account not found in database";
         }
         // At this point we should have got the ID
         unsigned acc_id = query.value(0).toUInt();
         query.prepare("DELETE FROM accounts WHERE id = :acc_id");
         query.bindValue(":acc_id", acc_id);
         if (!query.exec()) {
-            qDebug() << "Error executing query:" << query.lastError().text();
+            qDebug() << "Error executing query (code line 369):" << query.lastError().text();
             return;
         }
         qDebug() << "Account deleted";
@@ -380,7 +371,7 @@ void MainWindow::delete_account(QListWidgetItem *item) {
         query.prepare("UPDATE users SET num_acc = num_acc - 1 WHERE id = :uid");
         query.bindValue(":uid", curr_user_id);
         if (!query.exec()) {
-            qDebug() << "Error executing query:" << query.lastError().text();
+            qDebug() << "Error executing query (code line 378):" << query.lastError().text();
             return;
         }
         curr_user->num_accounts--;
@@ -403,10 +394,7 @@ void MainWindow::change_coefficient(QListWidgetItem *item) {
         qDebug() << "Error executing query:" << query.lastError().text();
         return;
     }
-    if (!query.next()) {
-        qDebug() << "Error executing query:" << query.lastError().text();
-        return;
-    }
+    query.next();
     // At this point we should have got the ID
     unsigned acc_id = query.value(0).toUInt();
 
@@ -417,10 +405,7 @@ void MainWindow::change_coefficient(QListWidgetItem *item) {
         qDebug() << "Error executing query:" << query.lastError().text();
         return;
     }
-    if (!query.next()) {
-        qDebug() << "Error executing query:" << query.lastError().text();
-        return;
-    }
+    query.next();
     double curr_coef = query.value(0).toDouble();
 
     // Create a dialog window (pop-up)
@@ -523,7 +508,7 @@ void MainWindow::update_progress_bar(QProgressBar *bar, int &progressValue, QTim
     if (progressValue >= 100) {
         timer->stop();
         bar->hide();
-        delete timer;  // Cleanup
+        delete timer;
         curr_user->populate_accounts_list(ui->accounts_list);  // Update the list
         return;
     }
@@ -574,50 +559,59 @@ void MainWindow::on_btn_withdrawal_clicked() {
 }
 
 void MainWindow::on_ok_withdrawal_clicked() {
-//     double sum = ui->withdrawal_sum->text().toDouble();
-//     if (sum == 0) {
-//         return;
-//     }
+    double sum = ui->withdrawal_sum->text().toDouble();
+    if (sum == 0) {
+        return;
+    }
 
-//     QString source = ui->withdrawal_source->text();
-//     Account *acc = curr_user->find_account(source.toStdString());
-//     if (acc == NULL) {
-//         // Highlight error
-//         ui->withdrawal_source->setStyleSheet("background-color: rgba(255, 0, 0, 100);");
-//         ui->label_bad_account->show();
-//         QTimer::singleShot(2000, this, [this]() {
-//             // Hide the error after 2s
-//             ui->withdrawal_source->setStyleSheet("background-color: rgb(52, 38, 75);");
-//             ui->label_bad_account->hide();
-//         });
-//         return;
-//      }
+    QString acc_name = ui->withdrawal_source->text();
+    // Get the id of the account with the name from ui->withdrawal_source
+    QSqlQuery query;
+    query.prepare("SELECT id FROM accounts WHERE owner_id = :uid AND name = :acc_name");
+    query.bindValue(":uid", curr_user_id);
+    query.bindValue(":acc_name", acc_name);
+    if (!query.exec()) {
+        qDebug() << "Error executing query:" << query.lastError().text();
+        return;
+    }
+    if (!query.next()) {
+        // User has no account with that name. Highlight error
+        ui->withdrawal_source->setStyleSheet("background-color: rgba(255, 0, 0, 100);");
+        ui->label_bad_account->show();
+        QTimer::singleShot(2000, this, [this]() {
+            // Hide the error after 2s
+            ui->withdrawal_source->setStyleSheet("background-color: rgb(52, 38, 75);");
+            ui->label_bad_account->hide();
+        });
+        return;
+    }
+    unsigned acc_id = query.value(0).toUInt();
 
-//     // Reset and prepare progress bar
-//     ui->progress_withdrawal->setValue(0);
-//     ui->progress_withdrawal->show();
+    // Reset and prepare progress bar
+    ui->progress_withdrawal->setValue(0);
+    ui->progress_withdrawal->show();
 
-//     int *progress = new int(0);  // Dynamically allocated so it persists in lambda
-//     QTimer *timer = new QTimer(this);
+    int *progress = new int(0);  // Dynamically allocated so it persists in lambda
+    QTimer *timer = new QTimer(this);
 
-//     connect(timer, &QTimer::timeout, this, [=]() mutable {
-//         update_progress_bar(ui->progress_withdrawal, *progress, timer);
-//     });
-//     timer->start(10);  // Update every 10ms (100 steps in 1 second)
+    connect(timer, &QTimer::timeout, this, [=]() mutable {
+        update_progress_bar(ui->progress_withdrawal, *progress, timer);
+    });
+    timer->start(10);  // Update every 10ms (100 steps in 1 second)
 
-//     curr_user->withdrawal_from(acc->get_name(), sum);
-//     curr_user->log_op(WITHDRAWAL, acc->get_name(), sum, LOG_FILE);
+    curr_user->withdrawal_from(acc_id, sum);
+    curr_user->log_op(WITHDRAWAL, acc_name.toStdString(), sum, LOG_FILE);
 
-//     // Fancy coordination. blabla
-//     QTimer::singleShot(1000, this, [this]() {
-//         ui->label_withdrawal1->hide();
-//         ui->label_withdrawal2->hide();
-//         ui->withdrawal_sum->clear();
-//         ui->withdrawal_sum->hide();
-//         ui->withdrawal_source->clear();
-//         ui->withdrawal_source->hide();
-//         ui->ok_withdrawal->hide();
-//     });
+    // Fancy coordination. blabla
+    QTimer::singleShot(1000, this, [this]() {
+        ui->label_withdrawal1->hide();
+        ui->label_withdrawal2->hide();
+        ui->withdrawal_sum->clear();
+        ui->withdrawal_sum->hide();
+        ui->withdrawal_source->clear();
+        ui->withdrawal_source->hide();
+        ui->ok_withdrawal->hide();
+    });
 }
 
 void MainWindow::on_withdrawal_sum_returnPressed() {
@@ -627,21 +621,3 @@ void MainWindow::on_withdrawal_sum_returnPressed() {
 void MainWindow::on_withdrawal_source_returnPressed() {
     on_ok_withdrawal_clicked();
 }
-
-
-// void handle_new_account(User &curr_user, string accounts_file, string users_file) {
-//     string name;
-//     double coefficient = 0.0;
-//     cout << "New account name: ";
-//     cin >> name;
-//     cout << "New account coefficient: ";
-//     cin >> coefficient;
-//     double sum_of_other_coefficients = 0.0;
-//     for (size_t i = 0; i < curr_user.num_accounts; i++) {
-//         sum_of_other_coefficients += curr_user.get_account_coefficient(i);
-//     }
-//     if (sum_of_other_coefficients + coefficient > 1.0) {
-//         cout << "Sum of all accounts' coefficients is too big. Try again with a smaller coefficient.\n";
-//     }
-//     curr_user.add_account(curr_user.num_accounts, name, coefficient, 0.0, accounts_file, users_file);
-// }

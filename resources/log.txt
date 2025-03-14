@@ -22,3 +22,9 @@
 2025/02/10 13:30:30 - Test Account deposited 100.
 2025/02/10 13:32:47 - Vasea deposited 100.
 2025/02/10 13:34:56 - Vasea deposited 100.
+2025/02/10 17:54:05 - Test Account deposited 80.
+2025/02/10 17:56:55 - Test Account withdrew 8 from acc1.
+2025/02/10 18:33:24 - Test Account deposited -1.
+2025/02/10 18:33:33 - Test Account deposited 1.
+2025/02/19 17:35:58 - testuser deposited 100.
+2025/02/19 17:36:03 - testuser withdrew 80 from acc2.
