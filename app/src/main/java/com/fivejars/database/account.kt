@@ -51,4 +51,11 @@ interface AccountDao {
         WHERE ownerId = :ownerId
     """)
     suspend fun sharedIncome(ownerId: Long, sum: Double)
+
+    @Query("UPDATE accounts SET balance = balance + :sum WHERE id = :id")
+    suspend fun deposit(id: Long, sum: Double)
+
+    @Query("UPDATE accounts SET balance = balance - :sum WHERE id = :id")
+    suspend fun withdraw(id: Long, sum: Double)
+
 }

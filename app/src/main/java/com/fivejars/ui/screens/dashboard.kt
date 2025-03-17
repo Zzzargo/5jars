@@ -25,14 +25,14 @@ import kotlinx.coroutines.launch
 
 // There will be plenty of dialogs
 enum class DialogType {
-    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME, WITHDRAW, OPTIONS
+    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME, DEPOSIT, WITHDRAW, OPTIONS
 }
 
 @Composable
 fun AccountCard(
     account: Account,
-//    onDeposit: () -> Unit,
-//    onWithdraw: () -> Unit,
+    onDeposit: () -> Unit,
+    onWithdraw: () -> Unit,
     onDelete: () -> Unit
 ) {
     Card(
@@ -43,17 +43,17 @@ fun AccountCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(account.name, style = MaterialTheme.typography.titleMedium)
+            Text("${account.name}: ${(account.coefficient * 100).toInt()}%", style = MaterialTheme.typography.titleMedium)
             Text("Balance: ${account.balance} RON", style = MaterialTheme.typography.bodyLarge)
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
+                Button(onClick = { onDeposit() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
                     Text("Deposit")
                 }
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)) {
+                Button(onClick = { onWithdraw() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)) {
                     Text("Withdraw")
                 }
                 Button(onClick = { onDelete() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)) {
@@ -151,6 +151,70 @@ fun IncomeDialog(onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
                 onSubmit(sum.toDoubleOrNull() ?: 0.0)
             }) {
                 Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun DepositDialog(accName: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
+    var sum by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Deposit to $accName") },
+        text = {
+            OutlinedTextField(
+                value = sum,
+                onValueChange = { input ->
+                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
+                        sum = input
+                    }
+                },
+                label = { Text("Sum") }
+            )
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSubmit(sum.toDoubleOrNull() ?: 0.0)
+            }) {
+                Text("Deposit")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun WithdrawDialog(accName: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
+    var sum by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Withdraw from $accName") },
+        text = {
+            OutlinedTextField(
+                value = sum,
+                onValueChange = { input ->
+                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
+                        sum = input
+                    }
+                },
+                label = { Text("Sum") }
+            )
+        },
+        confirmButton = {
+            Button(onClick = {
+                onSubmit(sum.toDoubleOrNull() ?: 0.0)
+            }) {
+                Text("Withdraw")
             }
         },
         dismissButton = {
@@ -290,6 +354,14 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                             onDelete = {
                                 activeDialog = DialogType.DELETE_ACCOUNT
                                 currentAccount = account.id
+                            },
+                            onDeposit = {
+                                activeDialog = DialogType.DEPOSIT
+                                currentAccount = account.id
+                            },
+                            onWithdraw = {
+                                activeDialog = DialogType.WITHDRAW
+                                currentAccount = account.id
                             }
                         )
                     }
@@ -334,6 +406,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                 }
             )
         }
+
         DialogType.INCOME -> {
             IncomeDialog(
                 onDismiss = { activeDialog = null },
@@ -349,8 +422,41 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                 }
             )
         }
-        DialogType.WITHDRAW -> {}
+
+        DialogType.DEPOSIT -> {
+            DepositDialog(
+                accName = accounts.find { it.id == currentAccount }?.name ?: "",
+                onDismiss = { activeDialog = null },
+                onSubmit = { sum ->
+                    scope.launch {
+                        db.accountDao().deposit(currentAccount, sum)
+
+                        // Refresh UI
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
+                        activeDialog = null // close dialog
+                    }
+                }
+            )
+        }
+
+        DialogType.WITHDRAW -> {
+            WithdrawDialog(
+                accName = accounts.find { it.id == currentAccount }?.name ?: "",
+                onDismiss = { activeDialog = null },
+                onSubmit = { sum ->
+                    scope.launch {
+                        db.accountDao().withdraw(currentAccount, sum)
+
+                        // Refresh UI
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
+                        activeDialog = null // close dialog
+                    }
+                }
+            )
+        }
+
         DialogType.OPTIONS -> {}
-        null -> {}
+
+        null -> {}  // Close dialog
     }
 }
