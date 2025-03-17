@@ -23,7 +23,10 @@ import com.fivejars.database.*
 import com.fivejars.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 
-
+// There will be plenty of dialogs
+enum class DialogType {
+    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME, WITHDRAW, OPTIONS
+}
 
 @Composable
 fun AccountCard(
@@ -121,7 +124,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
     }
 
-    var newAccDialogOpen by remember { mutableStateOf(false) }
+    var activeDialog by remember { mutableStateOf<DialogType?>(null) }
 
     // Wrap content in drawer func
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -146,7 +149,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     NavigationDrawerItem(
                         label = { Text("Add account") },
                         selected = false,
-                        onClick = { newAccDialogOpen = true }
+                        onClick = { activeDialog = DialogType.ADD_ACCOUNT }
                     )
                     NavigationDrawerItem(
                         label = { Text("Delete user account") },
@@ -234,9 +237,10 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
     }
 
-    if (newAccDialogOpen) {
+    when (activeDialog) {
+        DialogType.ADD_ACCOUNT ->
         NewAccDialog(
-            onDismiss = { newAccDialogOpen = false },
+            onDismiss = { activeDialog = null },
             onSubmit = { name, coef ->
                 // Add new account to database
                 scope.launch {
@@ -244,9 +248,15 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     db.accountDao().newAccount(newAccount)
                     // Refresh UI
                     accounts = db.accountDao().getUserAccounts(user!!.id)
-                    newAccDialogOpen = false  // close dialog
+                    activeDialog = null  // close dialog
                 }
             }
         )
+
+        DialogType.DELETE_ACCOUNT -> {}
+        DialogType.INCOME -> {}
+        DialogType.WITHDRAW -> {}
+        DialogType.OPTIONS -> {}
+        null -> {}
     }
 }
