@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 
@@ -34,6 +35,20 @@ interface AccountDao {
     @Query("SELECT * FROM accounts WHERE ownerId = :ownerId")
     suspend fun getUserAccounts(ownerId: Long): List<Account>
 
+    @Query("SELECT * FROM accounts WHERE id = :id")
+    suspend fun getAccountById(id: Long): Account
+
     @Insert
     suspend fun newAccount(account: Account)
+
+    @Delete
+    suspend fun deleteAccount(account: Account)
+
+    // Add a corresponding fraction of the sum to each account based on the coefficient
+    @Query("""
+        UPDATE accounts
+        SET balance = balance + (:sum * coefficient)
+        WHERE ownerId = :ownerId
+    """)
+    suspend fun sharedIncome(ownerId: Long, sum: Double)
 }

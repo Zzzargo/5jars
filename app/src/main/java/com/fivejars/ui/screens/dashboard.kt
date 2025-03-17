@@ -33,7 +33,7 @@ fun AccountCard(
     account: Account,
 //    onDeposit: () -> Unit,
 //    onWithdraw: () -> Unit,
-//    onDelete: () -> Unit
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -56,8 +56,8 @@ fun AccountCard(
                 Button(onClick = {}, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)) {
                     Text("Withdraw")
                 }
-                Button(onClick = {}, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.tertiary)) {
-                    Text("Options")
+                Button(onClick = { onDelete() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)) {
+                    Text("Delete")
                 }
             }
         }
@@ -109,6 +109,59 @@ fun NewAccDialog(onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
 }
 
 @Composable
+fun DeleteAccDialog(onDismiss: () -> Unit, onDelete: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Are you sure?") },
+        confirmButton = {
+            Button(onClick = {
+                onDelete()
+            }) {
+                Text("Yes")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Not really")
+            }
+        }
+    )
+}
+
+@Composable
+fun IncomeDialog(onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
+    var sum by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Shared Income") },
+        text = {
+                OutlinedTextField(
+                    value = sum,
+                    onValueChange = { input ->
+                        if (input.toDoubleOrNull() != null || input.isEmpty()) {
+                            sum = input
+                        }
+                    },
+                    label = { Text("Sum") }
+                )
+        },
+        confirmButton = {
+            Button(onClick = {
+                // Pass sum to submit func
+                onSubmit(sum.toDoubleOrNull() ?: 0.0)
+            }) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
 fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) {
     val user by userViewModel.loggedInUser.collectAsState()  // Get current user
     val db = DatabaseClient.getDatabase(context = LocalContext.current)
@@ -125,6 +178,8 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
     }
 
     var activeDialog by remember { mutableStateOf<DialogType?>(null) }
+    // Will hold an account that is currently selected
+    var currentAccount by remember { mutableLongStateOf(-1) }
 
     // Wrap content in drawer func
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -209,7 +264,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
                     Button(
-                        onClick = {  },
+                        onClick = { activeDialog = DialogType.INCOME },
                     ) {
                         Text("Shared Income")
                     }
@@ -230,7 +285,13 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(accounts) { account ->
-                        AccountCard(account)
+                        AccountCard(
+                            account,
+                            onDelete = {
+                                activeDialog = DialogType.DELETE_ACCOUNT
+                                currentAccount = account.id
+                            }
+                        )
                     }
                 }
             }
@@ -238,23 +299,56 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
     }
 
     when (activeDialog) {
-        DialogType.ADD_ACCOUNT ->
-        NewAccDialog(
-            onDismiss = { activeDialog = null },
-            onSubmit = { name, coef ->
-                // Add new account to database
-                scope.launch {
-                    val newAccount = Account(ownerId = user!!.id, balance = 0.0, name = name, coefficient = coef)
-                    db.accountDao().newAccount(newAccount)
-                    // Refresh UI
-                    accounts = db.accountDao().getUserAccounts(user!!.id)
-                    activeDialog = null  // close dialog
+        DialogType.ADD_ACCOUNT -> {
+            NewAccDialog(
+                onDismiss = { activeDialog = null },
+                onSubmit = { name, coef ->
+                    // Add new account to database
+                    scope.launch {
+                        val newAccount = Account(
+                            ownerId = user!!.id,
+                            balance = 0.0,
+                            name = name,
+                            coefficient = coef
+                        )
+                        db.accountDao().newAccount(newAccount)
+                        // Refresh UI
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
+                        activeDialog = null  // close dialog
+                    }
                 }
-            }
-        )
+            )
+        }
 
-        DialogType.DELETE_ACCOUNT -> {}
-        DialogType.INCOME -> {}
+        DialogType.DELETE_ACCOUNT -> {
+            DeleteAccDialog(onDismiss = { activeDialog = null },
+                onDelete = {
+                    scope.launch {
+                        val acc = db.accountDao().getAccountById(currentAccount)
+                        db.accountDao().deleteAccount(acc)
+
+                        // Refresh UI
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
+                        activeDialog = null // close dialog
+                    }
+                }
+            )
+        }
+        DialogType.INCOME -> {
+            IncomeDialog(
+                onDismiss = { activeDialog = null },
+                onSubmit = { sum ->
+                    scope.launch {
+                        // Add a fraction of the sum to each account
+                        db.accountDao().sharedIncome(user!!.id, sum)
+
+                        // Refresh UI
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
+                        activeDialog = null // close dialog
+                    }
+                }
+            )
+        }
         DialogType.WITHDRAW -> {}
         DialogType.OPTIONS -> {}
         null -> {}
