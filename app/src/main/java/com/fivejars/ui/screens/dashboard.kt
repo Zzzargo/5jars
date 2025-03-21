@@ -7,17 +7,19 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material.icons.automirrored.outlined.Send
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fivejars.database.*
 import com.fivejars.viewmodels.UserViewModel
@@ -25,7 +27,8 @@ import kotlinx.coroutines.launch
 
 // There will be plenty of dialogs
 enum class DialogType {
-    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME, DEPOSIT, WITHDRAW, OPTIONS
+    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME,
+    DEPOSIT, WITHDRAW, DELETE_USER, SETTINGS
 }
 
 @Composable
@@ -35,6 +38,8 @@ fun AccountCard(
     onWithdraw: () -> Unit,
     onDelete: () -> Unit
 ) {
+    var optionsExpanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -56,8 +61,37 @@ fun AccountCard(
                 Button(onClick = { onWithdraw() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)) {
                     Text("Withdraw")
                 }
-                Button(onClick = { onDelete() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error)) {
-                    Text("Delete")
+
+                // Dropdown menu for more options
+                Box {
+                    IconButton(onClick = { optionsExpanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "More options")
+                    }
+
+                    DropdownMenu(
+                        expanded = optionsExpanded,
+                        onDismissRequest = { optionsExpanded = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Rename account") },
+                            leadingIcon = { Icon(Icons.Outlined.Edit, contentDescription = null) },
+                            onClick = { optionsExpanded = false } // Close menu after selection
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Change coefficient") },
+                            leadingIcon = { Icon(Icons.Outlined.Build, contentDescription = null) },
+                            onClick = { optionsExpanded = false }
+                        )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = { Text("Delete account") },
+                            leadingIcon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
+                            onClick = {
+                                onDelete()
+                                optionsExpanded = false
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -65,10 +99,16 @@ fun AccountCard(
 }
 
 @Composable
-fun NewAccDialog(onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
+fun NewAccDialog(currCoefSum: Double, onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
     var newAccountName by remember { mutableStateOf("") }
     var newAccountCoef by remember { mutableStateOf("") }
+
+    // Error flags
+    var coefBig by remember { mutableStateOf(false) }
+
+
     AlertDialog(
+        modifier = Modifier.fillMaxWidth(),
         onDismissRequest = { onDismiss() },
         title = { Text("Add New Account") },
         text = {
@@ -82,12 +122,26 @@ fun NewAccDialog(onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
                 OutlinedTextField(
                     value = newAccountCoef,
                     onValueChange = { input ->
-                        if (input.toDoubleOrNull() != null || input.isEmpty()) {
+                        if (input.isEmpty()) {
+                            newAccountCoef = ""  // This prevents a crash
+                        }
+
+                        if (input.toDoubleOrNull() != null) {
                             newAccountCoef = input
+                            coefBig = false
+
+                            // If coefficients' sum exceeds 1 display error
+                            if (input.toDouble() + currCoefSum > 1) {
+                                coefBig = true
+                            }
                         }
                     },
-                    label = { Text("Account Coefficient") }
+                    label = { Text("Account Coefficient") },
+                    isError = coefBig
                 )
+                if (coefBig) {
+                    Text("Coefficients' sum exceeds 1", color = Color.Red, fontSize = 12.sp)
+                }
             }
         },
         confirmButton = {
@@ -109,7 +163,7 @@ fun NewAccDialog(onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
 }
 
 @Composable
-fun DeleteAccDialog(onDismiss: () -> Unit, onDelete: () -> Unit) {
+fun DeleteDialog(onDismiss: () -> Unit, onDelete: () -> Unit) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
         title = { Text("Are you sure?") },
@@ -129,21 +183,21 @@ fun DeleteAccDialog(onDismiss: () -> Unit, onDelete: () -> Unit) {
 }
 
 @Composable
-fun IncomeDialog(onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
+fun SingleInputDialog(text: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
     var sum by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Shared Income") },
+        title = { Text(text) },
         text = {
-                OutlinedTextField(
-                    value = sum,
-                    onValueChange = { input ->
-                        if (input.toDoubleOrNull() != null || input.isEmpty()) {
-                            sum = input
-                        }
-                    },
-                    label = { Text("Sum") }
-                )
+            OutlinedTextField(
+                value = sum,
+                onValueChange = { input ->
+                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
+                        sum = input
+                    }
+                },
+                label = { Text("Sum") }
+            )
         },
         confirmButton = {
             Button(onClick = {
@@ -151,70 +205,6 @@ fun IncomeDialog(onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
                 onSubmit(sum.toDoubleOrNull() ?: 0.0)
             }) {
                 Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-fun DepositDialog(accName: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
-    var sum by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text("Deposit to $accName") },
-        text = {
-            OutlinedTextField(
-                value = sum,
-                onValueChange = { input ->
-                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
-                        sum = input
-                    }
-                },
-                label = { Text("Sum") }
-            )
-        },
-        confirmButton = {
-            Button(onClick = {
-                onSubmit(sum.toDoubleOrNull() ?: 0.0)
-            }) {
-                Text("Deposit")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-fun WithdrawDialog(accName: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
-    var sum by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text("Withdraw from $accName") },
-        text = {
-            OutlinedTextField(
-                value = sum,
-                onValueChange = { input ->
-                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
-                        sum = input
-                    }
-                },
-                label = { Text("Sum") }
-            )
-        },
-        confirmButton = {
-            Button(onClick = {
-                onSubmit(sum.toDoubleOrNull() ?: 0.0)
-            }) {
-                Text("Withdraw")
             }
         },
         dismissButton = {
@@ -258,7 +248,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                 ) {
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "Admin panel",
+                        "Control panel",
                         modifier = Modifier.padding(16.dp),
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -273,23 +263,18 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     NavigationDrawerItem(
                         label = { Text("Delete user account") },
                         selected = false,
-                        onClick = { /* Handle click */ }
+                        onClick = { activeDialog = DialogType.DELETE_USER }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                    Text(
-                        "Section 2",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.titleLarge
-                    )
                     NavigationDrawerItem(
                         label = { Text("Settings") },
                         selected = false,
                         icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                        badge = { Text("20") }, // Placeholder
                         onClick = { /* Handle click */ }
                     )
+
                     NavigationDrawerItem(
                         label = { Text("Log out") },
                         selected = false,
@@ -333,11 +318,11 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                         Text("Shared Income")
                     }
 
-                    Button(
-                        onClick = {  },
-                    ) {
-                        Text("Shared op2")
-                    }
+//                    Button(
+//                        onClick = {  },
+//                    ) {
+//                        Text("Shared op2")
+//                    }
                 }
                 Spacer(Modifier.height(12.dp))
 
@@ -348,7 +333,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(accounts) { account ->
+                    items(accounts.sortedByDescending { it.coefficient }) { account ->
                         AccountCard(
                             account,
                             onDelete = {
@@ -373,6 +358,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
     when (activeDialog) {
         DialogType.ADD_ACCOUNT -> {
             NewAccDialog(
+                currCoefSum = accounts.sumOf { it.coefficient },
                 onDismiss = { activeDialog = null },
                 onSubmit = { name, coef ->
                     // Add new account to database
@@ -393,7 +379,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.DELETE_ACCOUNT -> {
-            DeleteAccDialog(onDismiss = { activeDialog = null },
+            DeleteDialog(onDismiss = { activeDialog = null },
                 onDelete = {
                     scope.launch {
                         val acc = db.accountDao().getAccountById(currentAccount)
@@ -407,8 +393,23 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             )
         }
 
+        DialogType.DELETE_USER -> {
+            DeleteDialog(
+                onDismiss = { activeDialog = null },
+                onDelete = {
+                    scope.launch {
+                        db.userDao().deleteUser(user!!)
+                        userViewModel.logout()
+                        activeDialog = null // close dialog
+                        navController.navigate("login")
+                    }
+                }
+            )
+        }
+
         DialogType.INCOME -> {
-            IncomeDialog(
+            SingleInputDialog(
+                text = "Shared Income",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
                     scope.launch {
@@ -424,8 +425,8 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.DEPOSIT -> {
-            DepositDialog(
-                accName = accounts.find { it.id == currentAccount }?.name ?: "",
+            SingleInputDialog(
+                text = "Deposit to ${accounts.find { it.id == currentAccount }!!.name}",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
                     scope.launch {
@@ -440,8 +441,8 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.WITHDRAW -> {
-            WithdrawDialog(
-                accName = accounts.find { it.id == currentAccount }?.name ?: "",
+            SingleInputDialog(
+                text = "Withdraw from ${accounts.find { it.id == currentAccount }!!.name}",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
                     scope.launch {
@@ -455,7 +456,15 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             )
         }
 
-        DialogType.OPTIONS -> {}
+        DialogType.SETTINGS -> {
+            DropdownMenu( expanded = false, onDismissRequest = {  }) {
+                DropdownMenuItem(
+                    text = { Text("Test") },
+                    leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
+                    onClick = {  }
+                )
+            }
+        }
 
         null -> {}  // Close dialog
     }
