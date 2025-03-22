@@ -6,10 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
-import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -28,7 +25,9 @@ import kotlinx.coroutines.launch
 // There will be plenty of dialogs
 enum class DialogType {
     ADD_ACCOUNT, DELETE_ACCOUNT, INCOME,
-    DEPOSIT, WITHDRAW, DELETE_USER, SETTINGS
+    DEPOSIT, WITHDRAW, DELETE_USER, EDIT_ACC_NAME,
+    EDIT_COEF, EDIT_USER_NAME, EDIT_USER_USERNAME,
+    EDIT_USER_PASSWORD
 }
 
 @Composable
@@ -36,7 +35,9 @@ fun AccountCard(
     account: Account,
     onDeposit: () -> Unit,
     onWithdraw: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onEditName: () -> Unit,
+    onEditCoef: () -> Unit
 ) {
     var optionsExpanded by remember { mutableStateOf(false) }
 
@@ -75,12 +76,18 @@ fun AccountCard(
                         DropdownMenuItem(
                             text = { Text("Rename account") },
                             leadingIcon = { Icon(Icons.Outlined.Edit, contentDescription = null) },
-                            onClick = { optionsExpanded = false } // Close menu after selection
+                            onClick = {
+                                onEditName()
+                                optionsExpanded = false
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text("Change coefficient") },
                             leadingIcon = { Icon(Icons.Outlined.Build, contentDescription = null) },
-                            onClick = { optionsExpanded = false }
+                            onClick = {
+                                onEditCoef()
+                                optionsExpanded = false
+                            }
                         )
                         HorizontalDivider()
                         DropdownMenuItem(
@@ -257,23 +264,42 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
 
                     NavigationDrawerItem(
                         label = { Text("Add account") },
+                        icon = { Icon(Icons.Outlined.Add, contentDescription = null) },
                         selected = false,
                         onClick = { activeDialog = DialogType.ADD_ACCOUNT }
                     )
+
                     NavigationDrawerItem(
-                        label = { Text("Delete user account") },
+                        label = { Text("Change name") },
                         selected = false,
-                        onClick = { activeDialog = DialogType.DELETE_USER }
+                        icon = { Icon(Icons.Outlined.Person, contentDescription = null) },
+                        onClick = { activeDialog = DialogType.EDIT_USER_NAME }
                     )
 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     NavigationDrawerItem(
-                        label = { Text("Settings") },
+                        label = { Text("Change username") },
                         selected = false,
-                        icon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                        onClick = { /* Handle click */ }
+                        icon = { Icon(Icons.Outlined.Edit, contentDescription = null) },
+                        onClick = { activeDialog = DialogType.EDIT_USER_USERNAME }
                     )
+
+                    NavigationDrawerItem(
+                        label = { Text("Change password") },
+                        selected = false,
+                        icon = { Icon(Icons.Outlined.Lock, contentDescription = null) },
+                        onClick = { activeDialog = DialogType.EDIT_USER_PASSWORD }
+                    )
+
+                    NavigationDrawerItem(
+                        label = { Text("Delete user account") },
+                        selected = false,
+                        icon = { Icon(Icons.Outlined.Delete, contentDescription = null) },
+                        onClick = { activeDialog = DialogType.DELETE_USER }
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     NavigationDrawerItem(
                         label = { Text("Log out") },
@@ -346,6 +372,14 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                             },
                             onWithdraw = {
                                 activeDialog = DialogType.WITHDRAW
+                                currentAccount = account.id
+                            },
+                            onEditName = {
+                                activeDialog = DialogType.EDIT_ACC_NAME
+                                currentAccount = account.id
+                            },
+                            onEditCoef = {
+                                activeDialog = DialogType.EDIT_COEF
                                 currentAccount = account.id
                             }
                         )
@@ -456,14 +490,99 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             )
         }
 
-        DialogType.SETTINGS -> {
-            DropdownMenu( expanded = false, onDismissRequest = {  }) {
-                DropdownMenuItem(
-                    text = { Text("Test") },
-                    leadingIcon = { Icon(Icons.Outlined.Settings, contentDescription = null) },
-                    onClick = {  }
-                )
-            }
+        DialogType.EDIT_USER_NAME -> {
+            AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Test") },
+                confirmButton = {
+                    Button(onClick = {
+                        activeDialog = null
+                    }) {
+                        Text("Yay")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { activeDialog = null }) {
+                        Text("Nay")
+                    }
+                }
+            )
+        }
+
+        DialogType.EDIT_ACC_NAME -> {
+            AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Test") },
+                confirmButton = {
+                    Button(onClick = {
+                        activeDialog = null
+                    }) {
+                        Text("Yay")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { activeDialog = null }) {
+                        Text("Nay")
+                    }
+                }
+            )
+        }
+
+        DialogType.EDIT_COEF -> {
+            AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Test") },
+                confirmButton = {
+                    Button(onClick = {
+                        activeDialog = null
+                    }) {
+                        Text("Yay")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { activeDialog = null }) {
+                        Text("Nay")
+                    }
+                }
+            )
+        }
+
+        DialogType.EDIT_USER_USERNAME -> {
+            AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Test") },
+                confirmButton = {
+                    Button(onClick = {
+                        activeDialog = null
+                    }) {
+                        Text("Yay")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { activeDialog = null }) {
+                        Text("Nay")
+                    }
+                }
+            )
+        }
+
+        DialogType.EDIT_USER_PASSWORD -> {
+            AlertDialog(
+                onDismissRequest = { activeDialog = null },
+                title = { Text("Test") },
+                confirmButton = {
+                    Button(onClick = {
+                        activeDialog = null
+                    }) {
+                        Text("Yay")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { activeDialog = null }) {
+                        Text("Nay")
+                    }
+                }
+            )
         }
 
         null -> {}  // Close dialog
