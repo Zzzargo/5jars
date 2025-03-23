@@ -13,22 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.fivejars.database.*
 import com.fivejars.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 
-// There will be plenty of dialogs
-enum class DialogType {
-    ADD_ACCOUNT, DELETE_ACCOUNT, INCOME,
-    DEPOSIT, WITHDRAW, DELETE_USER, EDIT_ACC_NAME,
-    EDIT_COEF, EDIT_USER_NAME, EDIT_USER_USERNAME,
-    EDIT_USER_PASSWORD
-}
+import com.fivejars.ui.components.*
 
 @Composable
 fun AccountCard(
@@ -106,129 +98,14 @@ fun AccountCard(
 }
 
 @Composable
-fun NewAccDialog(currCoefSum: Double, onDismiss: () -> Unit, onSubmit: (String, Double) -> Unit) {
-    var newAccountName by remember { mutableStateOf("") }
-    var newAccountCoef by remember { mutableStateOf("") }
-
-    // Error flags
-    var coefBig by remember { mutableStateOf(false) }
-
-
-    AlertDialog(
-        modifier = Modifier.fillMaxWidth(),
-        onDismissRequest = { onDismiss() },
-        title = { Text("Add New Account") },
-        text = {
-            Column {
-                OutlinedTextField(
-                    value = newAccountName,
-                    onValueChange = { newAccountName = it },
-                    label = { Text("Account Name") }
-                )
-
-                OutlinedTextField(
-                    value = newAccountCoef,
-                    onValueChange = { input ->
-                        if (input.isEmpty()) {
-                            newAccountCoef = ""  // This prevents a crash
-                        }
-
-                        if (input.toDoubleOrNull() != null) {
-                            newAccountCoef = input
-                            coefBig = false
-
-                            // If coefficients' sum exceeds 1 display error
-                            if (input.toDouble() + currCoefSum > 1) {
-                                coefBig = true
-                            }
-                        }
-                    },
-                    label = { Text("Account Coefficient") },
-                    isError = coefBig
-                )
-                if (coefBig) {
-                    Text("Coefficients' sum exceeds 1", color = Color.Red, fontSize = 12.sp)
-                }
-            }
-        },
-        confirmButton = {
-            Button(onClick = {
-                onSubmit(
-                    newAccountName,
-                    newAccountCoef.toDoubleOrNull() ?: 0.0
-                )
-            }) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-fun DeleteDialog(onDismiss: () -> Unit, onDelete: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text("Are you sure?") },
-        confirmButton = {
-            Button(onClick = {
-                onDelete()
-            }) {
-                Text("Yes")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Not really")
-            }
-        }
-    )
-}
-
-@Composable
-fun SingleInputDialog(text: String, onDismiss: () -> Unit, onSubmit: (Double) -> Unit) {
-    var sum by remember { mutableStateOf("") }
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text(text) },
-        text = {
-            OutlinedTextField(
-                value = sum,
-                onValueChange = { input ->
-                    if (input.toDoubleOrNull() != null || input.isEmpty()) {
-                        sum = input
-                    }
-                },
-                label = { Text("Sum") }
-            )
-        },
-        confirmButton = {
-            Button(onClick = {
-                // Pass sum to submit func
-                onSubmit(sum.toDoubleOrNull() ?: 0.0)
-            }) {
-                Text("Confirm")
-            }
-        },
-        dismissButton = {
-            Button(onClick = { onDismiss() }) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
 fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) {
     val user by userViewModel.loggedInUser.collectAsState()  // Get current user
     val db = DatabaseClient.getDatabase(context = LocalContext.current)
     var accounts by remember { mutableStateOf<List<Account>>(emptyList()) }
     var nickname = user?.nickname ?: "Unknown"
     val scope = rememberCoroutineScope()
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Fetch some initial data from the database
     LaunchedEffect(user) {
@@ -320,7 +197,10 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             }
         }
     ) {
-        Scaffold() { innerPadding ->
+        Scaffold(
+            modifier = Modifier.imePadding(),
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -330,7 +210,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             ) {
                 Text(
                     "Hi, $nickname!",
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                 )
                 Spacer(Modifier.height(12.dp))
 
@@ -442,7 +322,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.INCOME -> {
-            SingleInputDialog(
+            SingleInputNumDialog(
                 text = "Shared Income",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
@@ -459,7 +339,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.DEPOSIT -> {
-            SingleInputDialog(
+            SingleInputNumDialog(
                 text = "Deposit to ${accounts.find { it.id == currentAccount }!!.name}",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
@@ -475,7 +355,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.WITHDRAW -> {
-            SingleInputDialog(
+            SingleInputNumDialog(
                 text = "Withdraw from ${accounts.find { it.id == currentAccount }!!.name}",
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
@@ -510,38 +390,43 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.EDIT_ACC_NAME -> {
-            AlertDialog(
-                onDismissRequest = { activeDialog = null },
-                title = { Text("Test") },
-                confirmButton = {
-                    Button(onClick = {
+            SingleInputStringDialog(
+                "New name for account ${ accounts.find { it.id == currentAccount }!!.name }",
+                onDismiss = { activeDialog = null },
+                onSubmit = { name ->
+                    scope.launch {
+                        if (name.isEmpty()) {
+                            snackbarHostState.showSnackbar("Name cannot be empty")
+                            return@launch
+                        }
+                        db.accountDao().updateName(currentAccount, name)
+
+                        // Refresh accounts list
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
                         activeDialog = null
-                    }) {
-                        Text("Yay")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { activeDialog = null }) {
-                        Text("Nay")
+                        snackbarHostState.showSnackbar("Name updated")
                     }
                 }
             )
         }
 
         DialogType.EDIT_COEF -> {
-            AlertDialog(
-                onDismissRequest = { activeDialog = null },
-                title = { Text("Test") },
-                confirmButton = {
-                    Button(onClick = {
+            SingleInputNumDialog(
+                text = "New coefficient for account ${ accounts.find { it.id == currentAccount }!!.name }",
+                onDismiss = { activeDialog = null },
+                onSubmit = { coef ->
+                    scope.launch {
+                        val coefSum = accounts.sumOf { it.coefficient } - accounts.find { it.id == currentAccount }!!.coefficient
+                        if (coefSum + coef > 1) {
+                            snackbarHostState.showSnackbar("Coefficient sum exceeds 1")
+                            return@launch
+                        }
+                        db.accountDao().updateCoefficient(currentAccount, coef)
+
+                        // Refresh accounts list
+                        accounts = db.accountDao().getUserAccounts(user!!.id)
                         activeDialog = null
-                    }) {
-                        Text("Yay")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { activeDialog = null }) {
-                        Text("Nay")
+                        snackbarHostState.showSnackbar("Coefficient updated")
                     }
                 }
             )

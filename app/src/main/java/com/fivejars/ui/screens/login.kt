@@ -54,6 +54,7 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
 
     /* UI */
     Scaffold(
+        modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { contentPadding ->
         Column(
@@ -65,7 +66,7 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
             Text(
                 "Welcome to Five Jars!",
                 modifier = Modifier.padding(20.dp),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.titleLarge
             )
 
             OutlinedTextField(

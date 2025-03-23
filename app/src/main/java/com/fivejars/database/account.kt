@@ -58,4 +58,10 @@ interface AccountDao {
     @Query("UPDATE accounts SET balance = balance - :sum WHERE id = :id")
     suspend fun withdraw(id: Long, sum: Double)
 
+    @Query("UPDATE accounts SET coefficient = :coefficient WHERE id = :id")
+    suspend fun updateCoefficient(id: Long, coefficient: Double)
+
+    @Query("UPDATE accounts SET name = :name WHERE id = :id")
+    suspend fun updateName(id: Long, name: String)
+
 }

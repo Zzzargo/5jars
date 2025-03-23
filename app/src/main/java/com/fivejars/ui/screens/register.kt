@@ -2,13 +2,10 @@ package com.fivejars.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -16,8 +13,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.fivejars.database.DatabaseClient
 import com.fivejars.database.User
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,6 +63,7 @@ fun RegisterScreen(navController: NavController) {
     }
 
     Scaffold(
+        modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { contentPadding ->
         Column(
