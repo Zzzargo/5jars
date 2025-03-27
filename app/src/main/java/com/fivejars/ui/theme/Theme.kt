@@ -12,30 +12,36 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = DarkPrimary,
+    secondary = DarkSecondary,
+    tertiary = DarkTertiary,
+    background = DarkBackground,
+    surface = DarkSurface,
+    onPrimary = DarkOnPrimary,
+    onSecondary = DarkOnSecondary,
+    onTertiary = DarkOnTertiary,
+    onBackground = DarkOnBackground,
+    onSurface = DarkOnSurface
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
-
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F)
+    primary = LightPrimary,
+    secondary = LightSecondary,
+    tertiary = LightTertiary,
+    background = LightBackground,
+    surface = LightSurface,
+    onPrimary = LightOnPrimary,
+    onSecondary = LightOnSecondary,
+    onTertiary = LightOnTertiary,
+    onBackground = LightOnBackground,
+    onSurface = LightOnSurface
 )
 
 @Composable
 fun FiveJarsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,  // don't like this
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

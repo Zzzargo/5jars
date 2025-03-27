@@ -1,8 +1,10 @@
 package com.fivejars.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.material3.NavigationBarDefaults.windowInsets
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,50 +56,70 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
 
     /* UI */
     Scaffold(
-        modifier = Modifier.imePadding(),
+        modifier = Modifier
+            .imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { contentPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(contentPadding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        )
-        {
-            Text(
-                "Welcome to Five Jars!",
-                modifier = Modifier.padding(20.dp),
-                style = MaterialTheme.typography.titleLarge
+        Box(  // This helps integrate the background better
+            modifier = Modifier
+                .padding(0.dp)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding)
+                    .background(MaterialTheme.colorScheme.background),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             )
+            {
+                Text(
+                    "Welcome to Five Jars!",
+                    modifier = Modifier.padding(20.dp),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
 
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-            )
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Username") },
+                )
 
-            OutlinedTextField(
-                value = password,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
-                ),
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.padding(top = 8.dp)
-            )
+                OutlinedTextField(
+                    value = password,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.padding(top = 8.dp),
+                )
 
-            Button(
-                onClick = { handleLogin() },
-                modifier = Modifier.padding(top = 16.dp)
-            ) {
-                Text("Login")
-            }
+                Button(
+                    onClick = { handleLogin() },
+                    modifier = Modifier.padding(top = 16.dp)
 
-            TextButton(
-                onClick = { navController.navigate("register") },
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
-                Text("Register")
+                ) {
+                    Text(
+                        "Login",
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+
+                TextButton(
+                    onClick = { navController.navigate("register") },
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                ) {
+                    Text(
+                        "Register",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
             }
         }
     }

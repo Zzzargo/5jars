@@ -1,5 +1,6 @@
 package com.fivejars.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -52,7 +53,8 @@ fun RegisterScreen(navController: NavController) {
                 db.userDao().insertUser(newUser)
                 snackbarHostState.showSnackbar(
                     "Registration successful! Redirecting to login",
-                    actionLabel = "OK"
+                    actionLabel = "OK",
+                    duration = SnackbarDuration.Short
                 )
                 navController.navigate("login")
             } catch (e: Exception) {
@@ -66,63 +68,77 @@ fun RegisterScreen(navController: NavController) {
         modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { contentPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(contentPadding),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-            Text(
-                "Register",
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            OutlinedTextField(
-                label = { Text("Nickname") },
-                value = nickname,
-                onValueChange = { nickname = it }
-            )
-
-            OutlinedTextField(
-                label = { Text("Username") },
-                value = username,
-                onValueChange = { username = it }
-            )
-
-            OutlinedTextField(
-                label = { Text("Password") },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
-                ),
-                value = password,
-                onValueChange = { password = it },
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            OutlinedTextField(
-                label = { Text("Confirm password") },
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Password
-                ),
-                value = confirm,
-                onValueChange = { confirm = it },
-                visualTransformation = PasswordVisualTransformation()
-            )
-
-            Button(
-                onClick = {
-                    handleRegister()
-                },
-                modifier = Modifier.padding(top = 16.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Register")
-            }
+                Text(
+                    "Register",
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
 
-            Button(
-                onClick = { navController.navigate("login") },
-                modifier = Modifier.padding(top = 16.dp)
-            ) {
-                Text("Back to Login")
+                OutlinedTextField(
+                    label = { Text("Nickname") },
+                    value = nickname,
+                    onValueChange = { nickname = it },
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                )
+
+                OutlinedTextField(
+                    label = { Text("Username") },
+                    value = username,
+                    onValueChange = { username = it },
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                )
+
+                OutlinedTextField(
+                    label = { Text("Password") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    value = password,
+                    onValueChange = { password = it },
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier
+                        .padding(bottom = 16.dp)
+                )
+
+                OutlinedTextField(
+                    label = { Text("Confirm password") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    value = confirm,
+                    onValueChange = { confirm = it },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                Button(
+                    onClick = {
+                        handleRegister()
+                    },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Register")
+                }
+
+                Button(
+                    onClick = { navController.navigate("login") },
+                    modifier = Modifier.padding(top = 16.dp)
+                ) {
+                    Text("Back to Login")
+                }
             }
         }
     }

@@ -2,6 +2,7 @@ package com.fivejars.ui.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -13,6 +14,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.sp
 
 enum class DialogType {
@@ -70,10 +73,12 @@ fun NewAccDialog(currCoefSum: Double, onDismiss: () -> Unit, onSubmit: (String, 
         },
         confirmButton = {
             Button(onClick = {
-                onSubmit(
-                    newAccountName,
-                    newAccountCoef.toDoubleOrNull() ?: 0.0
-                )
+                if (!coefBig) {
+                    onSubmit(
+                        newAccountName,
+                        newAccountCoef.toDoubleOrNull() ?: 0.0
+                    )
+                }
             }) {
                 Text("Confirm")
             }
@@ -160,6 +165,77 @@ fun SingleInputStringDialog(text: String, onDismiss: () -> Unit, onSubmit: (Stri
             Button(onClick = {
                 // Pass name to submit func
                 onSubmit(inputText)
+            }) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            Button(onClick = { onDismiss() }) {
+                Text("Cancel")
+            }
+        }
+    )
+}
+
+@Composable
+fun UpdatePassDialog(currPass: String, onDismiss: () -> Unit, onSubmit: (String, String) -> Unit) {
+    var oldPass by remember { mutableStateOf("") }
+    var newPass by remember { mutableStateOf("") }
+    var confirmPass by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Change password") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = oldPass,
+                    label = { Text("Old Password") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    onValueChange = { oldPass = it },
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                OutlinedTextField(
+                    value = newPass,
+                    onValueChange = { input ->
+                        newPass = input
+                    },
+                    label = { Text("New password") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    visualTransformation = PasswordVisualTransformation()
+                )
+
+                OutlinedTextField(
+                    value = confirmPass,
+                    onValueChange = { input ->
+                        confirmPass = input
+                    },
+                    label = { Text("Confirm new password") },
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Password
+                    ),
+                    visualTransformation = PasswordVisualTransformation()
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                if (newPass.isEmpty() || confirmPass.isEmpty() || oldPass.isEmpty()) {
+                    onSubmit("", "ERR_EMPTY")
+                }
+
+                if (oldPass != currPass) {
+                    onSubmit("", "ERR_PASS_MISMATCH")
+                }
+
+                if (newPass == confirmPass) {
+                    onSubmit(newPass, "OK")
+                }
             }) {
                 Text("Confirm")
             }

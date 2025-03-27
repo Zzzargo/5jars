@@ -1,9 +1,11 @@
 package com.fivejars.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
@@ -13,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -34,11 +37,14 @@ fun AccountCard(
     var optionsExpanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text("${account.name}: ${(account.coefficient * 100).toInt()}%", style = MaterialTheme.typography.titleMedium)
@@ -48,16 +54,27 @@ fun AccountCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Button(onClick = { onDeposit() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)) {
+                Button(
+                    onClick = { onDeposit() },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                ) {
                     Text("Deposit")
                 }
-                Button(onClick = { onWithdraw() }, colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)) {
+                Button(
+                    onClick = { onWithdraw() },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
+                ) {
                     Text("Withdraw")
                 }
 
                 // Dropdown menu for more options
                 Box {
-                    IconButton(onClick = { optionsExpanded = true }) {
+                    IconButton(
+                        onClick = { optionsExpanded = true },
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.tertiary, shape = CircleShape)
+                            .clip(CircleShape)
+                    ) {
                         Icon(Icons.Default.MoreVert, contentDescription = "More options")
                     }
 
@@ -102,7 +119,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
     val user by userViewModel.loggedInUser.collectAsState()  // Get current user
     val db = DatabaseClient.getDatabase(context = LocalContext.current)
     var accounts by remember { mutableStateOf<List<Account>>(emptyList()) }
-    var nickname = user?.nickname ?: "Unknown"
+    var nickname by remember { mutableStateOf(user?.nickname ?: "Unknown") }
     val scope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -201,68 +218,77 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
             modifier = Modifier.imePadding(),
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
         ) { innerPadding ->
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)  // Use innerPadding from Scaffold
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(0.dp)
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                Text(
-                    "Hi, $nickname!",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-                Spacer(Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(MaterialTheme.colorScheme.background),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Button(
-                        onClick = { activeDialog = DialogType.INCOME },
+                    Spacer(Modifier.height(12.dp))
+                    Text(
+                        "Hi, $nickname!",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    Spacer(Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
-                        Text("Shared Income")
-                    }
+                        Button(
+                            onClick = { activeDialog = DialogType.INCOME },
+                        ) {
+                            Text("Shared Income")
+                        }
 
 //                    Button(
 //                        onClick = {  },
 //                    ) {
 //                        Text("Shared op2")
 //                    }
-                }
-                Spacer(Modifier.height(12.dp))
+                    }
+                    Spacer(Modifier.height(12.dp))
 
-                Text("Total: ${accounts.sumOf { it.balance }} RON")
-                Spacer(Modifier.height(12.dp))
+                    Text("Total: ${accounts.sumOf { it.balance }} RON")
+                    Spacer(Modifier.height(12.dp))
 
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(accounts.sortedByDescending { it.coefficient }) { account ->
-                        AccountCard(
-                            account,
-                            onDelete = {
-                                activeDialog = DialogType.DELETE_ACCOUNT
-                                currentAccount = account.id
-                            },
-                            onDeposit = {
-                                activeDialog = DialogType.DEPOSIT
-                                currentAccount = account.id
-                            },
-                            onWithdraw = {
-                                activeDialog = DialogType.WITHDRAW
-                                currentAccount = account.id
-                            },
-                            onEditName = {
-                                activeDialog = DialogType.EDIT_ACC_NAME
-                                currentAccount = account.id
-                            },
-                            onEditCoef = {
-                                activeDialog = DialogType.EDIT_COEF
-                                currentAccount = account.id
-                            }
-                        )
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(horizontal = 20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(accounts.sortedByDescending { it.coefficient }) { account ->
+                            AccountCard(
+                                account,
+                                onDelete = {
+                                    activeDialog = DialogType.DELETE_ACCOUNT
+                                    currentAccount = account.id
+                                },
+                                onDeposit = {
+                                    activeDialog = DialogType.DEPOSIT
+                                    currentAccount = account.id
+                                },
+                                onWithdraw = {
+                                    activeDialog = DialogType.WITHDRAW
+                                    currentAccount = account.id
+                                },
+                                onEditName = {
+                                    activeDialog = DialogType.EDIT_ACC_NAME
+                                    currentAccount = account.id
+                                },
+                                onEditCoef = {
+                                    activeDialog = DialogType.EDIT_COEF
+                                    currentAccount = account.id
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -371,19 +397,21 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.EDIT_USER_NAME -> {
-            AlertDialog(
-                onDismissRequest = { activeDialog = null },
-                title = { Text("Test") },
-                confirmButton = {
-                    Button(onClick = {
+            SingleInputStringDialog(
+                "New nickname",
+                onDismiss = { activeDialog = null },
+                onSubmit = { name ->
+                    scope.launch {
+                        if (name.isEmpty()) {
+                            snackbarHostState.showSnackbar("Name cannot be empty")
+                            return@launch
+                        }
+                        db.userDao().updateNickname(user!!.id, name)
+
+                        // Refresh UI
+                        nickname = name
                         activeDialog = null
-                    }) {
-                        Text("Yay")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { activeDialog = null }) {
-                        Text("Nay")
+                        snackbarHostState.showSnackbar("Nickname updated")
                     }
                 }
             )
@@ -404,7 +432,7 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                         // Refresh accounts list
                         accounts = db.accountDao().getUserAccounts(user!!.id)
                         activeDialog = null
-                        snackbarHostState.showSnackbar("Name updated")
+                        snackbarHostState.showSnackbar("Account name updated")
                     }
                 }
             )
@@ -433,38 +461,46 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
         }
 
         DialogType.EDIT_USER_USERNAME -> {
-            AlertDialog(
-                onDismissRequest = { activeDialog = null },
-                title = { Text("Test") },
-                confirmButton = {
-                    Button(onClick = {
+            SingleInputStringDialog(
+                "New username",
+                onDismiss = { activeDialog = null },
+                onSubmit = { name ->
+                    scope.launch {
+                        if (name.isEmpty()) {
+                            snackbarHostState.showSnackbar("Name cannot be empty")
+                            return@launch
+                        }
+                        db.userDao().updateUsername(user!!.id, name)
+
+                        // Refresh UI
                         activeDialog = null
-                    }) {
-                        Text("Yay")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { activeDialog = null }) {
-                        Text("Nay")
+                        snackbarHostState.showSnackbar("Username updated")
                     }
                 }
             )
         }
 
         DialogType.EDIT_USER_PASSWORD -> {
-            AlertDialog(
-                onDismissRequest = { activeDialog = null },
-                title = { Text("Test") },
-                confirmButton = {
-                    Button(onClick = {
-                        activeDialog = null
-                    }) {
-                        Text("Yay")
-                    }
-                },
-                dismissButton = {
-                    Button(onClick = { activeDialog = null }) {
-                        Text("Nay")
+            UpdatePassDialog(
+                currPass =  user!!.password,
+                onDismiss = { activeDialog = null },
+                onSubmit = { newPass, msg ->
+                    scope.launch {
+                        when (msg) {
+                            "OK" -> {
+                                db.userDao().updatePassword(user!!.id, newPass)
+
+                                // Refresh UI
+                                activeDialog = null
+                                snackbarHostState.showSnackbar("Password updated")
+                            }
+                            "ERR_EMPTY" -> {
+                                snackbarHostState.showSnackbar("Please fill in all fields")
+                            }
+                            "ERR_PASS_MISMATCH" -> {
+                                snackbarHostState.showSnackbar("Passwords do not match")
+                            }
+                        }
                     }
                 }
             )

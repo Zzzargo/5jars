@@ -28,6 +28,15 @@ interface UserDao {
     @Query("SELECT nickname FROM users WHERE id = :id")
     suspend fun getNicknameById(id: Long): String
 
+    @Query("UPDATE users SET nickname = :nickname WHERE id = :id")
+    suspend fun updateNickname(id: Long, nickname: String)
+
+    @Query("UPDATE users SET username = :username WHERE id = :id")
+    suspend fun updateUsername(id: Long, username: String)
+
+    @Query("UPDATE users SET password = :password WHERE id = :id")
+    suspend fun updatePassword(id: Long, password: String)
+
     @Insert
     suspend fun insertUser(user: User)
 
