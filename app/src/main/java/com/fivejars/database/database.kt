@@ -5,10 +5,11 @@ import androidx.room.RoomDatabase
 import androidx.room.Room
 import android.content.Context
 
-@Database(entities = [User::class, Account::class], version = 1)
+@Database(entities = [User::class, Account::class, Transaction::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun accountDao(): AccountDao
+    abstract fun transactionDao(): TransactionDao
 }
 
 object DatabaseClient {
@@ -21,7 +22,6 @@ object DatabaseClient {
                 AppDatabase::class.java,
                 "app_database",
             )
-                .fallbackToDestructiveMigration()
                 .build()
         }
         return appDatabase!!

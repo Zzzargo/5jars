@@ -40,5 +40,6 @@ fun FiveJarsApp(userViewModel: UserViewModel) {
         composable("login") { LoginScreen(navController, userViewModel) }
         composable("register") { RegisterScreen(navController) }
         composable("dashboard") { DashboardScreen(navController, userViewModel) }
+        composable("history") { HistoryScreen(navController, userViewModel) }
     }
 }

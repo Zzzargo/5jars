@@ -1,5 +1,6 @@
 package com.fivejars.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
+import androidx.compose.material.icons.automirrored.outlined.List
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
@@ -24,6 +27,8 @@ import com.fivejars.viewmodels.UserViewModel
 import kotlinx.coroutines.launch
 
 import com.fivejars.ui.components.*
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AccountCard(
@@ -196,6 +201,22 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                     NavigationDrawerItem(
+                        label = { Text("History") },
+                        selected = false,
+                        icon = {
+                            Icon(
+                                Icons.AutoMirrored.Outlined.List,
+                                contentDescription = null
+                            )
+                        },
+                        onClick = {
+                            navController.navigate("history")
+                        },
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+                    NavigationDrawerItem(
                         label = { Text("Log out") },
                         selected = false,
                         icon = {
@@ -261,7 +282,8 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
 
                     LazyColumn(
                         modifier = Modifier
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 20.dp)
+                            .fillMaxHeight(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(accounts.sortedByDescending { it.coefficient }) { account ->
@@ -338,10 +360,14 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                 onDismiss = { activeDialog = null },
                 onDelete = {
                     scope.launch {
-                        db.userDao().deleteUser(user!!)
-                        userViewModel.logout()
-                        activeDialog = null // close dialog
-                        navController.navigate("login")
+                        try {
+                            db.userDao().deleteUser(user!!)
+                            userViewModel.logout()
+                            activeDialog = null // close dialog
+                            navController.navigate("login")
+                        } catch (e : Exception) {
+                            snackbarHostState.showSnackbar("An error occurred: ${e.message}")
+                        }
                     }
                 }
             )
@@ -353,12 +379,27 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                 onDismiss = { activeDialog = null },
                 onSubmit = { sum ->
                     scope.launch {
-                        // Add a fraction of the sum to each account
-                        db.accountDao().sharedIncome(user!!.id, sum)
+                        try {
+                            // Add a fraction of the sum to each account
+                            db.accountDao().sharedIncome(user!!.id, sum)
 
-                        // Refresh UI
-                        accounts = db.accountDao().getUserAccounts(user!!.id)
-                        activeDialog = null // close dialog
+                            val trans = Transaction(
+                                userId = user!!.id,
+                                accountId = db.accountDao().getUserAccounts(user!!.id)[0].id,
+                                date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")).toString(),
+                                sum = sum,
+                                details = "Now I want to write a really long ting to see what happens when it's really long",
+                                operation = "Income"
+                            )
+
+                            db.transactionDao().newTransaction(trans)
+
+                            // Refresh UI
+                            accounts = db.accountDao().getUserAccounts(user!!.id)
+                            activeDialog = null // close dialog
+                        } catch (e: Exception) {
+                            snackbarHostState.showSnackbar("An error occurred: ${e.message}")
+                        }
                     }
                 }
             )
@@ -372,8 +413,19 @@ fun DashboardScreen(navController: NavController, userViewModel: UserViewModel) 
                     scope.launch {
                         db.accountDao().deposit(currentAccount, sum)
 
+                        val trans = Transaction(
+                            userId = user!!.id,
+                            accountId = currentAccount,
+                            date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")).toString(),
+                            sum = sum,
+                            details = "Test op deposit",
+                            operation = "Deposit"
+                        )
+                        db.transactionDao().newTransaction(trans)
+
                         // Refresh UI
                         accounts = db.accountDao().getUserAccounts(user!!.id)
+                        currentAccount = -1L
                         activeDialog = null // close dialog
                     }
                 }

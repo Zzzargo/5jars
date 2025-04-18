@@ -31,25 +31,29 @@ fun LoginScreen(navController: NavController, userViewModel: UserViewModel) {
 
     fun handleLogin() {
         scope.launch {
-            if (username.isEmpty() || password.isEmpty()) {
-                snackbarHostState.showSnackbar("Please fill in all fields.")
-                return@launch
-            }
-
-            // Query the database for the user
-            userFound = db.userDao().findByUsername(username)
-            if (userFound != null) {
-                // Separated the checks for different error messages
-                if (userFound!!.password == password) {
-                    // Set current user and go to dashboard
-                    userViewModel.setCurrUser(userFound!!)
-                    navController.navigate("dashboard")
-                } else {
-                    snackbarHostState.showSnackbar("Incorrect password")
+            try {
+                if (username.isEmpty() || password.isEmpty()) {
+                    snackbarHostState.showSnackbar("Please fill in all fields.")
+                    return@launch
                 }
-            } else {
-                // Show error if login fails
-                snackbarHostState.showSnackbar("User not found")
+
+                // Query the database for the user
+                userFound = db.userDao().findByUsername(username)
+                if (userFound != null) {
+                    // Separated the checks for different error messages
+                    if (userFound!!.password == password) {
+                        // Set current user and go to dashboard
+                        userViewModel.setCurrUser(userFound!!)
+                        navController.navigate("dashboard")
+                    } else {
+                        snackbarHostState.showSnackbar("Incorrect password")
+                    }
+                } else {
+                    // Show error if login fails
+                    snackbarHostState.showSnackbar("User not found")
+                }
+            } catch(exception: Exception) {
+                snackbarHostState.showSnackbar("An error occurred during login: ${exception.message}")
             }
         }
     }
