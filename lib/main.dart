@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:five_jars_ultra/cobol_ffi/cobol_bridge.dart';
 
 void main() {
   runApp(const MyApp());
@@ -75,6 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    // Create a new cobol bridge object and call the getMessage method
+    final cobol = CobolBridge();
+    final String msg = cobol.getMessage();
+
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -109,6 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Text(msg),
           ],
         ),
       ),
