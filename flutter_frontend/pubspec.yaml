@@ -21,6 +21,7 @@ dependencies:
   ffi: ^2.1.4
   http: ^1.5.0
   decimal: ^3.2.4
+  go_router: ^16.2.4
 
   cupertino_icons: ^1.0.8
 

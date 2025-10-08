@@ -2,24 +2,20 @@ from flask import Flask, jsonify, request
 import mysql.connector, json, os, subprocess
 from dotenv import load_dotenv
 
-# Load secrets from .env
-load_dotenv()
-
-# Load non-secret DB config
-config_path = os.path.join(os.path.dirname(__file__), "../db/db_config.json")
-with open(config_path, "r") as f:
-    cfg = json.load(f)
+# Load secrets from .env or .env.local if running locally
+env_file = ".env.local" if os.path.exists(".env.local") else ".env"
+load_dotenv(env_file)
 
 cobol_path = os.path.join(os.path.dirname(__file__), "../cobol/build")
 
 # Connect to the database helper
 def get_db_connection():
     return mysql.connector.connect(
-        host=cfg["host"],
-        user=os.getenv("DB_USER", "root"),
-        password=os.getenv("DB_PASSWORD"),
-        database=cfg["database"],
-        port=os.getenv("DB_PORT", 3306)
+        host=os.getenv("FIVEJARS_DB_HOST", "localhost"),
+        user=os.getenv("FIVEJARS_MYSQL_USER", "root"),
+        password=os.getenv("FIVEJARS_MYSQL_USER_PASSWORD") or os.getenv("FIVEJARS_MYSQL_ROOT_PASSWORD"),
+        database=os.getenv("FIVEJARS_MYSQL_DATABASE"),
+        port=os.getenv("FIVEJARS_DB_PORT", 3306)
     )
 
 app = Flask(__name__)
@@ -34,12 +30,9 @@ def index():
 def cobol_test():
     # Run the COBOL program and capture output
     binary_path = os.path.join(cobol_path, "test")
-    print(f"Running COBOL binary at: {binary_path}")
     try:
         result = subprocess.run([binary_path], capture_output=True, text=True, check=True)
-        output = result.stdout
-        print(f"COBOL Output: {output}")
-    
+        output = result.stdout    
         return jsonify({"success": True, "output": output})
     except subprocess.CalledProcessError as e:
         return jsonify({"success": False, "error": e.stderr})
@@ -55,4 +48,4 @@ def get_users():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)

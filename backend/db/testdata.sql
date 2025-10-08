@@ -1,4 +1,4 @@
-USE 5jars;
+USE fivejars;
 
 -- Test users
 INSERT INTO users (username, nickname, password_hash)
