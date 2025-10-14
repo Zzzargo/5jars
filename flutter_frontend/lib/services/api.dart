@@ -1,11 +1,19 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:decimal/decimal.dart';
 import 'package:logging/logging.dart';
 
 class BackendAPI {
-  static const String baseUrl = "http://localhost:5000"; // Flask server
   static final Logger _logger = Logger('BackendAPI');
+  // Flask server
+  static String get baseUrl {
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:5000'; // Localhost for Android emulator
+    } else {
+      return 'http://localhost:5000'; // Localhost for desktop
+    }
+  }
 
   /// Generic response handler
   ///

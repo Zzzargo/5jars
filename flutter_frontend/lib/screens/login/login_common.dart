@@ -3,10 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../services/api.dart';
 
 class LoginForm extends StatefulWidget {
-  // Constructor
   const LoginForm({super.key, required this.isDesktop});
 
-  // Indicates if the layout is for desktop
   final bool isDesktop;
 
   // Stateful widget => define how the state is created
@@ -21,7 +19,7 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
   bool isLoading = false;
 
-  // Dispose controllers when the widget is removed from the widget tree
+  // Dispose of the controllers when the widget is removed from the widget tree
   @override
   void dispose() {
     _usernameController.dispose();
