@@ -7,18 +7,6 @@ import 'widgets.dart';
 class RegisterScreen extends AppScreen {
   const RegisterScreen({super.key});
 
-  /// Build method for the mobile register screen
-  @override
-  Widget buildMobile(BuildContext context) {
-    return Scaffold();
-  }
-
-  /// Build method for the desktop register screen
-  @override
-  Widget buildDesktop(BuildContext context) {
-    return Scaffold();
-  }
-
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
@@ -73,5 +61,68 @@ class _RegisterScreenState extends AppScreenState<RegisterScreen> {
         context,
       ).showSnackBar(SnackBar(content: Text(errorMsg)));
     }
+  }
+
+  /// Build method for the mobile register screen
+  @override
+  Widget buildMobile(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: SingleChildScrollView(
+          child: CommonWidgets.registerForm(
+            context: context,
+            nicknameController: nicknameController,
+            usernameController: usernameController,
+            passwordController: passwordController,
+            isLoading: isLoading,
+            handleRegister: handleRegister,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Build method for the desktop register screen
+  @override
+  Widget buildDesktop(BuildContext context) {
+    return Scaffold(
+      body: Row(
+        children: [
+          Flexible(
+            flex: 1,
+            child: Container(
+              color: Colors.pink,
+              child: const Center(
+                child: Text(
+                  '5 Jars Animation',
+                  style: TextStyle(
+                    fontSize: 48,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Flexible(
+            flex: 1,
+            child: Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.8,
+                heightFactor: 0.5,
+                child: CommonWidgets.registerForm(
+                  context: context,
+                  nicknameController: nicknameController,
+                  usernameController: usernameController,
+                  passwordController: passwordController,
+                  isLoading: isLoading,
+                  handleRegister: handleRegister,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

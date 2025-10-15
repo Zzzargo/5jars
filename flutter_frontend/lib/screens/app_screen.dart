@@ -12,24 +12,22 @@ abstract class AppScreen extends StatefulWidget {
         platform == TargetPlatform.windows ||
         platform == TargetPlatform.linux;
   }
+}
+
+// createState methods of the appScreen subclasses will extend this class
+abstract class AppScreenState<T extends AppScreen> extends State<T> {
+  /// Loading state - prevents some bugs and shows placeholders
+  bool isLoading = false;
 
   /// Abstract build method for an [AppScreen]'s mobile UI implementation
   Widget buildMobile(BuildContext context);
 
   /// Abstract build method for an [AppScreen]'s desktop UI implementation
   Widget buildDesktop(BuildContext context);
-}
-
-// createState methods of the appScreen subclasses will extend this behaviour
-abstract class AppScreenState<T extends AppScreen> extends State<T> {
-  /// Loading state - prevents some bugs and shows placeholders
-  bool isLoading = false;
 
   /// Abstract build method - chooses layout based on platform
   @override
   Widget build(BuildContext context) {
-    return widget.isDesktop
-        ? widget.buildDesktop(context)
-        : widget.buildMobile(context);
+    return widget.isDesktop ? buildDesktop(context) : buildMobile(context);
   }
 }
