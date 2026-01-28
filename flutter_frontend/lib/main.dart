@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'screens/login/login_screen.dart';
-import 'screens/register/register_screen.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/dashboard_screen.dart';
 
 void main() {
   runApp(const App());
@@ -17,7 +17,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     // Router configuration. App starts at LoginScreen.
     final GoRouter router = GoRouter(
-      initialLocation: '/login',
+      initialLocation: '/register',
       routes: [
         GoRoute(
           path: '/login',
