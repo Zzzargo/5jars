@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:decimal/decimal.dart';
 import 'package:logging/logging.dart';
+import 'dart:async';
 
-class BackendAPI {
-  static final Logger _logger = Logger('BackendAPI');
+class ApiClient {
+  static final Logger _logger = Logger('ApiClient');
+
   // Flask server
   static String get baseUrl {
     if (Platform.isAndroid) {
@@ -15,22 +17,54 @@ class BackendAPI {
     }
   }
 
-  /// Generic response handler
+  /// Generic request maker
   ///
-  /// Private method of the backend API class
+  /// Takes a http request, waits for response, handles errors and timeouts,
+  /// and returns a JSON-like map with keys:
+  /// - success: bool
+  /// - data/error: dynamic (the response body parsed or error message)
+  /// - statusCode: HTTP response status code
+  static Future<Map<String, dynamic>> _makeRequest({
+    required http.Request request,
+    Duration timeout = const Duration(seconds: 5), // Default timeout
+  }) async {
+    try {
+      final response = await request.send().timeout(timeout);
+      final responseBody = await http.Response.fromStream(response);
+      return _handleResponse(responseBody);
+    } on TimeoutException {
+      _logger.severe('Request timed out after ${timeout.inSeconds}s');
+      return {
+        'success': false,
+        'error': 'Request timed out. Server may be down.',
+        'statusCode': 503,
+      };
+    } on SocketException catch (e) {
+      _logger.severe('Couldn\'t connect to the backend: $e');
+      return {
+        'success': false,
+        'error': 'Network error: ${e.message}',
+        'statusCode': 500,
+      };
+    }
+  }
+
+  /// Generic response handler
   ///
   /// Takes a http response and returns a JSON-like map with keys:
   /// - success: bool
-  /// - data: dynamic (the response body parsed as JSON)
-  /// - statusCode: int (HTTP status code)
+  /// - data: dynamic (the response body parsed)
+  /// - statusCode: HTTP response status code
   static Map<String, dynamic> _handleResponse(http.Response response) {
     try {
       final data = jsonDecode(response.body);
-      return {
-        'success': data['success'] ?? false, // I like this operator
-        'data': data,
-        'statusCode': response.statusCode,
-      };
+      return response.statusCode < 400
+          ? {'success': true, 'data': data, 'statusCode': response.statusCode}
+          : {
+              'success': false,
+              'error': data['error'] ?? 'Unknown error',
+              'statusCode': response.statusCode,
+            };
     } catch (_) {
       return {
         'success': false,
@@ -62,29 +96,25 @@ class BackendAPI {
     }
   }
 
-  /// User registration API
   static Future<Map<String, dynamic>> registerUser({
-    required String username,
     required String nickname,
+    required String username,
     required String password,
   }) async {
     final url = Uri.parse('$baseUrl/users');
     final body = jsonEncode({
-      'username': username,
       'nickname': nickname,
+      'username': username,
       'password': password,
     });
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
+    return await _makeRequest(
+      request: http.Request('POST', url)
+        ..headers.addAll({'Content-Type': 'application/json'})
+        ..body = body,
     );
-
-    return _handleResponse(response);
   }
 
-  /// User login API
   static Future<Map<String, dynamic>> loginUser({
     required String username,
     required String password,
@@ -92,12 +122,10 @@ class BackendAPI {
     final url = Uri.parse('$baseUrl/login');
     final body = jsonEncode({'username': username, 'password': password});
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: body,
+    return await _makeRequest(
+      request: http.Request('POST', url)
+        ..headers.addAll({'Content-Type': 'application/json'})
+        ..body = body,
     );
-
-    return _handleResponse(response);
   }
 }
