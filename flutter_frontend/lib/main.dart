@@ -1,23 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'screens/login_screen.dart';
-import 'screens/register_screen.dart';
-import 'screens/dashboard_screen.dart';
+import 'package:logging/logging.dart';
+import 'package:five_jars_ultra/ui/login_screen.dart';
+import 'package:five_jars_ultra/ui/register_screen.dart';
+import 'package:five_jars_ultra/ui/dashboard_screen.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
+
+  WidgetsFlutterBinding.ensureInitialized();
+  // Ensure portrait orientation
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
   runApp(const App());
 }
 
 class App extends StatelessWidget {
-  // Constructor
   const App({super.key});
 
-  // Build method
   @override
   Widget build(BuildContext context) {
-    // Router configuration. App starts at LoginScreen.
+    /// Router configuration. App starts at LoginScreen.
     final GoRouter router = GoRouter(
-      initialLocation: '/register',
+      initialLocation: '/login',
       routes: [
         GoRoute(
           path: '/login',
@@ -37,7 +47,9 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       title: '5 Jars',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color.fromARGB(255, 90, 28, 109),
+        ),
       ),
       routerConfig: router,
     );
