@@ -1,7 +1,7 @@
 import 'package:five_jars_ultra/ui/widgets/branding.dart';
 import 'package:five_jars_ultra/ui/widgets/login_form.dart';
 import 'package:flutter/material.dart';
-import 'adaptive_screen.dart';
+import 'package:five_jars_ultra/ui/adaptive_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});

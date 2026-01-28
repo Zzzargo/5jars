@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'adaptive_screen.dart';
+import 'package:five_jars_ultra/ui/adaptive_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});

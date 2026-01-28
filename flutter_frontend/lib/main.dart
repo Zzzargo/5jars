@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:five_jars_ultra/ui/login_screen.dart';
-import 'ui/register_screen.dart';
-import 'ui/dashboard_screen.dart';
+import 'package:five_jars_ultra/ui/register_screen.dart';
+import 'package:five_jars_ultra/ui/dashboard_screen.dart';
 import 'package:flutter/services.dart';
 
 void main() async {

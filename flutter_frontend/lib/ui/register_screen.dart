@@ -1,6 +1,6 @@
 import 'package:five_jars_ultra/ui/widgets/branding.dart';
 import 'package:flutter/material.dart';
-import 'adaptive_screen.dart';
+import 'package:five_jars_ultra/ui/adaptive_screen.dart';
 import 'package:five_jars_ultra/ui/widgets/register_form.dart';
 
 class RegisterScreen extends StatelessWidget {

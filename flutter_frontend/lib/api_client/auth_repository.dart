@@ -1,4 +1,4 @@
-import 'api_client.dart';
+import 'package:five_jars_ultra/api_client/api_client.dart';
 
 class AuthRepository {
   static Future<AuthResult> login({
