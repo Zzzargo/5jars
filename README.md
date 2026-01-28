@@ -6,6 +6,6 @@
 - Flutter
 
 ### Backend
-- Flask
-- MySQL
-- COBOL + C
+- Spring Boot
+- PostgreSQL
+- COBOL
