@@ -8,16 +8,10 @@ services:
       - "5432:5432" # Expose PostgreSQL on the default port, change if needed
 
     env_file:
-      - .env
+      - ../../../../.env
 
     volumes:
-      # Persistent data
       - five_jars_postgres_dev:/var/lib/postgresql
-
-      # Single source of truth
-      - ../../../db:/docker-entrypoint-initdb.source:ro
-      # Initialization script. Selects which data to insert in the database at startup
-      - ./init.sh:/docker-entrypoint-initdb.d/init.sh:ro
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
