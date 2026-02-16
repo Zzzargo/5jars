@@ -2,3 +2,4 @@
 .env.local
 build/
 .idea
+.vscode/

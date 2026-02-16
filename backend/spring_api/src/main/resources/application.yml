@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: spring_api
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/five_jars_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:prod_password}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    locations: filesystem:../../infrastructure/db/migrations
+
+  jackson:
+    # camelCase(Java) -> snake_case(JSON)
+    property-naming-strategy: SNAKE_CASE
+    # allow extra fields on requests
+    deserialization:
+      fail-on-unknown-properties: false
+
+app:
+  cors:
+    # TODO: add real domain
+    allowed-origins: "https://fivejars.com"
