@@ -23,3 +23,7 @@ app:
   cors:
     # TODO: add real domain
     allowed-origins: "https://fivejars.com"
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: ${JWT_EXPIRATION}
