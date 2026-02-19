@@ -1,10 +1,10 @@
-import 'package:five_jars_ultra/ui/widgets/branding.dart';
-import 'package:five_jars_ultra/ui/widgets/login_form.dart';
+import 'package:five_jars_ultra/shared/widgets/branding.dart';
 import 'package:flutter/material.dart';
-import 'package:five_jars_ultra/ui/adaptive_screen.dart';
+import 'package:five_jars_ultra/shared/adaptive_screen.dart';
+import 'package:five_jars_ultra/features/auth/presentation/widgets/register_form.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class LoginScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 26),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
-              child: const LoginForm(),
+              child: const RegisterForm(),
             ),
           ),
         ),
@@ -33,7 +33,7 @@ class LoginScreen extends StatelessWidget {
         children: [
           // Left side - Branding section
           Expanded(flex: 1, child: const Branding()),
-          // Right side - Login form
+          // Right side - Register form
           Expanded(
             flex: 1,
             child: Center(
@@ -47,7 +47,7 @@ class LoginScreen extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [const LoginForm()],
+                    children: [const RegisterForm()],
                   ),
                 ),
               ),

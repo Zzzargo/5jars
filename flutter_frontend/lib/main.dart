@@ -1,10 +1,13 @@
+import 'package:five_jars_ultra/features/auth/presentation/manager/login_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:five_jars_ultra/ui/login_screen.dart';
-import 'package:five_jars_ultra/ui/register_screen.dart';
-import 'package:five_jars_ultra/ui/dashboard_screen.dart';
+import 'package:five_jars_ultra/features/auth/presentation/login_screen.dart';
+import 'package:five_jars_ultra/features/auth/presentation/register_screen.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
 
 void main() async {
   Logger.root.level = Level.ALL;
@@ -16,6 +19,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Ensure portrait orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Initialize Dependency Injections the Holy Grail
+  await di.init();
 
   runApp(const App());
 }
@@ -31,7 +37,10 @@ class App extends StatelessWidget {
       routes: [
         GoRoute(
           path: '/login',
-          builder: (context, state) => const LoginScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => di.serviceLocator<LoginBloc>(),
+            child: const LoginScreen(),
+          ),
         ),
         GoRoute(
           path: '/register',
