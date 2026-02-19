@@ -1,5 +1,6 @@
 import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/register_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
@@ -15,4 +16,5 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton(() => AuthClient(serviceLocator()));
 
   serviceLocator.registerFactory(() => LoginBloc(serviceLocator()));
+  serviceLocator.registerFactory(() => RegisterBloc(serviceLocator()));
 }

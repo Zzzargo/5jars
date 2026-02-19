@@ -1,4 +1,5 @@
 import 'package:five_jars_ultra/features/auth/presentation/manager/login_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/register_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +45,10 @@ class App extends StatelessWidget {
         ),
         GoRoute(
           path: '/register',
-          builder: (context, state) => const RegisterScreen(),
+          builder: (context, state) => BlocProvider(
+            create: (context) => di.serviceLocator<RegisterBloc>(),
+            child: const RegisterScreen(),
+          ),
         ),
         GoRoute(
           path: '/dashboard',
