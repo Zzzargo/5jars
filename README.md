@@ -6,6 +6,10 @@
 - Flutter
 
 ### Backend
-- Spring Boot
+- Spring
 - PostgreSQL
 - COBOL
+
+## Installing
+- The project expects you to have a .env file in the root, where this README lays, with the secrets inside. Defaults are
+provided but may not work
