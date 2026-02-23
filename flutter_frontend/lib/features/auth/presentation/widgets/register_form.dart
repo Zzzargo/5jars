@@ -1,6 +1,8 @@
-import 'package:five_jars_ultra/features/auth/presentation/manager/register_bloc.dart';
-import 'package:five_jars_ultra/features/auth/presentation/manager/register_event.dart';
-import 'package:five_jars_ultra/features/auth/presentation/manager/register_state.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_event.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_state.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
@@ -34,68 +36,39 @@ class _RegisterFormState extends State<RegisterForm> {
     super.dispose();
   }
 
-  // Future<void> _handleRegister() async {
-  //   // Validate form fields
-  //   if (!_formKey.currentState!.validate()) {
-  //     return;
-  //   }
-
-  //   final nickname = _nicknameController.text.trim();
-  //   final username = _usernameController.text.trim();
-  //   final password = _passwordController.text;
-
-  //   setState(() => isLoading = true);
-
-  //   final result = await AuthRepository.register(
-  //     nickname: nickname,
-  //     username: username,
-  //     password: password,
-  //   );
-
-  //   if (!mounted) return;
-
-  //   setState(() => isLoading = false);
-
-  //   if (result.success) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(
-  //           "Account created successfully! " +
-  //               "You will be soon redirected to the login page.",
-  //         ),
-  //         backgroundColor: Colors.green.shade700,
-  //         behavior: SnackBarBehavior.floating,
-  //       ),
-  //     );
-  //     context.go('/login');
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(
-  //         content: Text(result.error!),
-  //         backgroundColor: Colors.red.shade700,
-  //         behavior: SnackBarBehavior.floating,
-  //       ),
-  //     );
-  //   }
-  // }
+  void _onRegisterSubmit() {
+    // Run validators
+    if (_formKey.currentState!.validate()) {
+      // Dispatch the register attempt event to the bloc
+      context.read<RegisterBloc>().add(
+        RegisterSubmitted(
+          nickname: _nicknameController.text.trim(),
+          username: _usernameController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RegisterBloc, RegisterState>(
+      // State management
       listener: (context, state) {
         if (state is RegisterSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 "Account created successfully! "
-                "You will be soon redirected to the login page.",
+                "You will be soon redirected to your dashboard.",
               ),
               backgroundColor: Colors.green.shade700,
               behavior: SnackBarBehavior.floating,
             ),
           );
 
-          context.go('/login');
+          // Notify the session bloc about the new authenticated user
+          context.read<AuthSessionBloc>().add(UserLoggedIn(state.username));
         } else if (state is RegisterFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -144,6 +117,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(height: 28),
                   TextFormField(
                     controller: _nicknameController,
+                    enabled: !isLoading,
                     decoration: InputDecoration(
                       labelText: 'Name',
                       prefixIcon: const Icon(Icons.person_outline),
@@ -167,6 +141,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _usernameController,
+                    enabled: !isLoading,
                     decoration: InputDecoration(
                       labelText: 'Username',
                       prefixIcon: const Icon(Icons.person_outline),
@@ -190,6 +165,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _passwordController,
+                    enabled: !isLoading,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outline),
@@ -230,6 +206,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: _confirmPasswordController,
+                    enabled: !isLoading,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       prefixIcon: const Icon(Icons.lock_outline),
@@ -262,28 +239,13 @@ class _RegisterFormState extends State<RegisterForm> {
                       }
                       return null;
                     },
-                    // TODO: use a registerSubmit trigger
-                    // onFieldSubmitted:(value) => {},
+                    onFieldSubmitted: (_) => _onRegisterSubmit(),
                   ),
                   const SizedBox(height: 24),
                   FractionallySizedBox(
                     widthFactor: 0.4,
                     child: PlatformElevatedButton(
-                      onPressed: isLoading
-                          ? null
-                          : () {
-                              // TODO: make this a separate function
-                              if (_formKey.currentState!.validate()) {
-                                // Dispatch the register attempt event to the bloc
-                                context.read<RegisterBloc>().add(
-                                  RegisterSubmitted(
-                                    nickname: _nicknameController.text.trim(),
-                                    username: _usernameController.text.trim(),
-                                    password: _passwordController.text,
-                                  ),
-                                );
-                              }
-                            },
+                      onPressed: isLoading ? null : _onRegisterSubmit,
                       material: (_, __) => MaterialElevatedButtonData(
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(

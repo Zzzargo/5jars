@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:five_jars_ultra/core/api/api_exception.dart';
+import 'package:five_jars_ultra/core/api/auth_interceptor.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
+import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:logging/logging.dart';
 
 class ApiHttpClient {
@@ -10,7 +12,7 @@ class ApiHttpClient {
 
   // This weird syntax is constructor with an initializer list. It allows to
   // initialize final fields before the constructor body runs
-  ApiHttpClient(EnvConfig envConfig)
+  ApiHttpClient(EnvConfig envConfig, SecureStorage secureStorage)
     : _dio = Dio(
         BaseOptions(
           baseUrl: envConfig.apiBaseUrl,
@@ -20,15 +22,14 @@ class ApiHttpClient {
           contentType: 'application/json',
         ),
       ) {
-    _dio.interceptors.add(
+    _dio.interceptors.addAll([
+      AuthInterceptor(secureStorage),
       LogInterceptor(
         requestBody: true,
         responseBody: true,
         logPrint: (obj) => _logger.info(obj),
       ),
-    );
-
-    // TODO: jwt interceptor for auth
+    ]);
   }
 
   /// Generic dio GET request wrapper
@@ -52,6 +53,7 @@ class ApiHttpClient {
   /// Generic dio exception transformer
   ApiException _handleError(DioException e) {
     final statusCode = e.response?.statusCode;
+    // Extract the "detail" field from Spring's ProblemDetail response
     final message =
         e.response?.data?['detail'] ?? 'An unexpected error occurred';
 
@@ -70,8 +72,6 @@ class ApiHttpClient {
       message: message,
       statusCode: statusCode,
     );
-
-    // Extract the "detail" field from Spring's ProblemDetail response
     return apiException;
   }
 }
