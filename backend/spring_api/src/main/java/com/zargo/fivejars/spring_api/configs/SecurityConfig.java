@@ -42,8 +42,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        // TODO: prevent an authenticated user from accessing all data
-                        .requestMatchers("/api/users/me").permitAll()
 
                         // Any other endpoints require authentication
                         .anyRequest().authenticated()

@@ -18,7 +18,8 @@ import java.util.UUID;
 @DynamicInsert  // Allows for empty fields, postgres will set the default there
 public final class User implements UserDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue  // Tell Hibernate to use the DB for UUID generation
+    @Column(columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID id;
 
     @Column(nullable = false, unique = true)
