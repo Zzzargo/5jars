@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:five_jars_ultra/core/api/api_exception.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
@@ -51,23 +53,15 @@ class AuthClient {
         username: authResponse.username,
       );
     } on ApiException catch (e) {
-      if (e.statusCode == 401) {
-        return const AuthFailure("Invalid username or password.");
-      }
-
-      if (e.statusCode == 403) {
-        return const AuthFailure("Nonono. Bad cat!");
-      }
-
-      if (e.statusCode == 409) {
-        return const AuthFailure("Username already taken.");
-      }
-
-      if (e.statusCode == 500) {
-        return const AuthFailure("Server error.");
-      }
-
-      return AuthFailure(e.toString());
+      return switch (e.statusCode) {
+        HttpStatus.unauthorized => const AuthFailure(
+          "Invalid username or password.",
+        ),
+        HttpStatus.forbidden => const AuthFailure("Nonono. Bad cat!"),
+        HttpStatus.conflict => const AuthFailure("Username already taken."),
+        HttpStatus.internalServerError => const AuthFailure("Server error."),
+        _ => AuthFailure(e.toString()),
+      };
     } catch (e) {
       // This should never happen, but if it does it's a bug in the http client
       return AuthFailure("An unknown error occurred: ${e.toString()}");

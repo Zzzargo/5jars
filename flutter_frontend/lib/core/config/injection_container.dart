@@ -1,5 +1,6 @@
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
+import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
 import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_bloc.dart';
@@ -31,6 +32,9 @@ Future<void> init() async {
     () => AuthClient(serviceLocator(), serviceLocator()),
   );
 
+  // App state manager for global loading/ready status
+  serviceLocator.registerLazySingleton(() => AppStateCubit());
+
   // Business logic components (BLoCs) - basically, state managers
   serviceLocator.registerLazySingleton(() => AuthSessionBloc(serviceLocator()));
 
@@ -41,7 +45,10 @@ Future<void> init() async {
 
   // Router configuration
   assert(serviceLocator.isRegistered<AuthSessionBloc>());
-  serviceLocator.registerLazySingleton(() => AppRouter(serviceLocator()));
+  assert(serviceLocator.isRegistered<AppStateCubit>());
+  serviceLocator.registerLazySingleton(
+    () => AppRouter(serviceLocator(), serviceLocator()),
+  );
 
   Logger(
     'InjectionContainer',

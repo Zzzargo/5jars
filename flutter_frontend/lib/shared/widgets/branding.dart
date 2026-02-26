@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class Branding extends StatelessWidget {
   const Branding({super.key});
 
+  // TODO: Separate background
+
   @override
   Widget build(BuildContext context) {
     return Container(

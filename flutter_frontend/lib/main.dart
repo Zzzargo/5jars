@@ -1,5 +1,6 @@
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/router/router.dart';
+import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
@@ -39,13 +40,29 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      lazy: false, // Run this immediately to check for an existing session
-      create: (_) {
-        final bloc = di.serviceLocator<AuthSessionBloc>();
-        bloc.add(AppStarted());
-        return bloc;
-      },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          lazy: false, // Run this immediately to check for an existing session
+          create: (_) {
+            final bloc = di.serviceLocator<AuthSessionBloc>();
+            bloc.add(AppStarted());
+            return bloc;
+          },
+        ),
+        BlocProvider(
+          lazy: false, // Run this immediately to set the app state to loading
+          create: (_) {
+            final cubit = di.serviceLocator<AppStateCubit>();
+            // Set the splash screen until the session bloc is determined
+            cubit.runTasks(
+              tasks: [di.serviceLocator<AuthSessionBloc>().isReady],
+            );
+
+            return cubit;
+          },
+        ),
+      ],
       child: const AppView(),
     );
   }

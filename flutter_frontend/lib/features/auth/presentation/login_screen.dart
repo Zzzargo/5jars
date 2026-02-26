@@ -33,7 +33,10 @@ class LoginScreen extends StatelessWidget {
       body: Row(
         children: [
           // Left side - Branding section
-          Expanded(flex: 1, child: const Branding()),
+          Expanded(
+            flex: 1,
+            child: const Hero(tag: "branding", child: Branding()),
+          ),
           // Right side - Login form
           Expanded(
             flex: 1,
@@ -45,11 +48,7 @@ class LoginScreen extends StatelessWidget {
                     maxWidth: 480,
                     minWidth: 320,
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [const LoginForm()],
-                  ),
+                  child: const LoginForm(),
                 ),
               ),
             ),
