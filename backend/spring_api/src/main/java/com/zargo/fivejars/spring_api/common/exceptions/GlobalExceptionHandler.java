@@ -1,6 +1,7 @@
 package com.zargo.fivejars.spring_api.common.exceptions;
 
 import com.zargo.fivejars.spring_api.features.authentication.exceptions.InvalidCredentialsException;
+import com.zargo.fivejars.spring_api.features.authentication.exceptions.InvalidTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -16,7 +17,7 @@ import java.time.Instant;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handleNotFound(final ResourceNotFoundException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
 
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         pd.setTitle("Resource Not Found");
@@ -26,7 +27,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UniqueConstraintViolationException.class)
     public ProblemDetail handleUniqueConstraintViolation(final UniqueConstraintViolationException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
 
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
         pd.setTitle("Unique Constraint Violation");
@@ -36,7 +37,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(final InvalidCredentialsException e) {
-        log.warn(e.getMessage(), e);
+        log.warn(e.getMessage());
 
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
         pd.setTitle("Invalid Credentials");
@@ -50,6 +51,16 @@ public class GlobalExceptionHandler {
 
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
         pd.setTitle("Access Denied");
+        pd.setProperty("timestamp", Instant.now());
+        return pd;
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ProblemDetail handleInvalidJwt(final InvalidTokenException e) {
+        log.warn(e.getMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
+        pd.setTitle("Authentication Failed");
         pd.setProperty("timestamp", Instant.now());
         return pd;
     }

@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
+import 'package:five_jars_ultra/features/auth/domain/auth_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
@@ -44,9 +47,25 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
       final token = await _storage.getToken();
 
       if (token != null) {
-        final username = await _storage.getUsername();
-        emit(AuthSessionAuthenticated(username ?? 'User'));
-        _logger.info('Existing session found for user: $username');
+        // Make sure the token is still valid with the backend
+        // TODO: after setting up the users client make a /me request instead
+        final authResult = await serviceLocator<AuthClient>().login(
+          "User",
+          "password",
+        );
+
+        if (authResult is AuthSuccess) {
+          final username = await _storage.getUsername();
+
+          emit(AuthSessionAuthenticated(username ?? 'User'));
+          _logger.info('Existing session found for user: $username');
+        } else {
+          await _storage.clearAll();
+
+          emit(AuthSessionUnauthenticated());
+          _logger.info('Invalid JWT. User must log in again.');
+          // TODO: notify the user their session expired
+        }
       } else {
         emit(AuthSessionUnauthenticated());
         _logger.info('No existing session found, user is unauthenticated');

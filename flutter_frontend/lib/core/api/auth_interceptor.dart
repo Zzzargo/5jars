@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 
 class AuthInterceptor extends Interceptor {
   final SecureStorage _storage;
@@ -28,9 +33,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // TODO: if backend returns 401, the token is invalid
-    if (err.response?.statusCode == 401) {
-      // TODO: eventually trigger a logout in the auth session bloc
+    // If backend returns 401, the token is invalid, log out
+    if (err.response?.statusCode == HttpStatus.unauthorized) {
+      serviceLocator<AuthSessionBloc>().add(UserLoggedOut());
     }
     return handler.next(err);
   }
