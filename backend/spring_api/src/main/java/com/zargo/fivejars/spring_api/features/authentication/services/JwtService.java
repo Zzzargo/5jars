@@ -10,7 +10,6 @@ import io.jsonwebtoken.Jwts;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.UUID;
 import java.util.function.Function;
 
 @Service

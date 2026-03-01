@@ -6,7 +6,7 @@ import com.zargo.fivejars.spring_api.features.authentication.dtos.AuthResponse;
 import com.zargo.fivejars.spring_api.features.authentication.dtos.LoginRequest;
 import com.zargo.fivejars.spring_api.features.authentication.dtos.RegisterRequest;
 import com.zargo.fivejars.spring_api.features.users.dtos.UserResponse;
-import com.zargo.fivejars.spring_api.features.users.repositories.UserRepository;
+import com.zargo.fivejars.spring_api.features.users.repository.UserRepository;
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

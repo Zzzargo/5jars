@@ -1,4 +1,4 @@
-package com.zargo.fivejars.spring_api.features.users.controllers;
+package com.zargo.fivejars.spring_api.features.users.controller;
 
 import com.zargo.fivejars.spring_api.features.users.dtos.UserResponse;
 import com.zargo.fivejars.spring_api.features.users.models.User;

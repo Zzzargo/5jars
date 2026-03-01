@@ -2,7 +2,7 @@ package com.zargo.fivejars.spring_api.features.users.services;
 
 import com.zargo.fivejars.spring_api.features.users.exceptions.UserNotFoundException;
 import com.zargo.fivejars.spring_api.features.users.models.User;
-import com.zargo.fivejars.spring_api.features.users.repositories.UserRepository;
+import com.zargo.fivejars.spring_api.features.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

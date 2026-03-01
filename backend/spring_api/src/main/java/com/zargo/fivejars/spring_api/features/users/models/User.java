@@ -3,12 +3,11 @@ package com.zargo.fivejars.spring_api.features.users.models;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,17 +21,17 @@ public final class User implements UserDetails {
     @Column(columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(name = "password_hash", nullable = false)
+    @Column(name = "password_hash", nullable = false, length = 60)
     private String passwordHash;
 
-    @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
 
     @Column(name = "last_access", nullable = false)
-    private Date lastAccess;
+    private Instant lastAccess;
 
     @Override @NonNull
     public Collection<? extends GrantedAuthority> getAuthorities() {

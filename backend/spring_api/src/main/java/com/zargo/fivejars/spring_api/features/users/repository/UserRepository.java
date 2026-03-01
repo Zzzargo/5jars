@@ -1,4 +1,4 @@
-package com.zargo.fivejars.spring_api.features.users.repositories;
+package com.zargo.fivejars.spring_api.features.users.repository;
 
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
