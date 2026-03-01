@@ -1,5 +1,6 @@
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 import 'package:five_jars_ultra/shared/widgets/branding.dart';
+import 'package:five_jars_ultra/shared/widgets/branding_background.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -30,20 +31,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Widget _buildDesktop(BuildContext context) {
     return Scaffold(
-      // Using Stack because we want the branding background to fill the screen
-      // This way anything we put on top stacks, permitting overlap
-      body: Stack(
-        children: [
-          const Center(
-            child: Hero(
-              // TODO: fix hero transition
-              tag: 'branding', // Hero allows a smooth transition to Login
-              child: Branding(),
-            ),
-          ),
-          Align(
-            alignment: const Alignment(0, 0.6), // 60% down the screen
-            child: SizedBox(
+      body: BrandingBackground(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Hero(tag: 'branding', child: Branding()),
+
+            const SizedBox(height: 28),
+
+            SizedBox(
               width: 40,
               height: 40,
               child: CircularProgressIndicator(
@@ -53,8 +50,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

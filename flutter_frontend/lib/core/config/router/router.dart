@@ -70,10 +70,12 @@ class AppRouter {
         path: AppRoutes.login,
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
+          transitionDuration: const Duration(milliseconds: 600),
           child: BlocProvider(
             create: (_) => serviceLocator<LoginBloc>(),
             child: const LoginScreen(),
           ),
+          // TODO: Make transitions consistent across all screens
           transitionsBuilder: (context, animation, secondaryAnimation, child) =>
               FadeTransition(opacity: animation, child: child),
         ),

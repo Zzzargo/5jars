@@ -1,4 +1,5 @@
 import 'package:five_jars_ultra/shared/widgets/branding.dart';
+import 'package:five_jars_ultra/shared/widgets/branding_background.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 import 'package:five_jars_ultra/features/auth/presentation/widgets/register_form.dart';
@@ -32,7 +33,7 @@ class RegisterScreen extends StatelessWidget {
       body: Row(
         children: [
           // Left side - Branding section
-          Expanded(flex: 1, child: const Branding()),
+          Expanded(flex: 1, child: const BrandingBackground(child: Branding())),
           // Right side - Register form
           Expanded(
             flex: 1,

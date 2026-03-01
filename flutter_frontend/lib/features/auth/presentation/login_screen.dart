@@ -1,5 +1,6 @@
 import 'package:five_jars_ultra/shared/widgets/branding.dart';
 import 'package:five_jars_ultra/features/auth/presentation/widgets/login_form.dart';
+import 'package:five_jars_ultra/shared/widgets/branding_background.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 
@@ -35,7 +36,9 @@ class LoginScreen extends StatelessWidget {
           // Left side - Branding section
           Expanded(
             flex: 1,
-            child: const Hero(tag: "branding", child: Branding()),
+            child: const BrandingBackground(
+              child: Hero(tag: "branding", child: Branding()),
+            ),
           ),
           // Right side - Login form
           Expanded(
