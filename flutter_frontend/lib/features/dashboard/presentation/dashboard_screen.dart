@@ -19,7 +19,7 @@ class DashboardScreen extends StatelessWidget {
     String username = "User";
 
     if (sessionState is AuthSessionAuthenticated) {
-      username = sessionState.username;
+      username = sessionState.user.username;
     }
 
     return Scaffold(

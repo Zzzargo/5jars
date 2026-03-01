@@ -48,7 +48,7 @@ class _LoginFormState extends State<LoginForm> {
       listener: (context, state) {
         if (state is LoginSuccess) {
           // Tell the auth session bloc of a login success, it will redirect
-          context.read<AuthSessionBloc>().add(UserLoggedIn(state.username));
+          context.read<AuthSessionBloc>().add(UserLoggedIn(state.user));
         } else if (state is LoginFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

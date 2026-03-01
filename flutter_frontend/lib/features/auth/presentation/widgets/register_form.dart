@@ -68,7 +68,7 @@ class _RegisterFormState extends State<RegisterForm> {
           );
 
           // Notify the session bloc about the new authenticated user
-          context.read<AuthSessionBloc>().add(UserLoggedIn(state.username));
+          context.read<AuthSessionBloc>().add(UserLoggedIn(state.user));
         } else if (state is RegisterFailure) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

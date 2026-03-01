@@ -24,7 +24,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
     switch (authResult) {
       case AuthSuccess():
-        emit(RegisterSuccess(authResult.username));
+        emit(RegisterSuccess(authResult.user));
 
       case AuthFailure f:
         emit(RegisterFailure(f.message));

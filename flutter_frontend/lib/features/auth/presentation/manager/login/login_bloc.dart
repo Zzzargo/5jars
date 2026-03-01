@@ -24,7 +24,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     switch (authResult) {
       case AuthSuccess s:
-        emit(LoginSuccess(s.username));
+        emit(LoginSuccess(s.user));
 
       case AuthFailure f:
         emit(LoginFailure(f.message));

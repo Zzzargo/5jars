@@ -46,12 +46,9 @@ class AuthClient {
       // Authentication successful. Store the JWT on the client side
       await _secureStorage.saveToken(authResponse.token);
       // And the username for UX
-      await _secureStorage.saveUsername(authResponse.username);
+      await _secureStorage.saveUsername(authResponse.user.username);
 
-      return AuthSuccess(
-        token: authResponse.token,
-        username: authResponse.username,
-      );
+      return AuthSuccess(token: authResponse.token, user: authResponse.user);
     } on ApiException catch (e) {
       return switch (e.statusCode) {
         HttpStatus.unauthorized => const AuthFailure(

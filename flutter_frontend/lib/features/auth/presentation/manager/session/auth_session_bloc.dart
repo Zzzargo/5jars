@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:five_jars_ultra/core/config/injection_container.dart';
-import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
-import 'package:five_jars_ultra/features/auth/domain/auth_result.dart';
+import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
+import 'package:five_jars_ultra/features/dashboard/domain/user_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
@@ -26,8 +26,8 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
     on<AppStarted>(_onAppStarted);
 
     on<UserLoggedIn>((event, emit) {
-      emit(AuthSessionAuthenticated(event.username));
-      _logger.info('User logged in: ${event.username}');
+      emit(AuthSessionAuthenticated(event.user));
+      _logger.info('User logged in: ${event.user.username}');
     });
 
     on<UserLoggedOut>((event, emit) async {
@@ -48,22 +48,36 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
       if (token != null) {
         // Make sure the token is still valid with the backend
-        // TODO: after setting up the users client make a /me request instead
-        final authResult = await serviceLocator<AuthClient>().login(
-          "User",
-          "password",
-        );
+        final authResult = await serviceLocator<UsersClient>().getMe();
 
-        if (authResult is AuthSuccess) {
-          final username = await _storage.getUsername();
+        switch (authResult) {
+          case UserSuccess():
+            final localUsername = await _storage.getUsername();
+            if (localUsername == null) {
+              // This should never happen
+              await _storage.clearAll();
+              emit(AuthSessionUnauthenticated());
+              _logger.warning('JWT found but no username. Clearing session.');
+              return;
+            }
 
-          emit(AuthSessionAuthenticated(username ?? 'User'));
-          _logger.info('Existing session found for user: $username');
-        } else {
-          await _storage.clearAll();
+            if (authResult.user.username != localUsername) {
+              // Update the local username (most likely the user changed name)
+              _logger.info(
+                'Updating stale local username:'
+                ' $localUsername -> ${authResult.user.username}',
+              );
+              await _storage.saveUsername(authResult.user.username);
+            }
 
-          emit(AuthSessionUnauthenticated());
-          _logger.info('Invalid JWT. User must log in again.');
+            emit(AuthSessionAuthenticated(authResult.user));
+            _logger.info('Existing session found for user: $localUsername');
+
+          case UserFailure():
+            await _storage.clearAll();
+
+            emit(AuthSessionUnauthenticated());
+            _logger.info('Invalid JWT. User must log in again.');
           // TODO: notify the user their session expired
         }
       } else {

@@ -5,6 +5,7 @@ import com.zargo.fivejars.spring_api.features.authentication.exceptions.Username
 import com.zargo.fivejars.spring_api.features.authentication.dtos.AuthResponse;
 import com.zargo.fivejars.spring_api.features.authentication.dtos.LoginRequest;
 import com.zargo.fivejars.spring_api.features.authentication.dtos.RegisterRequest;
+import com.zargo.fivejars.spring_api.features.users.dtos.UserResponse;
 import com.zargo.fivejars.spring_api.features.users.repositories.UserRepository;
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class AuthService {
 
         user = userRepository.save(user);  // Let the db generate a UUID before using it for jwt generation
         var token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getUsername());
+        return new AuthResponse(token, new UserResponse(user.getId(), user.getUsername(), user.getCreatedAt()));
     }
 
     public AuthResponse login(final LoginRequest request) {
@@ -55,6 +56,6 @@ public class AuthService {
         var user = (User) auth.getPrincipal();
         assert user != null;  // To be sure. The user can't be null because the auth manager throws an exception inside
         var token = jwtService.generateToken(user);
-        return new AuthResponse(token, user.getUsername());
+        return new AuthResponse(token, new UserResponse(user.getId(), user.getUsername(), user.getCreatedAt()));
     }
 }

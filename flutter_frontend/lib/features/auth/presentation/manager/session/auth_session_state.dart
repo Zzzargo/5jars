@@ -1,3 +1,5 @@
+import 'package:five_jars_ultra/features/dashboard/models/user_model.dart';
+
 sealed class AuthSessionState {
   const AuthSessionState();
 }
@@ -7,8 +9,8 @@ sealed class AuthSessionState {
 final class AuthSessionNone extends AuthSessionState {}
 
 final class AuthSessionAuthenticated extends AuthSessionState {
-  final String username;
-  AuthSessionAuthenticated(this.username);
+  final UserModel user;
+  AuthSessionAuthenticated(this.user);
 }
 
 final class AuthSessionUnauthenticated extends AuthSessionState {}
