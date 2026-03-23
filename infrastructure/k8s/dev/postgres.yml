@@ -1,0 +1,68 @@
+# Service - lives in the control plane, routes traffic to nodes
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  ports:
+    - port: 5432 # Expose default PostgreSQL port on the service
+  selector:
+    app: postgres # This tells the service to route traffic to pods with the label "app: postgres"
+
+
+---
+
+# StatefulSet for PostgreSQL. Orchestrates the runner pods
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: "postgres-service" # Link the StatefulSet to the corresponding service
+  replicas: 1 # Usually there is only one database pod which scales vertically if needed
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      # Here the runner pod is defined
+      containers:
+      - name: postgres
+        image: postgres:18-alpine
+
+        envFrom:
+        - secretRef:
+            name: fivejars-secrets # Reference to the secrets
+
+        ports:
+        - containerPort: 5432 # Expose PostgreSQL port within the pod
+
+        livenessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "postgres"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data # This is where PostgreSQL stores its data
+
+  # Persistent Volume Claim
+  # Makes the connection between the runner pods and the PersistentVolume (postgres-storage).
+  # Ensures data persistence across pod restarts
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 1Gi

@@ -10,7 +10,7 @@ spring:
 
   flyway:
     enabled: true
-    locations: filesystem:../../infrastructure/db/migrations,filesystem:../../infrastructure/db/seeds
+    locations: filesystem:/app/migrations,filesystem:/app/seeds
 
   jackson:
     # camelCase(Java) -> snake_case(JSON)

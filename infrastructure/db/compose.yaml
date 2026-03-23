@@ -8,7 +8,7 @@ services:
       - "5432:5432" # Expose PostgreSQL on the default port, change if needed
 
     env_file:
-      - ../../../../.env
+      - ../../.env
 
     volumes:
       - five_jars_postgres_dev:/var/lib/postgresql

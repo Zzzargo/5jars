@@ -1,4 +1,4 @@
-INSERT INTO accounts (owner_id, name, coefficient, balance)
+INSERT INTO jars (owner_id, name, coefficient, balance)
 VALUES
     ('11111111-1111-1111-1111-111111111111', 'Savings', 50.00, 1500.00),
     ('11111111-1111-1111-1111-111111111111', 'Food', 50.00, 300.00),

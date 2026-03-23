@@ -1,0 +1,40 @@
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  type: NodePort # This exposes it so that it can be accessed from outside the cluster (Flutter will talk to this service)
+  ports:
+    - port: 8080 # The port that the service will listen on inside the cluster
+      targetPort: 8080 # Same here
+      nodePort: 30080 # The port that will be exposed to the outside world
+  selector:
+    app: backend # Will route traffic to pods with the label "app: backend"
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      # Here the runner pod is defined
+      containers:
+      - name: spring-api
+        image: five-jars-backend:v1 # IMPORTANT: Kubernetes will look for this image, so build it and tag it accordingly
+        imagePullPolicy: Never # Use the local image built on the cluster node. This is crucial for development to avoid pulling from a registry
+        ports:
+        - containerPort: 8080 # Expose the port that the Spring Boot app listens on
+        envFrom:
+        - secretRef:
+            name: fivejars-secrets # Reference to the secrets
