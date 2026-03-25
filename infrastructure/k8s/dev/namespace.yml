@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fivejars
+  labels:
+    name: fivejars-backend
+    pod-security.kubernetes.io/enforce: restricted # Enforce High Security Standard

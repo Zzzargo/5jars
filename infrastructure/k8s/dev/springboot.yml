@@ -1,8 +1,19 @@
+# Service account - gives the pods an identity and permissions to talk to the K8s API (not needed for security reasons)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: backend-sa
+  namespace: fivejars
+automountServiceAccountToken: false # The blind pod: cannot talk to K8s API (secure)
+
+---
+
 # Service
 apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
+  namespace: fivejars
 spec:
   type: NodePort # This exposes it so that it can be accessed from outside the cluster (Flutter will talk to this service)
   ports:
@@ -18,21 +29,77 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment
+  namespace: fivejars
 spec:
-  replicas: 1
+  replicas: 2
+
+  # Strategy: How to replace old pods with new ones
+  strategy:
+    rollingUpdate:
+      maxSurge: 1 # Create 1 new pod before killing the old one
+      maxUnavailable: 0 # Never have 0 pods running during update
+
   selector:
     matchLabels:
       app: backend
+
   template:
     metadata:
       labels:
         app: backend
     spec:
+      serviceAccountName: backend-sa # Associate the service account with the pods for identity and permissions
+      securityContext:
+        runAsNonRoot: true # Don't run as root for better security
+        runAsUser: 1000 # Use a non-root user ID
+        fsGroup: 1000 # Set a group ID for file permissions
+
       # Here the runner pod is defined
       containers:
       - name: spring-api
-        image: five-jars-backend:v1 # IMPORTANT: Kubernetes will look for this image, so build it and tag it accordingly
-        imagePullPolicy: Never # Use the local image built on the cluster node. This is crucial for development to avoid pulling from a registry
+        # IMPORTANT: Kubernetes will look for this image, so build it and tag it accordingly
+        image: fivejars-backend:v0.0.2
+        imagePullPolicy: Never # Use a local image
+
+        securityContext:
+          allowPrivilegeEscalation: false # Don't allow the container to gain more privileges than its parent (the pod)
+          readOnlyRootFilesystem: false # Set to true once paths for logs are defined
+          capabilities:
+            drop: ["ALL"] # Drop all Linux capabilities
+          seccompProfile:
+            type: RuntimeDefault # Use the default seccomp profile for better security
+
+        # Resource management
+        resources:
+          # Minimum resources required to run the container
+          requests:
+            memory: "512Mi"
+            cpu: "100m" # 10% of a CPU core
+          # Maximum resources the container can use. If it tries to exceed this, it will be throttled or killed
+          limits:
+            memory: "2Gi"
+            cpu: "700m" # 70% of a CPU core
+
+        # Self-Healing
+        # Readiness: don't send traffic until Flyway is done and Spring is up
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8080
+          # This probe is crucial for ensuring that the pod only receives traffic when it's fully ready to handle requests
+          initialDelaySeconds: 45 # Give it some time to start up and run migrations before we start checking
+          periodSeconds: 5 # Check every 5 seconds after the initial delay
+          failureThreshold: 3 # If it fails 3 times in a row, mark the pod as Unready and stop sending traffic to it
+        
+        # Liveness: if the JVM is deadlocked, kill and restart the container
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 90 # This probe is for checking if the app is alive after it's been running for a while
+          periodSeconds: 30 # Check less frequently than readiness to save resources
+          failureThreshold: 5 # Allow more failures before killing the pod
+
         ports:
         - containerPort: 8080 # Expose the port that the Spring Boot app listens on
         envFrom:

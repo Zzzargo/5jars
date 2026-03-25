@@ -1,0 +1,10 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  extraPortMappings:
+  - containerPort: 30080 # This is the port that will be exposed on the control-plane node
+    hostPort: 30080 # This is the port that will be exposed on the host machine (Flutter will talk to this port)
+    protocol: TCP
+- role: worker
+- role: worker

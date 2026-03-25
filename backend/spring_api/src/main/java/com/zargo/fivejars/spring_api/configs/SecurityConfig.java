@@ -43,6 +43,10 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
 
+                        // 2. PUBLIC: Health and Readiness probes (Required for Kubernetes)
+                        // We permit /actuator/** so K8s can check liveness/readiness
+                        .requestMatchers("/actuator/**").permitAll() 
+
                         // Any other endpoints require authentication
                         .anyRequest().authenticated()
                 )
