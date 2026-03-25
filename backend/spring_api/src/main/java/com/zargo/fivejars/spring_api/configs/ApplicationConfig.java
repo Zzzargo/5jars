@@ -1,6 +1,6 @@
 package com.zargo.fivejars.spring_api.configs;
 
-import com.zargo.fivejars.spring_api.features.users.repositories.UserRepository;
+import com.zargo.fivejars.spring_api.features.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,76 +1,104 @@
-## Installing
-- The project expects you to have a .env file in the root, where this README lays, with the secrets inside. Defaults are
-provided but may not work
-
-
 # Five Jars Ultra
-**The superior money management app based on the 5 Jars system.**
 
-## 🚀 Tech Stack
+Money management app based on the five jars method.
 
-### Frontend
-- **Flutter**: Cross-platform UI framework in Dart
+## Tech Stack
 
-### Backend
-- **Spring Boot**: Robust REST API and business logic. The king of scalable and reliable backends
-- **PostgreSQL**: Reliable relational data storage. Some even made fullstack apps with just postgres :))
-- **COBOL**: The app's little neutron star. I just wanted to see if I could do it. Don't ask why, ask why not.
+- Frontend: Flutter. A cross-platform UI framework in Dart that allows to build beautiful and responsive apps for mobile, web, and desktop from a single codebase
+- Backend API: Spring Boot, the Holy Grail. A mature Java framework that simplifies building production-ready applications with a vast ecosystem of libraries.
+- Database: PostgreSQL. A powerful open-source relational database known for its reliability and feature set.
+- COBOL microservice. This is the star of the show. A microservice written in COBOL, running on OpenCobol, and containerized with Docker. I just wanted to prove that it's possible to integrate legacy technologies into modern architectures.
 
----
 
-## 🛠️ Installation & Setup
+## Project Structure
 
-### Environment Configuration
-The project requires a `.env` file located in the **root directory** (same folder as this README). This file stores secrets mostly, that's why it's included in [.gitignore](./.gitignore)
-
-**Create a `.env` file with the following template:**
-
-```venv
-# Database Configuration
-POSTGRES_DB=five_jars_db
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
-LOAD_SEEDS=true
-# Security (JWT)
-# Minimum 64-character base64 string recommended
-JWT_SECRET_KEY=your_very_secure_secret_key_that_should_be_at_least_64_characters_long
-JWT_EXPIRATION=11100000 # Token expiration time in milliseconds
-```
-
-## 📦 Deployment Options
-
-This project supports multiple ways to get up and running depending on your workflow:
-### A. The Full Kubernetes Experience (it's just cool)
-
-For a production-like environment using `kind` (Kubernetes IN Docker).
-Guide: see the [Kubernetes README](./infrastructure/k8s/README.md)
-
-### B. Standalone Containers
-
-If you want to run each piece separately for various reasons:
-
-#### Postgres Guide
-
-See the [Docker Compose README](./infrastructure/db/README.md) for instructions on setting up PostgreSQL with Docker Compose.
-
-Key Command: ```docker compose up -d```
-
-#### Spring Boot Guide
-Ensure a PostgreSQL instance is running
-
-Run `./gradlew bootRun` with arguments for the active profile from `backend/spring_api` or use the Dockerfile to build and run the Spring Boot app in a container
-
-## 📂 Project Structure
-```
+```text
 .
 ├── backend
-│   ├── cobol_microservice # The COBOL microservice source code
-│   └── spring_api # The Spring Boot backend source code
-│
-├── flutter_frontend # The Flutter frontend source code
-│
-├── infrastructure
-│   ├── db # Database migrations, seeds and the docker compose file
-│   └── k8s # Kubernetes manifests for development and production
-└── README.md
+│   ├── cobol_microservice
+│   └── spring_api
+├── flutter_frontend
+└── infrastructure
+		├── db
+		└── k8s
+```
+
+## Setup Options
+
+### Option A: Kubernetes Dev Environment (recommended)
+
+Follow [infrastructure/k8s/README.md](./infrastructure/k8s/README.md).
+
+Quick start:
+
+```bash
+cd infrastructure/k8s/dev
+./setup.sh ./.secrets.yml
+```
+
+This starts:
+- Namespace `fivejars`
+- CloudNativePG Postgres cluster
+- Backend deployment, service, and HPA
+- Network policies and metrics-server
+
+### Option B: Manually deploy each component of the tech stack
+
+#### The Database
+Follow [infrastructure/db/README.md](./infrastructure/db/README.md) to start the database, reachable at `localhost:5432` after running the container
+
+Quick start:
+
+```bash
+cd infrastructure/db
+docker compose up -d
+```
+
+#### The Backend API
+
+Ensure PostgreSQL is running, then run from `backend/spring_api`:
+
+```bash
+./gradlew bootRun
+```
+
+> Note: the runner needs the environment to have some variables defined to connect with the database and choose an active profile. A `.env` file is recommended to be had in the root of the project with the following content:
+
+```env
+DB_URL=jdbc:postgresql://localhost:5432/five_jars_db
+POSTGRES_DB=five_jars_db
+POSTGRES_USER=fivejars_db_user
+POSTGRES_PASSWORD=<your_password>
+LOAD_SEEDS=true/false
+JWT_SECRET_KEY=<your_jwt_secret_key>
+JWT_EXPIRATION=<jwt_expiration_in_ms>
+```
+
+## Environment Notes
+
+There are two secret configs in this project:
+
+- Root `.env` file:
+	- Mainly for standalone/local workflows.
+- Kubernetes Secret file:
+	- Used by k8s deployment.
+	- Expected keys include `username`, `password`, `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET_KEY`, and `JWT_EXPIRATION`.
+    - More on that at [infrastructure/k8s/README.md](./infrastructure/k8s/README.md#define-secrets).
+
+Do not commit real secrets :)
+
+## Useful Commands
+
+Kubernetes status:
+
+```bash
+kubectl get pods -n fivejars
+kubectl get svc -n fivejars
+kubectl get hpa -n fivejars
+```
+
+Backend health through NodePort:
+
+```bash
+curl http://localhost:30080/actuator/health
 ```

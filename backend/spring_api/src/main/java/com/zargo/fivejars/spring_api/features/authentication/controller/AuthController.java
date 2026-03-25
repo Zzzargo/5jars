@@ -1,4 +1,4 @@
-package com.zargo.fivejars.spring_api.features.authentication.controllers;
+package com.zargo.fivejars.spring_api.features.authentication.controller;
 
 import com.zargo.fivejars.spring_api.features.authentication.dtos.AuthResponse;
 import com.zargo.fivejars.spring_api.features.authentication.dtos.LoginRequest;

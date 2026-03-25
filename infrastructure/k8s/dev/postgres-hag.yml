@@ -1,0 +1,19 @@
+apiVersion: postgresql.cnpg.io/v1
+# This isn't really a Kubernetes cluster. It's declared as one to leverage the CloudNativePG Operator
+# Inside the Kubernetes cluster, this will actually be a High Availabiliy PostgreSQL group
+kind: Cluster
+metadata:
+  # The database will be accessible at the service name "fivejars-db-rw" (read-write) and "fivejars-db-ro" (read-only)
+  name: fivejars-db
+spec:
+  instances: 2 # 1 Primary (RW), 1 Replica (RO)
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.1-system-trixie
+  storage:
+    size: 3Gi
+  bootstrap:
+    initdb:
+      database: five_jars_db
+      owner: fivejars_db_user # Avoid using `postgres` as it's a special superuser and usually you won't be able to auth
+      secret:
+        name: fivejars-secrets
+
