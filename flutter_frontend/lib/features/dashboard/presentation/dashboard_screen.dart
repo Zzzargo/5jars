@@ -33,6 +33,10 @@ class DashboardScreen extends StatelessWidget {
                   context.read<AuthSessionBloc>().add(UserLoggedOut()),
               child: const Text('Logout'),
             ),
+            PlatformElevatedButton(
+              onPressed: () => (),
+              child: const Text('Add a jar'),
+            ),
           ],
         ),
       ),
@@ -50,6 +54,10 @@ class DashboardScreen extends StatelessWidget {
               onPressed: () =>
                   context.read<AuthSessionBloc>().add(UserLoggedOut()),
               child: const Text('Logout'),
+            ),
+            PlatformElevatedButton(
+              onPressed: () => (),
+              child: const Text('Add a jar'),
             ),
           ],
         ),
