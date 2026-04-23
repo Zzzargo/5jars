@@ -28,13 +28,13 @@ fi
 
 echo "--- ☸️ Creating Cluster: $CLUSTER_NAME ---"
 # Check if the cluster already exists before trying to delete it
-if kind get clusters | grep -q "$CLUSTER_NAME"; then
+if kind get clusters 2> /dev/null | grep -q "^$CLUSTER_NAME$"; then
   read -p "Delete existing cluster? (y/N): " -n 1 -r
   echo
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     kind delete cluster --name "$CLUSTER_NAME"
-  fi
   else
+    echo "Cluster '$CLUSTER_NAME' already exists. Exiting without changes."
     exit 0
   fi
 fi
