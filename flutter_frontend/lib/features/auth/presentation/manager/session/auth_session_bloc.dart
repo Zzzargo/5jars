@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/common/resource.dart';
 import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
-import 'package:five_jars_ultra/features/dashboard/domain/user_result.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
@@ -51,7 +51,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
         final authResult = await serviceLocator<UsersClient>().getMe();
 
         switch (authResult) {
-          case UserSuccess():
+          case ResourceSuccess():
             final localUsername = await _storage.getUsername();
             if (localUsername == null) {
               // This should never happen
@@ -61,19 +61,19 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
               return;
             }
 
-            if (authResult.user.username != localUsername) {
+            if (authResult.data.username != localUsername) {
               // Update the local username (most likely the user changed name)
               _logger.info(
                 'Updating stale local username:'
-                ' $localUsername -> ${authResult.user.username}',
+                ' $localUsername -> ${authResult.data.username}',
               );
-              await _storage.saveUsername(authResult.user.username);
+              await _storage.saveUsername(authResult.data.username);
             }
 
-            emit(AuthSessionAuthenticated(authResult.user));
+            emit(AuthSessionAuthenticated(authResult.data));
             _logger.info('Existing session found for user: $localUsername');
 
-          case UserFailure():
+          case ResourceError():
             await _storage.clearAll();
 
             emit(AuthSessionUnauthenticated());

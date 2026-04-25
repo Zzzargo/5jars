@@ -1,5 +1,5 @@
+import 'package:five_jars_ultra/core/common/resource.dart';
 import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
-import 'package:five_jars_ultra/features/auth/domain/auth_result.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_event.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,10 +23,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
     );
 
     switch (authResult) {
-      case AuthSuccess():
-        emit(RegisterSuccess(authResult.user));
+      case ResourceSuccess():
+        emit(RegisterSuccess(authResult.data.user));
 
-      case AuthFailure f:
+      case ResourceError f:
         emit(RegisterFailure(f.message));
     }
   }
