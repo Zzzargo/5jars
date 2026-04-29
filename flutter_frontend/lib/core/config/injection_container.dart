@@ -5,7 +5,9 @@ import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/data/jars_client.dart';
 import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
@@ -33,6 +35,7 @@ Future<void> init() async {
     () => AuthClient(serviceLocator(), serviceLocator()),
   );
   serviceLocator.registerLazySingleton(() => UsersClient(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => JarsClient(serviceLocator()));
 
   // App state manager for global loading/ready status
   serviceLocator.registerLazySingleton(() => AppStateCubit());
@@ -44,6 +47,7 @@ Future<void> init() async {
   serviceLocator.registerFactory(() => LoginBloc(serviceLocator()));
 
   serviceLocator.registerFactory(() => RegisterBloc(serviceLocator()));
+  serviceLocator.registerFactory(() => JarsBloc(serviceLocator()));
 
   // Router configuration
   assert(serviceLocator.isRegistered<AuthSessionBloc>());

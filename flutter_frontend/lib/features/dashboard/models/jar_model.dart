@@ -11,7 +11,7 @@ class JarModel {
   JarModel({
     required this.id,
     required this.name,
-    required this.description,
+    this.description,
     required this.balance,
     required this.coefficient,
     required this.createdAt,
