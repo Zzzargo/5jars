@@ -4,8 +4,8 @@ import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_gri
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class JarsProvider extends StatelessWidget {
-  const JarsProvider({super.key});
+class JarsView extends StatelessWidget {
+  const JarsView({super.key});
 
   @override
   Widget build(BuildContext context) {

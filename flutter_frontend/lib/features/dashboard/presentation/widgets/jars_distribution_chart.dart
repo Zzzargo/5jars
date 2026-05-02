@@ -1,46 +1,52 @@
+import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 class JarsDistributionChart extends StatelessWidget {
-  const JarsDistributionChart({super.key});
+  final List<JarModel> jars;
+
+  const JarsDistributionChart({super.key, required this.jars});
 
   @override
   Widget build(BuildContext context) {
+    // Industrial Tip: Define a set of colors for the jars
+    final List<Color> chartColors = [
+      Theme.of(context).colorScheme.primary,
+      Theme.of(context).colorScheme.tertiary,
+      Theme.of(context).colorScheme.secondary,
+      Colors.orangeAccent,
+      Colors.cyanAccent,
+      Colors.pinkAccent,
+    ];
+
     return Container(
-      height: 240,
+      height: 260,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.2),
+        ),
       ),
       child: Row(
         children: [
+          // THE PIE CHART
           Expanded(
             flex: 1,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: 140,
-                  height: 140,
-                  child: CircularProgressIndicator(
-                    value: 0.7, // Placeholder
-                    strokeWidth: 12,
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                const Text(
-                  "100%",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 4,
+                centerSpaceRadius: 45,
+                sections: _buildChartSections(chartColors),
+              ),
             ),
           ),
-          // Legend
-          const Expanded(
+          const SizedBox(width: 24),
+          // THE DYNAMIC LEGEND
+          Expanded(
             flex: 1,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -49,21 +55,24 @@ class JarsDistributionChart extends StatelessWidget {
                 Text(
                   "Jars Distribution",
                   style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 16),
-                _LegendItem(
-                  label: "Necessities",
-                  color: Colors.blue,
-                  percent: "55%",
-                ),
-                _LegendItem(
-                  label: "Education",
-                  color: Colors.purple,
-                  percent: "10%",
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: jars.length,
+                    itemBuilder: (context, index) {
+                      final jar = jars[index];
+                      return _LegendItem(
+                        label: jar.name,
+                        color: chartColors[index % chartColors.length],
+                        percent: "${jar.coefficient}%",
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -72,12 +81,32 @@ class JarsDistributionChart extends StatelessWidget {
       ),
     );
   }
+
+  List<PieChartSectionData> _buildChartSections(List<Color> colors) {
+    return jars.asMap().entries.map((entry) {
+      final index = entry.key;
+      final jar = entry.value;
+
+      return PieChartSectionData(
+        color: colors[index % colors.length],
+        value: jar.coefficient.toDouble(),
+        title: '${jar.coefficient}%',
+        radius: 40,
+        titleStyle: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+      );
+    }).toList();
+  }
 }
 
 class _LegendItem extends StatelessWidget {
   final String label;
   final Color color;
   final String percent;
+
   const _LegendItem({
     required this.label,
     required this.color,

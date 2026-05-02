@@ -1,6 +1,6 @@
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_provider.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/desktop_dashboard_sidebar.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_distribution_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 
@@ -25,12 +25,12 @@ class DashboardScreen extends StatelessWidget {
                 const SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 32),
-                    child: JarsDistributionChart(),
+                    child: JarsDistributionView(),
                   ),
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.all(32),
-                  sliver: JarsProvider(),
+                  sliver: JarsView(),
                 ),
               ],
             ),
@@ -56,12 +56,12 @@ class DashboardScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: EdgeInsets.all(16.0),
-              child: JarsDistributionChart(),
+              child: JarsDistributionView(),
             ),
           ),
           SliverPadding(
             padding: EdgeInsets.all(16),
-            sliver: JarsProvider(), // Mobile List
+            sliver: JarsView(), // Mobile List
           ),
         ],
       ),
