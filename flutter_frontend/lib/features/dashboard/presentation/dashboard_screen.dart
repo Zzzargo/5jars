@@ -1,8 +1,6 @@
-import 'package:decimal/decimal.dart';
-import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_provider.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/desktop_dashboard_sidebar.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_distribution_chart.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 
@@ -32,45 +30,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 SliverPadding(
                   padding: const EdgeInsets.all(32),
-                  sliver: JarsGrid(
-                    jars: [
-                      JarModel(
-                        id: "1337",
-                        name: "Test Card",
-                        balance: Decimal.fromInt(22),
-                        coefficient: Decimal.fromInt(22),
-                        createdAt: DateTime.now(),
-                      ),
-                      JarModel(
-                        id: "1338",
-                        name: "Another Test Card",
-                        balance: Decimal.fromInt(22),
-                        coefficient: Decimal.fromInt(22),
-                        createdAt: DateTime.now(),
-                      ),
-                      JarModel(
-                        id: "1337",
-                        name: "Test Card",
-                        balance: Decimal.fromInt(22),
-                        coefficient: Decimal.fromInt(22),
-                        createdAt: DateTime.now(),
-                      ),
-                      JarModel(
-                        id: "1337",
-                        name: "Test Card",
-                        balance: Decimal.fromInt(22),
-                        coefficient: Decimal.fromInt(22),
-                        createdAt: DateTime.now(),
-                      ),
-                      JarModel(
-                        id: "1337",
-                        name: "Test Card",
-                        balance: Decimal.fromInt(22),
-                        coefficient: Decimal.fromInt(22),
-                        createdAt: DateTime.now(),
-                      ),
-                    ],
-                  ),
+                  sliver: JarsProvider(),
                 ),
               ],
             ),
@@ -101,45 +61,7 @@ class DashboardScreen extends StatelessWidget {
           ),
           SliverPadding(
             padding: EdgeInsets.all(16),
-            sliver: JarsGrid(
-              jars: [
-                JarModel(
-                  id: "1337",
-                  name: "Test Card",
-                  balance: Decimal.fromInt(22),
-                  coefficient: Decimal.fromInt(22),
-                  createdAt: DateTime.now(),
-                ),
-                JarModel(
-                  id: "1338",
-                  name: "Another Test Card",
-                  balance: Decimal.fromInt(22),
-                  coefficient: Decimal.fromInt(22),
-                  createdAt: DateTime.now(),
-                ),
-                JarModel(
-                  id: "1337",
-                  name: "Test Card",
-                  balance: Decimal.fromInt(22),
-                  coefficient: Decimal.fromInt(22),
-                  createdAt: DateTime.now(),
-                ),
-                JarModel(
-                  id: "1337",
-                  name: "Test Card",
-                  balance: Decimal.fromInt(22),
-                  coefficient: Decimal.fromInt(22),
-                  createdAt: DateTime.now(),
-                ),
-                JarModel(
-                  id: "1337",
-                  name: "Test Card",
-                  balance: Decimal.fromInt(22),
-                  coefficient: Decimal.fromInt(22),
-                  createdAt: DateTime.now(),
-                ),
-              ],
-            ), // Mobile List
+            sliver: JarsProvider(), // Mobile List
           ),
         ],
       ),
