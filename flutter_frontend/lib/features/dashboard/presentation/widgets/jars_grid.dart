@@ -1,52 +1,31 @@
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_state.dart';
+import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jar_card.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class JarsGrid extends StatelessWidget {
-  final int crossAxisCount;
-  const JarsGrid({super.key, required this.crossAxisCount});
+  final List<JarModel> jars;
+
+  const JarsGrid({super.key, required this.jars});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<JarsBloc, JarsState>(
-      builder: (context, state) {
-        if (state is JarsLoading) {
-          return const SliverToBoxAdapter(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
+    if (jars.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: Center(child: Text('No jars found. Add one to start!')),
+      );
+    }
 
-        if (state is JarsLoadFailure) {
-          return SliverToBoxAdapter(
-            child: Center(child: Text('Error: ${state.message}')),
-          );
-        }
-
-        if (state is JarsLoadSuccess) {
-          if (state.jars.isEmpty) {
-            return const SliverToBoxAdapter(
-              child: Center(child: Text('No jars found. Add one to start!')),
-            );
-          }
-
-          return SliverGrid(
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 2.5,
-            ),
-            delegate: SliverChildBuilderDelegate(
-              (context, index) => JarCard(jar: state.jars[index]),
-              childCount: state.jars.length,
-            ),
-          );
-        }
-
-        return const SliverToBoxAdapter(child: SizedBox.shrink());
-      },
+    return SliverGrid(
+      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 450,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 2.5,
+      ),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => JarCard(jar: jars[index]),
+        childCount: jars.length,
+      ),
     );
   }
 }

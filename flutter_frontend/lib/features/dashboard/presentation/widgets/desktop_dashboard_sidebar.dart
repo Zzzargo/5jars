@@ -1,4 +1,3 @@
-import 'package:five_jars_ultra/core/common/palette.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +14,11 @@ class DesktopDashboardSidebar extends StatelessWidget {
     return SafeArea(
       child: Container(
         width: isDrawer ? null : 280, // Drawer handles width on mobile
-        color: Palette.sidebarPurple,
+        color: Theme.of(context).colorScheme.surface,
         child: Column(
           children: [
             const SizedBox(height: 24),
-            _buildLogo(),
+            _buildLogo(context),
             const SizedBox(height: 40),
 
             _SidebarItem(
@@ -65,16 +64,20 @@ class DesktopDashboardSidebar extends StatelessWidget {
     // Handle navigation logic here (e.g., changing a state or route)
   }
 
-  Widget _buildLogo() {
-    return const Row(
+  Widget _buildLogo(BuildContext context) {
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.vignette_rounded, color: Palette.accentPurple, size: 32),
-        SizedBox(width: 12),
+        Icon(
+          Icons.vignette_rounded,
+          color: Theme.of(context).colorScheme.primary,
+          size: 32,
+        ),
+        const SizedBox(width: 12),
         Text(
           'Five Jars',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             letterSpacing: 2,
             fontWeight: FontWeight.w900,
             fontSize: 18,
@@ -106,16 +109,20 @@ class _SidebarItem extends StatelessWidget {
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         tileColor: isActive
-            ? Palette.primaryPurple.withValues(alpha: 0.2)
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
             : Colors.transparent,
         leading: Icon(
           icon,
-          color: isActive ? Palette.accentPurple : Palette.textDim,
+          color: isActive
+              ? Theme.of(context).colorScheme.onPrimary
+              : Theme.of(context).colorScheme.onSurfaceVariant,
         ),
         title: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : Palette.textDim,
+            color: isActive
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurfaceVariant,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),

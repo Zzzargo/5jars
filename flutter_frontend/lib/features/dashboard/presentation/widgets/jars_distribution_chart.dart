@@ -1,4 +1,3 @@
-import 'package:five_jars_ultra/core/common/palette.dart';
 import 'package:flutter/material.dart';
 
 class JarsDistributionChart extends StatelessWidget {
@@ -10,7 +9,7 @@ class JarsDistributionChart extends StatelessWidget {
       height: 240,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Palette.surface,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
@@ -26,8 +25,8 @@ class JarsDistributionChart extends StatelessWidget {
                   child: CircularProgressIndicator(
                     value: 0.7, // Placeholder
                     strokeWidth: 12,
-                    backgroundColor: Palette.background,
-                    color: Palette.accentPurple,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
                 const Text(
@@ -95,7 +94,10 @@ class _LegendItem extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(color: Palette.textDim, fontSize: 12),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 12,
+            ),
           ),
           const Spacer(),
           Text(

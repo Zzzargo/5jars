@@ -78,7 +78,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
             emit(AuthSessionUnauthenticated());
             _logger.info('Invalid JWT. User must log in again.');
-          // TODO: notify the user their session expired
+          // TODO: notify the user their session expired via a snackbar or smth
         }
       } else {
         emit(AuthSessionUnauthenticated());

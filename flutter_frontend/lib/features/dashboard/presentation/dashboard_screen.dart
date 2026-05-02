@@ -1,4 +1,5 @@
-import 'package:five_jars_ultra/core/common/palette.dart';
+import 'package:decimal/decimal.dart';
+import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/desktop_dashboard_sidebar.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_distribution_chart.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_grid.dart';
@@ -15,7 +16,7 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildDesktop(BuildContext context) {
     return Scaffold(
-      backgroundColor: Palette.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Row(
         children: [
           const DesktopDashboardSidebar(),
@@ -29,9 +30,47 @@ class DashboardScreen extends StatelessWidget {
                     child: JarsDistributionChart(),
                   ),
                 ),
-                const SliverPadding(
-                  padding: EdgeInsets.all(32),
-                  sliver: JarsGrid(crossAxisCount: 3), // Desktop Grid
+                SliverPadding(
+                  padding: const EdgeInsets.all(32),
+                  sliver: JarsGrid(
+                    jars: [
+                      JarModel(
+                        id: "1337",
+                        name: "Test Card",
+                        balance: Decimal.fromInt(22),
+                        coefficient: Decimal.fromInt(22),
+                        createdAt: DateTime.now(),
+                      ),
+                      JarModel(
+                        id: "1338",
+                        name: "Another Test Card",
+                        balance: Decimal.fromInt(22),
+                        coefficient: Decimal.fromInt(22),
+                        createdAt: DateTime.now(),
+                      ),
+                      JarModel(
+                        id: "1337",
+                        name: "Test Card",
+                        balance: Decimal.fromInt(22),
+                        coefficient: Decimal.fromInt(22),
+                        createdAt: DateTime.now(),
+                      ),
+                      JarModel(
+                        id: "1337",
+                        name: "Test Card",
+                        balance: Decimal.fromInt(22),
+                        coefficient: Decimal.fromInt(22),
+                        createdAt: DateTime.now(),
+                      ),
+                      JarModel(
+                        id: "1337",
+                        name: "Test Card",
+                        balance: Decimal.fromInt(22),
+                        coefficient: Decimal.fromInt(22),
+                        createdAt: DateTime.now(),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -44,7 +83,7 @@ class DashboardScreen extends StatelessWidget {
   Widget _buildMobile(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Palette.background,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
         title: const Text(
           'My Jars',
@@ -52,7 +91,7 @@ class DashboardScreen extends StatelessWidget {
         ),
       ),
       drawer: const Drawer(child: DesktopDashboardSidebar()),
-      body: const CustomScrollView(
+      body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
@@ -62,14 +101,52 @@ class DashboardScreen extends StatelessWidget {
           ),
           SliverPadding(
             padding: EdgeInsets.all(16),
-            sliver: JarsGrid(crossAxisCount: 1), // Mobile List
+            sliver: JarsGrid(
+              jars: [
+                JarModel(
+                  id: "1337",
+                  name: "Test Card",
+                  balance: Decimal.fromInt(22),
+                  coefficient: Decimal.fromInt(22),
+                  createdAt: DateTime.now(),
+                ),
+                JarModel(
+                  id: "1338",
+                  name: "Another Test Card",
+                  balance: Decimal.fromInt(22),
+                  coefficient: Decimal.fromInt(22),
+                  createdAt: DateTime.now(),
+                ),
+                JarModel(
+                  id: "1337",
+                  name: "Test Card",
+                  balance: Decimal.fromInt(22),
+                  coefficient: Decimal.fromInt(22),
+                  createdAt: DateTime.now(),
+                ),
+                JarModel(
+                  id: "1337",
+                  name: "Test Card",
+                  balance: Decimal.fromInt(22),
+                  coefficient: Decimal.fromInt(22),
+                  createdAt: DateTime.now(),
+                ),
+                JarModel(
+                  id: "1337",
+                  name: "Test Card",
+                  balance: Decimal.fromInt(22),
+                  coefficient: Decimal.fromInt(22),
+                  createdAt: DateTime.now(),
+                ),
+              ],
+            ), // Mobile List
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Palette.primaryPurple,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () {},
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
     );
   }
@@ -80,17 +157,20 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(32.0),
         child: Row(
           children: [
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Welcome back,',
-                  style: TextStyle(color: Palette.textDim, fontSize: 16),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 16,
+                  ),
                 ),
                 Text(
                   'Alex Doe',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -102,8 +182,8 @@ class DashboardScreen extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Palette.primaryPurple,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,
                     vertical: 16,

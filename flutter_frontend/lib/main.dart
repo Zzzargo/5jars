@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/core/common/app_theme.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
@@ -78,11 +79,9 @@ class AppView extends StatelessWidget {
     return MaterialApp.router(
       title: '5 Jars Ultra',
       routerConfig: router,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 90, 28, 109),
-        ),
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
     );
   }
 }
