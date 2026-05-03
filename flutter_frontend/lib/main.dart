@@ -1,4 +1,4 @@
-import 'package:five_jars_ultra/core/common/app_theme.dart';
+import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/state/app_state_cubit.dart';

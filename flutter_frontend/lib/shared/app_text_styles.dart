@@ -1,4 +1,4 @@
-import 'package:five_jars_ultra/core/common/palette.dart';
+import 'package:five_jars_ultra/shared/palette.dart';
 import 'package:flutter/material.dart';
 
 class AppTextStyles {
@@ -12,8 +12,8 @@ class AppTextStyles {
 
   static const TextTheme _base = TextTheme(
     displayLarge: TextStyle(
-      fontSize: 57,
-      fontWeight: FontWeight.w700,
+      fontSize: 58,
+      fontWeight: FontWeight.w800,
       letterSpacing: -1.5,
     ),
     displayMedium: TextStyle(
@@ -36,17 +36,17 @@ class AppTextStyles {
     headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
 
     titleLarge: TextStyle(
-      fontSize: 20,
+      fontSize: 22,
       fontWeight: FontWeight.w600,
       letterSpacing: 0.1,
     ),
     titleMedium: TextStyle(
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.1,
     ),
     titleSmall: TextStyle(
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.1,
     ),
@@ -64,21 +64,21 @@ class AppTextStyles {
       height: 1.5,
     ),
     bodySmall: TextStyle(
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: FontWeight.w400,
       letterSpacing: 0.3,
       height: 1.5,
     ),
 
     labelLarge: TextStyle(
-      fontSize: 14,
+      fontSize: 16,
       fontWeight: FontWeight.w600,
-      letterSpacing: 0.5,
+      letterSpacing: 0.3,
     ),
     labelMedium: TextStyle(
-      fontSize: 12,
+      fontSize: 13,
       fontWeight: FontWeight.w600,
-      letterSpacing: 0.5,
+      letterSpacing: 0.4,
     ),
     labelSmall: TextStyle(
       fontSize: 11,
@@ -88,14 +88,14 @@ class AppTextStyles {
   );
 
   static TextTheme dark() => _base.apply(
-    bodyColor: Palette.darkTextMain,
+    bodyColor: Palette.darkTextDim,
     displayColor: Palette.darkTextMain,
-    decorationColor: Palette.darkTextDim,
+    decorationColor: Palette.darkTextMuted,
   );
 
   static TextTheme light() => _base.apply(
-    bodyColor: Palette.lightTextMain,
+    bodyColor: Palette.lightTextDim,
     displayColor: Palette.lightTextMain,
-    decorationColor: Palette.lightTextDim,
+    decorationColor: Palette.lightTextMuted,
   );
 }

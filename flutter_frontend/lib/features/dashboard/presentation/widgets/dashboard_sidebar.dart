@@ -3,56 +3,52 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DesktopDashboardSidebar extends StatelessWidget {
+class DashboardSidebar extends StatelessWidget {
   final bool isDrawer;
 
-  const DesktopDashboardSidebar({super.key, this.isDrawer = false});
+  const DashboardSidebar({super.key, this.isDrawer = false});
 
   @override
   Widget build(BuildContext context) {
-    // Wrap in SafeArea to handle mobile notches/home indicators
-    return SafeArea(
-      child: Container(
-        width: isDrawer ? null : 280, // Drawer handles width on mobile
-        color: Theme.of(context).colorScheme.surface,
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
-            _buildLogo(context),
-            const SizedBox(height: 40),
+    return Container(
+      width: isDrawer ? null : 250, // Drawer handles width on mobile
+      color: Theme.of(context).colorScheme.surface,
+      child: Column(
+        children: [
+          const SizedBox(height: 24),
+          _buildLogo(context),
+          const SizedBox(height: 24),
+          _SidebarItem(
+            icon: Icons.dashboard_rounded,
+            label: 'Dashboard',
+            isActive: true,
+            onTap: () => _handleNavigation(context),
+          ),
+          _SidebarItem(
+            icon: Icons.account_balance_wallet_rounded,
+            label: 'Accounts',
+            onTap: () => _handleNavigation(context),
+          ),
+          _SidebarItem(
+            icon: Icons.history_rounded,
+            label: 'Transactions',
+            onTap: () => _handleNavigation(context),
+          ),
 
-            _SidebarItem(
-              icon: Icons.dashboard_rounded,
-              label: 'Dashboard',
-              isActive: true,
-              onTap: () => _handleNavigation(context),
-            ),
-            _SidebarItem(
-              icon: Icons.account_balance_wallet_rounded,
-              label: 'Accounts',
-              onTap: () => _handleNavigation(context),
-            ),
-            _SidebarItem(
-              icon: Icons.history_rounded,
-              label: 'Transactions',
-              onTap: () => _handleNavigation(context),
-            ),
+          const Spacer(),
 
-            const Spacer(),
-
-            _SidebarItem(
-              icon: Icons.logout_rounded,
-              label: 'Logout',
-              onTap: () {
-                // 1. Close drawer if on mobile
-                if (isDrawer) Navigator.pop(context);
-                // 2. Dispatch logout event
-                context.read<AuthSessionBloc>().add(UserLoggedOut());
-              },
-            ),
-            const SizedBox(height: 20),
-          ],
-        ),
+          _SidebarItem(
+            icon: Icons.logout_rounded,
+            label: 'Logout',
+            onTap: () {
+              // 1. Close drawer if on mobile
+              if (isDrawer) Navigator.pop(context);
+              // 2. Dispatch logout event
+              context.read<AuthSessionBloc>().add(UserLoggedOut());
+            },
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
@@ -69,19 +65,20 @@ class DesktopDashboardSidebar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
-          Icons.vignette_rounded,
+          Icons.view_in_ar_outlined,
           color: Theme.of(context).colorScheme.primary,
-          size: 32,
+          size: 36,
         ),
         const SizedBox(width: 12),
         Text(
           'Five Jars',
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            letterSpacing: 2,
-            fontWeight: FontWeight.w900,
-            fontSize: 18,
-          ),
+          style: Theme.of(context).textTheme.displayMedium,
+          // style: TextStyle(
+          //   color: Theme.of(context).colorScheme.onSurface,
+          //   letterSpacing: 2,
+          //   fontWeight: FontWeight.w900,
+          //   fontSize: 22,
+          // ),
         ),
       ],
     );

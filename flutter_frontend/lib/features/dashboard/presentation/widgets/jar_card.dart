@@ -10,49 +10,42 @@ class JarCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.simpleCurrency();
+    final currencyFormat = NumberFormat.simpleCurrency(
+      locale: 'ro_MD',
+      name: 'RON',
+    );
     // Convert Decimal to double only for presentation
     final balance = double.parse(jar.balance.toString());
+    final theme = Theme.of(context);
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
-        // Adds "Splash" effect when clicked
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-          child: ListTile(
-            leading: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(
-                Icons.account_balance_wallet_rounded,
-                color: Theme.of(context).colorScheme.onPrimaryContainer,
-              ),
+        child: ListTile(
+          tileColor: theme.colorScheme.secondaryContainer,
+          leading: CircleAvatar(
+            backgroundColor: theme.colorScheme.surfaceContainer,
+            child: Icon(
+              Icons.account_balance_wallet_rounded,
+              color: theme.colorScheme.onSecondaryContainer,
+              size: 20,
             ),
-            title: Text(
-              jar.name,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Text(
-              'Contribution: ${jar.coefficient}%',
-              style: TextStyle(color: Colors.grey.shade600),
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: Text(
-              currencyFormat.format(balance),
-              style: const TextStyle(
-                fontFamily: 'monospace', // Alignment integrity
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+          ),
+          title: Text(
+            jar.name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyLarge,
+          ),
+          subtitle: Text(
+            'Contribution: ${jar.coefficient}%',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(
+            currencyFormat.format(balance),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
             ),
           ),
         ),

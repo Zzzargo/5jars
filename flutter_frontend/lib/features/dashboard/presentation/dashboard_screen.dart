@@ -1,6 +1,6 @@
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/desktop_dashboard_sidebar.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 
@@ -17,7 +17,7 @@ class DashboardScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Row(
         children: [
-          const DesktopDashboardSidebar(),
+          const DashboardSidebar(),
           Expanded(
             child: CustomScrollView(
               slivers: [
@@ -50,7 +50,7 @@ class DashboardScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
-      drawer: const Drawer(child: DesktopDashboardSidebar()),
+      drawer: const Drawer(child: DashboardSidebar(isDrawer: true)),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

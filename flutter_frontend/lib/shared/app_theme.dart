@@ -1,5 +1,5 @@
-import 'package:five_jars_ultra/core/common/app_text_styles.dart';
-import 'package:five_jars_ultra/core/common/palette.dart';
+import 'package:five_jars_ultra/shared/app_text_styles.dart';
+import 'package:five_jars_ultra/shared/palette.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -22,6 +22,10 @@ class AppTheme {
       surface: Palette.darkSurface,
       onSurface: Palette.darkTextMain,
       surfaceContainerHighest: Palette.darkSurfaceVariant,
+      surfaceContainerHigh: Palette.darkSurfaceHigh,
+      surfaceContainer: Palette.darkSurface,
+      surfaceContainerLow: Palette.darkSurfaceLow,
+      surfaceContainerLowest: Palette.darkSurfaceLowest,
       onSurfaceVariant: Palette.darkTextDim,
       // Outline
       outline: Palette.darkBorder,
@@ -58,6 +62,10 @@ class AppTheme {
       // Surface
       surface: Palette.lightSurface,
       onSurface: Palette.lightTextMain,
+      surfaceContainerLowest: Palette.lightSurfaceLowest,
+      surfaceContainerLow: Palette.lightSurfaceLow,
+      surfaceContainer: Palette.lightSurface,
+      surfaceContainerHigh: Palette.lightSurfaceHigh,
       surfaceContainerHighest: Palette.lightSurfaceVariant,
       onSurfaceVariant: Palette.lightTextDim,
       // Outline
@@ -228,7 +236,7 @@ class AppTheme {
                 states.contains(WidgetState.pressed)) {
               return BorderSide(color: colorScheme.primary, width: 2);
             }
-            return BorderSide(color: colorScheme.outline, width: 1);
+            return BorderSide(color: colorScheme.outline, width: 1.5);
           }),
           overlayColor: WidgetStateProperty.all(
             colorScheme.primary.withAlpha(15),
@@ -410,13 +418,47 @@ class AppTheme {
       // ── Tooltip ─────────────────────────────
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: isDark ? Palette.darkSurfaceVariant : Palette.lightTextMain,
+          color: isDark
+              ? Palette.darkSurfaceVariant
+              : Palette.lightSurfaceVariant,
           borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isDark ? Palette.darkBorder : Palette.lightBorder,
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(isDark ? 60 : 20),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         textStyle: textTheme.bodySmall?.copyWith(
-          color: isDark ? Palette.darkTextMain : Palette.lightSurface,
+          color: isDark ? Palette.darkTextMain : Palette.lightTextMain,
         ),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
+
+      // ── Filled Button ───────────────────────
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all(colorScheme.primary),
+          foregroundColor: WidgetStateProperty.all(colorScheme.onPrimary),
+          iconColor: WidgetStateProperty.all(colorScheme.onPrimary),
+        ),
+      ),
+
+      // ── Icon Button ───────────────────────────
+      iconButtonTheme: IconButtonThemeData(
+        style: ButtonStyle(
+          iconColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.onPrimary;
+            }
+            return colorScheme.onSurfaceVariant;
+          }),
+        ),
       ),
     );
   }
