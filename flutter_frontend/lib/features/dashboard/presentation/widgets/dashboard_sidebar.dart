@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,19 @@ class DashboardSidebar extends StatelessWidget {
             icon: Icons.history_rounded,
             label: 'Transactions',
             onTap: () => _handleNavigation(context),
+          ),
+          _SidebarItem(
+            icon: context.watch<ThemeCubit>().state == ThemeMode.dark
+                ? Icons.light_mode_rounded
+                : Icons.dark_mode_rounded,
+            label: context.watch<ThemeCubit>().state == ThemeMode.dark
+                ? 'Light Mode'
+                : 'Dark Mode',
+            onTap: () => {
+              context.read<ThemeCubit>().state == ThemeMode.dark
+                  ? context.read<ThemeCubit>().setLight()
+                  : context.read<ThemeCubit>().setDark(),
+            },
           ),
 
           const Spacer(),
@@ -70,16 +84,7 @@ class DashboardSidebar extends StatelessWidget {
           size: 36,
         ),
         const SizedBox(width: 12),
-        Text(
-          'Five Jars',
-          style: Theme.of(context).textTheme.displayMedium,
-          // style: TextStyle(
-          //   color: Theme.of(context).colorScheme.onSurface,
-          //   letterSpacing: 2,
-          //   fontWeight: FontWeight.w900,
-          //   fontSize: 22,
-          // ),
-        ),
+        Text('Five Jars', style: Theme.of(context).textTheme.displayMedium),
       ],
     );
   }

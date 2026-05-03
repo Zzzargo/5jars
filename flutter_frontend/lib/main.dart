@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/router/router.dart';
@@ -63,6 +64,10 @@ class App extends StatelessWidget {
             return cubit;
           },
         ),
+        BlocProvider(
+          lazy: false, // Run this immediately to load the saved theme mode
+          create: (_) => di.serviceLocator<ThemeCubit>(),
+        ),
       ],
       child: const AppView(),
     );
@@ -75,13 +80,15 @@ class AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = di.serviceLocator<AppRouter>().config;
+    final themeMode = context.watch<ThemeCubit>().state;
 
     return MaterialApp.router(
       title: '5 Jars Ultra',
       routerConfig: router,
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
+      themeMode:
+          themeMode, // The theme is reactive to changes in the ThemeCubit
     );
   }
 }
