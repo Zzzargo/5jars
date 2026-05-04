@@ -88,14 +88,14 @@ class AppTextStyles {
   );
 
   static TextTheme dark() => _base.apply(
-    bodyColor: Palette.darkTextDim,
-    displayColor: Palette.darkTextMain,
-    decorationColor: Palette.darkTextMuted,
+    bodyColor: Palette.darkTextBody,
+    displayColor: Palette.darkTextDisplay,
+    decorationColor: Palette.darkTextDecorations,
   );
 
   static TextTheme light() => _base.apply(
-    bodyColor: Palette.lightTextDim,
-    displayColor: Palette.lightTextMain,
-    decorationColor: Palette.lightTextMuted,
+    bodyColor: Palette.lightTextBody,
+    displayColor: Palette.lightTextDisplay,
+    decorationColor: Palette.lightTextDecorations,
   );
 }

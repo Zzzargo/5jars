@@ -72,8 +72,8 @@ class _Section extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Divider(color: Theme.of(context).colorScheme.outline),
-          const SizedBox(height: 16),
+          Divider(),
+          const SizedBox(height: 12),
           child,
         ],
       ),
@@ -268,10 +268,7 @@ class _TypographyPreview extends StatelessWidget {
                 width: 180,
                 child: Text(
                   name,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontFamily: 'monospace',
-                  ),
+                  style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),
               Expanded(child: Text(sample, style: style)),
@@ -468,12 +465,12 @@ class _CardsPreview extends StatelessWidget {
             child: Column(
               children: [
                 ListTile(
-                  tileColor: cs.primaryContainer,
+                  tileColor: cs.secondaryContainer,
                   leading: CircleAvatar(
-                    backgroundColor: cs.secondaryContainer,
+                    backgroundColor: cs.secondary,
                     child: Icon(
                       Icons.restaurant_outlined,
-                      color: cs.onSecondaryContainer,
+                      color: cs.onSecondary,
                       size: 20,
                     ),
                   ),
@@ -486,12 +483,12 @@ class _CardsPreview extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 ListTile(
-                  tileColor: cs.primaryContainer,
+                  tileColor: cs.secondaryContainer,
                   leading: CircleAvatar(
-                    backgroundColor: cs.secondaryContainer,
+                    backgroundColor: cs.secondary,
                     child: Icon(
                       Icons.work_outline,
-                      color: cs.onSecondaryContainer,
+                      color: cs.onSecondary,
                       size: 20,
                     ),
                   ),
@@ -740,13 +737,81 @@ class _ComponentsPreview extends StatelessWidget {
                 );
               }).toList(),
         ),
+        const SizedBox(height: 8),
+        const _PreviewRow(label: 'Layered Depth (M3 Standards)', children: []),
+        const SizedBox(height: 16),
+        Center(
+          child: SizedBox(
+            height: 250,
+            width: double.infinity,
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                // Background/Lowest Layer
+                _buildLayer(context, cs.surfaceContainerLowest, 'Lowest', 0),
+                // Each layer shifts up and gets smaller
+                _buildLayer(context, cs.surfaceContainerLow, 'Low', 30),
+                _buildLayer(context, cs.surfaceContainer, 'Container', 60),
+                _buildLayer(context, cs.surfaceContainerHigh, 'High', 90),
+                // Highest Layer
+                _buildLayer(
+                  context,
+                  cs.surfaceContainerHighest,
+                  'Highest',
+                  120,
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget _buildLayer(
+    BuildContext context,
+    Color color,
+    String label,
+    double offset,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Positioned(
+      top: offset, // Moves the layer "down" the stack
+      left: offset, // Shrinks the layer from the left
+      right: offset, // Shrinks the layer from the right
+      child: Container(
+        height: 100, // Each layer has a consistent height
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: cs.outline.withAlpha(30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: cs.onSurface,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
 // ─────────────────────────────────────────────
-//  Helper: labeled row of widgets
+//  Helpers
 // ─────────────────────────────────────────────
 class _PreviewRow extends StatelessWidget {
   final String label;
