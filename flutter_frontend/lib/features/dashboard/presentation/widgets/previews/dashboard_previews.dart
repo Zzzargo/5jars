@@ -52,12 +52,23 @@ Widget previewCardsAndEmptyGrid() {
 
 @Preview(group: "Dashboard > Jars", name: "Jar Grids")
 Widget previewJarGrids() {
-  return CustomScrollView(
-    slivers: [
-      JarsGrid(jars: _sampleJars(2)),
-      const SliverToBoxAdapter(child: Divider(height: 20)),
-      JarsGrid(jars: _sampleJars(5)),
-    ],
+  return MaterialApp(
+    theme: AppTheme.light(),
+    darkTheme: AppTheme.dark(),
+    themeMode: ThemeMode.system,
+    debugShowCheckedModeBanner: false,
+    home: Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: CustomScrollView(
+          slivers: [
+            JarsGrid(jars: _sampleJars(2)),
+            const SliverToBoxAdapter(child: Divider(height: 20)),
+            JarsGrid(jars: _sampleJars(5)),
+          ],
+        ),
+      ),
+    ),
   );
 }
 

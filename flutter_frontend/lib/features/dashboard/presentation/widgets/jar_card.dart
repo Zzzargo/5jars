@@ -25,17 +25,13 @@ class JarCard extends StatelessWidget {
           tileColor: theme.colorScheme.secondaryContainer,
           leading: CircleAvatar(
             backgroundColor: theme.colorScheme.primary,
-            child: Icon(
-              Icons.account_balance_wallet_rounded,
-              color: theme.colorScheme.onSecondaryContainer,
-              size: 20,
-            ),
+            child: Icon(Icons.account_balance_wallet_rounded),
           ),
           title: Text(
             jar.name,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.labelLarge,
+            style: theme.textTheme.titleMedium,
           ),
           subtitle: Text(
             'Contribution: ${jar.coefficient}%',
@@ -44,9 +40,7 @@ class JarCard extends StatelessWidget {
           ),
           trailing: Text(
             currencyFormat.format(balance),
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
+            style: theme.textTheme.labelLarge,
           ),
         ),
       ),

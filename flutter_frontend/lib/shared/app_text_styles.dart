@@ -71,17 +71,17 @@ class AppTextStyles {
     ),
 
     labelLarge: TextStyle(
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: FontWeight.w600,
       letterSpacing: 0.3,
     ),
     labelMedium: TextStyle(
-      fontSize: 13,
+      fontSize: 15,
       fontWeight: FontWeight.w600,
       letterSpacing: 0.4,
     ),
     labelSmall: TextStyle(
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: FontWeight.w500,
       letterSpacing: 0.5,
     ),
