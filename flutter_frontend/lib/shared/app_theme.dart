@@ -107,6 +107,8 @@ class AppTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       scaffoldBackgroundColor: colorScheme.surface,
+      splashColor: colorScheme.primary.withAlpha(30),
+      highlightColor: colorScheme.primary.withAlpha(10),
 
       // ── AppBar ──────────────────────────────
       appBarTheme: AppBarTheme(
