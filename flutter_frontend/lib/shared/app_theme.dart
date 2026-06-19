@@ -445,6 +445,14 @@ class AppTheme {
           }),
         ),
       ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surfaceContainerHigh,
+        surfaceTintColor: Colors.transparent,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        textStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface),
+        menuPadding: EdgeInsets.zero,
+      ),
     );
   }
 }
