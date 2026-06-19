@@ -7,10 +7,12 @@ import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/core/common/resource.dart';
 import 'package:five_jars_ultra/features/auth/models/auth_response.dart';
 import 'package:five_jars_ultra/features/dashboard/models/user_model.dart';
+import 'package:logging/logging.dart';
 
 class AuthClient {
   final ApiHttpClient _apiClient;
   final SecureStorage _secureStorage;
+  static final Logger _logger = Logger("Auth Client");
 
   // This post was made by the Dependency Injection Gang
   AuthClient(this._apiClient, this._secureStorage);
@@ -68,6 +70,7 @@ class AuthClient {
       };
     } catch (e) {
       // This should never happen, but if it does it's a bug in the http client
+      _logger.severe("Unexpected error: $e");
       return const ResourceError("An unknown error occurred.");
     }
   }

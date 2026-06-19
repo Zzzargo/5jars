@@ -8,7 +8,7 @@ import 'package:logging/logging.dart';
 class ApiHttpClient {
   final Dio _dio;
 
-  static final Logger _logger = Logger('ApiClient');
+  static final Logger _logger = Logger('API Client');
 
   // This weird syntax is constructor with an initializer list. It allows to
   // initialize final fields before the constructor body runs

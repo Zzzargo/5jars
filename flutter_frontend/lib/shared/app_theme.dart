@@ -441,7 +441,7 @@ class AppTheme {
             if (states.contains(WidgetState.selected)) {
               return colorScheme.onPrimary;
             }
-            return colorScheme.onSurfaceVariant;
+            return colorScheme.onSecondaryContainer;
           }),
         ),
       ),
