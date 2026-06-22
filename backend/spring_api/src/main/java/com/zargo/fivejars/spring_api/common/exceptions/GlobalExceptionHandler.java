@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.Instant;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestControllerAdvice
 /// This is the base exception handler for anything that goes wrong at any of the controllers or deeper
 public class GlobalExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler(exception = ResourceNotFoundException.class)
     public ProblemDetail handleNotFound(final ResourceNotFoundException e) {
         log.warn(e.getMessage());
 
@@ -31,6 +32,16 @@ public class GlobalExceptionHandler {
 
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
         pd.setTitle("Unique Constraint Violation");
+        pd.setProperty("timestamp", Instant.now());
+        return pd;
+    }
+
+    @ExceptionHandler(BusinessLogicException.class)
+    public ProblemDetail handleBusinessLogicException(final BusinessLogicException e) {
+        log.warn(e.getMessage());
+
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        pd.setTitle("Business Logic Exception");
         pd.setProperty("timestamp", Instant.now());
         return pd;
     }

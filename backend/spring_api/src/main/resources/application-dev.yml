@@ -4,13 +4,13 @@ spring:
 
   datasource:
     url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   flyway:
     enabled: true
-    locations: filesystem:/app/migrations,filesystem:/app/seeds
+    locations: filesystem:../../infrastructure/db/migrations,filesystem:../../infrastructure/db/seeds
 
   jackson:
     # camelCase(Java) -> snake_case(JSON)
