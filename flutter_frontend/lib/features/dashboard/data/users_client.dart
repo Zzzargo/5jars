@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:five_jars_ultra/core/api/api_exception.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
 import 'package:five_jars_ultra/core/common/resource.dart';
-import 'package:five_jars_ultra/features/dashboard/models/user_model.dart';
+import 'package:five_jars_ultra/features/auth/models/user_model.dart';
 
 class UsersClient {
   final ApiHttpClient _apiClient;

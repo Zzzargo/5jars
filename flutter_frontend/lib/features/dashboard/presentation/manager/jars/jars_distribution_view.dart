@@ -21,7 +21,7 @@ class JarsDistributionView extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(
               context,
-            ).colorScheme.surfaceContainerHighest.withOpacity(0.1),
+            ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(24),
           ),
           child: const Center(

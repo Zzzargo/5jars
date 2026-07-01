@@ -1,4 +1,4 @@
-import 'package:five_jars_ultra/features/dashboard/models/user_model.dart';
+import 'package:five_jars_ultra/features/auth/models/user_model.dart';
 
 class AuthResponse {
   final String token;

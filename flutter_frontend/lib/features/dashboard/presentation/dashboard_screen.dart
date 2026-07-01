@@ -1,8 +1,13 @@
+import 'package:five_jars_ultra/features/dashboard/dtos/create_jar_request.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -67,10 +72,22 @@ class DashboardScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).colorScheme.primary,
-        onPressed: () {},
+        onPressed: () => _onNewJar(context),
         child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
     );
+  }
+
+  void _onNewJar(BuildContext context) async {
+    final CreateJarRequest? request = await showDialog<CreateJarRequest>(
+      context: context,
+      builder: (context) => const CreateJarDialog(),
+    );
+
+    // If the user didn't cancel and the request is valid
+    if (request != null && context.mounted) {
+      context.read<JarsBloc>().add(NewJarRequested(request));
+    }
   }
 
   Widget _buildHeader(BuildContext context, {required bool isDesktop}) {
@@ -102,7 +119,7 @@ class DashboardScreen extends StatelessWidget {
             const Spacer(),
             if (isDesktop)
               ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () => _onNewJar(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   foregroundColor: Theme.of(context).colorScheme.onPrimary,

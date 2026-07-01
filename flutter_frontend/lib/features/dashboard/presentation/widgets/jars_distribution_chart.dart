@@ -1,3 +1,4 @@
+import 'package:decimal/decimal.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -7,17 +8,33 @@ class JarsDistributionChart extends StatelessWidget {
 
   const JarsDistributionChart({super.key, required this.jars});
 
+  List<Color> generateChartColors(BuildContext context, int count) {
+    final ThemeData theme = Theme.of(context);
+    final Color primaryColor = theme.colorScheme.primary;
+
+    // Convert thr theme's primary color to HSV to match the vibe
+    final HSVColor baseHsv = HSVColor.fromColor(primaryColor);
+
+    return List.generate(count, (index) {
+      // Distribute hues evenly across the color wheel (360 degrees)
+      double hue = (baseHsv.hue + (index * (360 / count))) % 360;
+
+      return HSVColor.fromAHSV(
+        1.0,
+        hue,
+        // Keep saturation and value adapted to dark/light mode
+        baseHsv.saturation.clamp(
+          0.4,
+          0.7,
+        ), // Keeps it from getting too washed out or neon
+        baseHsv.value.clamp(0.6, 0.9), // Keeps contrast highly visible
+      ).toColor();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Industrial Tip: Define a set of colors for the jars
-    final List<Color> chartColors = [
-      Theme.of(context).colorScheme.primary,
-      Theme.of(context).colorScheme.tertiary,
-      Theme.of(context).colorScheme.secondary,
-      Colors.orangeAccent,
-      Colors.cyanAccent,
-      Colors.pinkAccent,
-    ];
+    final List<Color> chartColors = generateChartColors(context, jars.length);
 
     return Container(
       height: 260,
@@ -25,10 +42,12 @@ class JarsDistributionChart extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(
           context,
-        ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.2),
+          color: Theme.of(
+            context,
+          ).colorScheme.outlineVariant.withValues(alpha: 0.2),
         ),
       ),
       child: Row(
@@ -68,8 +87,8 @@ class JarsDistributionChart extends StatelessWidget {
                       final jar = jars[index];
                       return _LegendItem(
                         label: jar.name,
-                        color: chartColors[index % chartColors.length],
-                        percent: "${jar.coefficient}%",
+                        color: chartColors[index],
+                        percent: "${jar.coefficient * Decimal.fromInt(100)}%",
                       );
                     },
                   ),
@@ -88,9 +107,9 @@ class JarsDistributionChart extends StatelessWidget {
       final jar = entry.value;
 
       return PieChartSectionData(
-        color: colors[index % colors.length],
+        color: colors[index],
         value: jar.coefficient.toDouble(),
-        title: '${jar.coefficient}%',
+        title: '${jar.coefficient * Decimal.fromInt(100)}%',
         radius: 40,
         titleStyle: const TextStyle(
           fontSize: 10,

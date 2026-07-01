@@ -5,8 +5,8 @@ import 'package:five_jars_ultra/core/api/api_exception.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/core/common/resource.dart';
-import 'package:five_jars_ultra/features/auth/models/auth_response.dart';
-import 'package:five_jars_ultra/features/dashboard/models/user_model.dart';
+import 'package:five_jars_ultra/features/auth/dtos/auth_response.dart';
+import 'package:five_jars_ultra/features/auth/models/user_model.dart';
 import 'package:logging/logging.dart';
 
 class AuthClient {

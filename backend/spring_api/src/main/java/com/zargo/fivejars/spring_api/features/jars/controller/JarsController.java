@@ -57,7 +57,7 @@ public class JarsController {
             ) {
         log.info("User {} distributing income: {}", currentUser.getUsername(), request.amount());
         List<Jar> updatedJars = jarsService.distributeIncome(currentUser, request.amount());
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         updatedJars.stream()
                                 .map(Jar::toResponse)
@@ -72,7 +72,7 @@ public class JarsController {
             @AuthenticationPrincipal User currentUser
     ) {
         Jar jar = jarsService.deposit(id, currentUser.getId(), request.amount());
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(Jar.toResponse(jar));
     }
 
@@ -83,7 +83,7 @@ public class JarsController {
             @AuthenticationPrincipal User currentUser
     ) {
         Jar jar = jarsService.withdraw(id, currentUser.getId(), request.amount());
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(Jar.toResponse(jar));
     }
 }

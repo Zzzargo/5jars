@@ -1,4 +1,4 @@
 {
-  "API_BASE_URL": "http://localhost:30080/api",
+  "API_BASE_URL": "http://localhost:8080/api",
   "ENV": "dev"
 }
