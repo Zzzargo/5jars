@@ -20,7 +20,7 @@ class JarsGrid extends StatelessWidget {
         maxCrossAxisExtent: 450,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        childAspectRatio: 2.5,
+        mainAxisExtent: 120, // Fixed height for each card to prevent overflow
       ),
       delegate: SliverChildBuilderDelegate(
         (context, index) => JarCard(jar: jars[index]),

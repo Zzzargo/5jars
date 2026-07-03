@@ -9,11 +9,10 @@ class JarsDistributionChart extends StatelessWidget {
   const JarsDistributionChart({super.key, required this.jars});
 
   List<Color> generateChartColors(BuildContext context, int count) {
-    final ThemeData theme = Theme.of(context);
-    final Color primaryColor = theme.colorScheme.primary;
+    final cs = Theme.of(context).colorScheme;
 
     // Convert thr theme's primary color to HSV to match the vibe
-    final HSVColor baseHsv = HSVColor.fromColor(primaryColor);
+    final HSVColor baseHsv = HSVColor.fromColor(cs.primary);
 
     return List.generate(count, (index) {
       // Distribute hues evenly across the color wheel (360 degrees)
@@ -35,69 +34,105 @@ class JarsDistributionChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Color> chartColors = generateChartColors(context, jars.length);
+    final cs = Theme.of(context).colorScheme;
 
-    return Container(
-      height: 260,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.2),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isCompact = constraints.maxWidth < 600;
+
+        return Container(
+          height: isCompact ? 420 : 260,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerHighest.withValues(alpha: 0.3),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.2)),
+          ),
+          child: isCompact
+              ? _buildVerticalLayout(context, chartColors, cs)
+              : _buildHorizontalLayout(context, chartColors, cs),
+        );
+      },
+    );
+  }
+
+  Widget _buildHorizontalLayout(
+    BuildContext context,
+    List<Color> chartColors,
+    ColorScheme cs,
+  ) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 1,
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 4,
+              centerSpaceRadius: 45,
+              sections: _buildChartSections(chartColors),
+            ),
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          // THE PIE CHART
-          Expanded(
-            flex: 1,
-            child: PieChart(
-              PieChartData(
-                sectionsSpace: 4,
-                centerSpaceRadius: 45,
-                sections: _buildChartSections(chartColors),
-              ),
+        const SizedBox(width: 24),
+        Expanded(flex: 1, child: _buildLegend(context, chartColors, cs)),
+      ],
+    );
+  }
+
+  Widget _buildVerticalLayout(
+    BuildContext context,
+    List<Color> chartColors,
+    ColorScheme cs,
+  ) {
+    return Column(
+      children: [
+        Expanded(
+          child: PieChart(
+            PieChartData(
+              sectionsSpace: 4,
+              centerSpaceRadius: 45,
+              sections: _buildChartSections(chartColors),
             ),
           ),
-          const SizedBox(width: 24),
-          // THE DYNAMIC LEGEND
-          Expanded(
-            flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Jars Distribution",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: jars.length,
-                    itemBuilder: (context, index) {
-                      final jar = jars[index];
-                      return _LegendItem(
-                        label: jar.name,
-                        color: chartColors[index],
-                        percent: "${jar.coefficient * Decimal.fromInt(100)}%",
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+        ),
+        const SizedBox(height: 16),
+        Expanded(child: _buildLegend(context, chartColors, cs)),
+      ],
+    );
+  }
+
+  Widget _buildLegend(
+    BuildContext context,
+    List<Color> chartColors,
+    ColorScheme cs,
+  ) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Jars Distribution",
+          style: TextStyle(
+            color: cs.onSurface,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: ListView.builder(
+            itemCount: jars.length,
+            itemBuilder: (context, index) {
+              final jar = jars[index];
+              return _LegendItem(
+                label: jar.name,
+                color: chartColors[index],
+                percent: "${jar.coefficient * Decimal.fromInt(100)}%",
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
@@ -134,24 +169,20 @@ class _LegendItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           CircleAvatar(radius: 5, backgroundColor: color),
           const SizedBox(width: 8),
-          Text(
-            label,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              fontSize: 12,
-            ),
-          ),
+          Text(label, style: TextStyle(color: cs.onSurface, fontSize: 12)),
           const Spacer(),
           Text(
             percent,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: cs.onSurface,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),

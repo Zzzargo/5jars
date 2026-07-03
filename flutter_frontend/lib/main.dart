@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/services.dart';
 import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,21 @@ void main() async {
 
   // Ensure portrait orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Ensure minimum window size
+  await windowManager.ensureInitialized();
+
+  const options = WindowOptions(
+    size: Size(1280, 720),
+    minimumSize: Size(640, 360),
+    center: true,
+    title: 'Five Jars Ultra',
+  );
+
+  windowManager.waitUntilReadyToShow(options, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   runApp(const App());
 }

@@ -75,16 +75,17 @@ class DashboardSidebar extends StatelessWidget {
   }
 
   Widget _buildLogo(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(
           Icons.view_in_ar_outlined,
-          color: Theme.of(context).colorScheme.primary,
+          color: theme.colorScheme.primary,
           size: 36,
         ),
         const SizedBox(width: 12),
-        Text('Five Jars', style: Theme.of(context).textTheme.displayMedium),
+        Text('Five Jars', style: theme.textTheme.displayMedium),
       ],
     );
   }
@@ -105,26 +106,20 @@ class _SidebarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         tileColor: isActive
-            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)
+            ? cs.primary.withValues(alpha: 0.2)
             : Colors.transparent,
-        leading: Icon(
-          icon,
-          color: isActive
-              ? Theme.of(context).colorScheme.onPrimary
-              : Theme.of(context).colorScheme.onSurfaceVariant,
-        ),
+        leading: Icon(icon, color: isActive ? cs.primary : cs.onSurfaceVariant),
         title: Text(
           label,
           style: TextStyle(
-            color: isActive
-                ? Colors.white
-                : Theme.of(context).colorScheme.onSurfaceVariant,
+            color: isActive ? cs.primary : cs.onSurfaceVariant,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
