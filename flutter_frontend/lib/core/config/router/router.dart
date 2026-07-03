@@ -7,6 +7,8 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_b
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/register_screen.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
 import 'package:five_jars_ultra/shared/splash_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,7 +91,12 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.dashboard,
-        builder: (context, state) => const DashboardScreen(),
+        builder: (context, state) => BlocProvider(
+          create: (context) =>
+              // Fetch jars immediately when the dashboard is opened
+              serviceLocator<JarsBloc>()..add(JarsFetchRequested()),
+          child: const DashboardScreen(),
+        ),
       ),
     ],
   );

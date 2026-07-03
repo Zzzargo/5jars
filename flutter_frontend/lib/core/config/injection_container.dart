@@ -1,15 +1,19 @@
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
+import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/data/jars_client.dart';
 import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -33,6 +37,7 @@ Future<void> init() async {
     () => AuthClient(serviceLocator(), serviceLocator()),
   );
   serviceLocator.registerLazySingleton(() => UsersClient(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => JarsClient(serviceLocator()));
 
   // App state manager for global loading/ready status
   serviceLocator.registerLazySingleton(() => AppStateCubit());
@@ -44,12 +49,21 @@ Future<void> init() async {
   serviceLocator.registerFactory(() => LoginBloc(serviceLocator()));
 
   serviceLocator.registerFactory(() => RegisterBloc(serviceLocator()));
+  serviceLocator.registerFactory(() => JarsBloc(serviceLocator()));
 
   // Router configuration
   assert(serviceLocator.isRegistered<AuthSessionBloc>());
   assert(serviceLocator.isRegistered<AppStateCubit>());
   serviceLocator.registerLazySingleton(
     () => AppRouter(serviceLocator(), serviceLocator()),
+  );
+
+  // Theme state
+  final prefs = await SharedPreferences.getInstance();
+  serviceLocator.registerLazySingleton(() => prefs);
+  assert(serviceLocator.isRegistered<SharedPreferences>());
+  serviceLocator.registerLazySingleton(
+    () => ThemeCubit(serviceLocator<SharedPreferences>()),
   );
 
   Logger(

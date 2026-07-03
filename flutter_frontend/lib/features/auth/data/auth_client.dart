@@ -4,17 +4,23 @@ import 'package:dio/dio.dart';
 import 'package:five_jars_ultra/core/api/api_exception.dart';
 import 'package:five_jars_ultra/core/api/api_http_client.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
-import 'package:five_jars_ultra/features/auth/domain/auth_result.dart';
-import 'package:five_jars_ultra/features/auth/models/auth_response.dart';
+import 'package:five_jars_ultra/core/common/resource.dart';
+import 'package:five_jars_ultra/features/auth/dtos/auth_response.dart';
+import 'package:five_jars_ultra/features/auth/models/user_model.dart';
+import 'package:logging/logging.dart';
 
 class AuthClient {
   final ApiHttpClient _apiClient;
   final SecureStorage _secureStorage;
+  static final Logger _logger = Logger("Auth Client");
 
   // This post was made by the Dependency Injection Gang
   AuthClient(this._apiClient, this._secureStorage);
 
-  Future<AuthResult> login(String username, String password) async {
+  Future<Resource<({String token, UserModel user})>> login(
+    String username,
+    String password,
+  ) async {
     return _handleAuthRequest(
       () => _apiClient.post('/auth/login', {
         'username': username,
@@ -23,7 +29,7 @@ class AuthClient {
     );
   }
 
-  Future<AuthResult> register({
+  Future<Resource<({String token, UserModel user})>> register({
     required String username,
     required String password,
   }) async {
@@ -35,7 +41,7 @@ class AuthClient {
     );
   }
 
-  Future<AuthResult> _handleAuthRequest(
+  Future<Resource<({String token, UserModel user})>> _handleAuthRequest(
     Future<Response> Function() requestMethod,
   ) async {
     try {
@@ -48,20 +54,24 @@ class AuthClient {
       // And the username for UX
       await _secureStorage.saveUsername(authResponse.user.username);
 
-      return AuthSuccess(token: authResponse.token, user: authResponse.user);
+      return ResourceSuccess((
+        token: authResponse.token,
+        user: authResponse.user,
+      ));
     } on ApiException catch (e) {
       return switch (e.statusCode) {
-        HttpStatus.unauthorized => const AuthFailure(
+        HttpStatus.unauthorized => const ResourceError(
           "Invalid username or password.",
         ),
-        HttpStatus.forbidden => const AuthFailure("Nonono. Bad cat!"),
-        HttpStatus.conflict => const AuthFailure("Username already taken."),
-        HttpStatus.internalServerError => const AuthFailure("Server error."),
-        _ => AuthFailure(e.toString()),
+        HttpStatus.forbidden => const ResourceError("Nonono. Bad cat!"),
+        HttpStatus.conflict => const ResourceError("Username already taken."),
+        HttpStatus.internalServerError => const ResourceError("Server error."),
+        _ => const ResourceError("An unknown error occurred."),
       };
     } catch (e) {
       // This should never happen, but if it does it's a bug in the http client
-      return AuthFailure("An unknown error occurred: ${e.toString()}");
+      _logger.severe("Unexpected error: $e");
+      return const ResourceError("An unknown error occurred.");
     }
   }
 }

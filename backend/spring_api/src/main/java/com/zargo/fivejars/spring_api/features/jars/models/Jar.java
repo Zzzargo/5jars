@@ -27,16 +27,20 @@ public class Jar {
     private User owner;
 
     @Column(nullable = false, length = 100)
+    @Setter
     private String name;
 
+    @Setter
     private String description;
 
     @DecimalMin("0.00")
     @DecimalMax("100.00")
     @Column(precision = 5, scale = 2, nullable = false)
+    @Setter
     private BigDecimal coefficient;
 
     @Column(precision = 15, scale = 4, nullable = false)
+    @Setter
     private BigDecimal balance;
 
     @Column(name = "created_at", nullable = false, updatable = false)

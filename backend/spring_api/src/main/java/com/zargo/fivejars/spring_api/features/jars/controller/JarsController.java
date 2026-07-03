@@ -2,6 +2,7 @@ package com.zargo.fivejars.spring_api.features.jars.controller;
 
 import com.zargo.fivejars.spring_api.features.jars.dtos.CreateJarRequest;
 import com.zargo.fivejars.spring_api.features.jars.dtos.JarResponse;
+import com.zargo.fivejars.spring_api.features.jars.dtos.MoneyOpRequest;
 import com.zargo.fivejars.spring_api.features.jars.models.Jar;
 import com.zargo.fivejars.spring_api.features.jars.service.JarsService;
 import com.zargo.fivejars.spring_api.features.users.models.User;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -46,5 +48,42 @@ public class JarsController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(Jar.toResponse(newJar));
+    }
+
+    @PostMapping("/income")
+    public ResponseEntity<List<JarResponse>> distributeIncome(
+            @Valid @RequestBody MoneyOpRequest request,
+            @AuthenticationPrincipal User currentUser
+            ) {
+        log.info("User {} distributing income: {}", currentUser.getUsername(), request.amount());
+        List<Jar> updatedJars = jarsService.distributeIncome(currentUser, request.amount());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        updatedJars.stream()
+                                .map(Jar::toResponse)
+                                .toList()
+                );
+    }
+
+    @PostMapping("/{id}/deposit")
+    public ResponseEntity<JarResponse> deposit(
+            @PathVariable UUID id,
+            @Valid @RequestBody MoneyOpRequest request,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        Jar jar = jarsService.deposit(id, currentUser.getId(), request.amount());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Jar.toResponse(jar));
+    }
+
+    @PostMapping("/{id}/withdraw")
+    public ResponseEntity<JarResponse> withdraw(
+            @PathVariable UUID id,
+            @Valid @RequestBody MoneyOpRequest request,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        Jar jar = jarsService.withdraw(id, currentUser.getId(), request.amount());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Jar.toResponse(jar));
     }
 }

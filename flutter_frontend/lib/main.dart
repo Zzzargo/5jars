@@ -1,3 +1,5 @@
+import 'package:five_jars_ultra/core/state/theme_cubit.dart';
+import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
@@ -8,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/services.dart';
 import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
+import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +34,21 @@ void main() async {
 
   // Ensure portrait orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  // Ensure minimum window size
+  await windowManager.ensureInitialized();
+
+  const options = WindowOptions(
+    size: Size(1280, 720),
+    minimumSize: Size(640, 360),
+    center: true,
+    title: 'Five Jars Ultra',
+  );
+
+  windowManager.waitUntilReadyToShow(options, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
 
   runApp(const App());
 }
@@ -62,6 +80,10 @@ class App extends StatelessWidget {
             return cubit;
           },
         ),
+        BlocProvider(
+          lazy: false, // Run this immediately to load the saved theme mode
+          create: (_) => di.serviceLocator<ThemeCubit>(),
+        ),
       ],
       child: const AppView(),
     );
@@ -74,15 +96,15 @@ class AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final router = di.serviceLocator<AppRouter>().config;
+    final themeMode = context.watch<ThemeCubit>().state;
 
     return MaterialApp.router(
       title: '5 Jars Ultra',
       routerConfig: router,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color.fromARGB(255, 90, 28, 109),
-        ),
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode:
+          themeMode, // The theme is reactive to changes in the ThemeCubit
     );
   }
 }
