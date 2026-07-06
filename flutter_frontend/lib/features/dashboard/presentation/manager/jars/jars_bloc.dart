@@ -54,7 +54,25 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
           emit(JarsLoadSuccess(updatedList));
         }
       } else if (result is ResourceError) {
-        // Handle error (e.g., show snackbar)
+        // TODO: Handle error (e.g., show snackbar)
+      }
+    });
+
+    on<JarWithdrawRequested>((event, emit) async {
+      final result = await _client.withdrawFromJar(event.jarId, event.request);
+
+      if (result is ResourceSuccess<JarModel>) {
+        final currentState = state;
+        if (currentState is JarsLoadSuccess) {
+          // Create a new list with the updated jar replaced
+          final updatedList = currentState.jars.map((j) {
+            return j.id == result.data.id ? result.data : j;
+          }).toList();
+
+          emit(JarsLoadSuccess(updatedList));
+        }
+      } else if (result is ResourceError) {
+        // TODO: Handle error (e.g., show snackbar)
       }
     });
   }

@@ -3,7 +3,7 @@ import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jar
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/create_jar_dialog.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
