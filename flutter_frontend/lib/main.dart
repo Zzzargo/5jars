@@ -99,6 +99,7 @@ class AppView extends StatelessWidget {
     final themeMode = context.watch<ThemeCubit>().state;
 
     return MaterialApp.router(
+      scaffoldMessengerKey: di.snackbarKey,
       title: '5 Jars Ultra',
       routerConfig: router,
       theme: AppTheme.light(),

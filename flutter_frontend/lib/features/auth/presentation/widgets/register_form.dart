@@ -1,3 +1,5 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_event.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_state.dart';
@@ -52,31 +54,22 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final NotificationService notificationService =
+        serviceLocator<NotificationService>();
+
     return BlocConsumer<RegisterBloc, RegisterState>(
       // State management
       listener: (context, state) {
         if (state is RegisterSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Account created successfully! "
-                "Redirecting to your dashboard...",
-              ),
-              backgroundColor: Colors.green.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
+          notificationService.showSuccess(
+            "Account created successfully! "
+            "Redirecting to your dashboard...",
           );
 
           // Notify the session bloc about the new authenticated user
           context.read<AuthSessionBloc>().add(UserLoggedIn(state.user));
         } else if (state is RegisterFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          notificationService.showError(state.message);
         }
       },
       builder: (context, state) {

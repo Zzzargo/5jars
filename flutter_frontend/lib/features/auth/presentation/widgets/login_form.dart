@@ -1,3 +1,5 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_bloc.dart';
@@ -43,6 +45,9 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final NotificationService notificationService =
+        serviceLocator<NotificationService>();
+
     return BlocConsumer<LoginBloc, LoginState>(
       // State managing
       listener: (context, state) {
@@ -50,13 +55,7 @@ class _LoginFormState extends State<LoginForm> {
           // Tell the auth session bloc of a login success, it will redirect
           context.read<AuthSessionBloc>().add(UserLoggedIn(state.user));
         } else if (state is LoginFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          notificationService.showError(state.message);
         }
       },
       builder: (context, state) {
