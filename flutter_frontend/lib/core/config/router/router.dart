@@ -70,18 +70,23 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.login,
-        pageBuilder: (context, state) => CustomTransitionPage(
-          key: state.pageKey,
-          transitionDuration: const Duration(milliseconds: 1200),
-          reverseTransitionDuration: const Duration(milliseconds: 1200),
-          child: BlocProvider(
-            create: (_) => serviceLocator<LoginBloc>(),
-            child: const LoginScreen(),
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            // While the hero travels, the rest of the screen fades
-            return FadeTransition(opacity: animation, child: child);
-          },
+
+        // pageBuilder: (context, state) => CustomTransitionPage(
+        //   key: state.pageKey,
+        //   transitionDuration: const Duration(milliseconds: 1200),
+        //   reverseTransitionDuration: const Duration(milliseconds: 1200),
+        //   child: BlocProvider(
+        //     create: (_) => serviceLocator<LoginBloc>(),
+        //     child: const LoginScreen(),
+        //   ),
+        //   transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        //     // While the hero travels, the rest of the screen fades
+        //     return FadeTransition(opacity: animation, child: child);
+        //   },
+        // ),
+        builder: (context, state) => BlocProvider(
+          create: (_) => serviceLocator<LoginBloc>(),
+          child: const LoginScreen(),
         ),
       ),
       GoRoute(

@@ -13,7 +13,9 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: SafeArea(
@@ -35,7 +37,7 @@ class LoginScreen extends StatelessWidget {
                         child: Material(
                           type: MaterialType.transparency,
                           child: Branding(
-                            fillColor: cs.primary,
+                            fillColor: isDark ? cs.secondary : cs.primary,
                             isCompact: true,
                           ),
                         ),
@@ -62,6 +64,10 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildDesktop(BuildContext context) {
+    // final theme = Theme.of(context);
+    // final cs = theme.colorScheme;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Row(
         children: [
@@ -71,15 +77,14 @@ class LoginScreen extends StatelessWidget {
             child: Hero(
               tag: "branding_bkgr",
               child: BrandingBackground(
-                child:
-                    // Hero(
-                    // tag: "branding",
-                    // child:
-                    const Material(
-                      type: MaterialType.transparency,
-                      child: Branding(),
+                child: Center(
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Branding(
+                      // fillColor: isDark ? cs.secondary : cs.primary,
                     ),
-                // ),
+                  ),
+                ),
               ),
             ),
           ),

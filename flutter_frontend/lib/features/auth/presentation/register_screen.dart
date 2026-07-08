@@ -33,7 +33,20 @@ class RegisterScreen extends StatelessWidget {
       body: Row(
         children: [
           // Left side - Branding section
-          Expanded(flex: 1, child: const BrandingBackground(child: Branding())),
+          Expanded(
+            flex: 1,
+            child: Hero(
+              tag: "branding_bkgr",
+              child: BrandingBackground(
+                child: Center(
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Branding(),
+                  ),
+                ),
+              ),
+            ),
+          ),
           // Right side - Register form
           Expanded(
             flex: 1,

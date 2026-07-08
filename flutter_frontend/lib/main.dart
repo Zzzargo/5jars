@@ -16,7 +16,7 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  timeDilation = 2.0; // TODO: Remove this line before production
+  // timeDilation = 5.0; // TODO: Remove this line before production
 
   // Set the global logger to print in this format
   Logger.root.onRecord.listen((record) {
@@ -42,7 +42,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   const options = WindowOptions(
-    size: Size(800, 720),
+    size: Size(1280, 720),
     minimumSize: Size(640, 360),
     center: true,
     title: 'Five Jars Ultra',
