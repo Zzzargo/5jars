@@ -93,7 +93,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     'Create Account',
                     style: TextStyle(
                       fontSize: 32,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: cs.primary,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -255,7 +255,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 3.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.primary,
+                                  cs.primary,
                                 ),
                               ),
                             )
@@ -280,7 +280,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             "Already have an account? ",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: cs.primary,
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,

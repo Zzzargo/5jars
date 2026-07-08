@@ -16,7 +16,7 @@ class AdaptiveScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 800;
+    final isDesktop = MediaQuery.of(context).size.width > 896;
     return isDesktop ? desktop(context) : mobile(context);
   }
 }

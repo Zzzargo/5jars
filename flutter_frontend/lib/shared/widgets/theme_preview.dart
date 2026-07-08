@@ -59,6 +59,8 @@ class _Section extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 32),
       child: Column(
@@ -66,8 +68,8 @@ class _Section extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: theme.colorScheme.primary,
               letterSpacing: 1.5,
             ),
           ),

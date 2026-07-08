@@ -72,14 +72,16 @@ class AppRouter {
         path: AppRoutes.login,
         pageBuilder: (context, state) => CustomTransitionPage(
           key: state.pageKey,
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: const Duration(milliseconds: 1200),
+          reverseTransitionDuration: const Duration(milliseconds: 1200),
           child: BlocProvider(
             create: (_) => serviceLocator<LoginBloc>(),
             child: const LoginScreen(),
           ),
-          // TODO: Make transitions consistent across all screens
-          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-              FadeTransition(opacity: animation, child: child),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // While the hero travels, the rest of the screen fades
+            return FadeTransition(opacity: animation, child: child);
+          },
         ),
       ),
       GoRoute(

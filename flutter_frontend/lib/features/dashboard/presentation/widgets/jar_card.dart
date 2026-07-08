@@ -87,6 +87,8 @@ class JarCard extends StatelessWidget {
                             // Hovering over the jar name shows the full name in case it's truncated
                             message: jar.name,
                             waitDuration: const Duration(milliseconds: 500),
+                            // preferBelow: false,
+                            verticalOffset: 12,
                             child: Text(
                               jar.name,
                               style: tt.titleMedium,
@@ -186,7 +188,7 @@ class _JarActionsMenu extends StatelessWidget {
       icon: Icon(Icons.more_vert_rounded, color: cs.onSurfaceVariant),
       offset: const Offset(0, 10),
       // Use the theme's surface container for a proper elevated feel
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      color: cs.surfaceContainerHigh,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onSelected: (action) {

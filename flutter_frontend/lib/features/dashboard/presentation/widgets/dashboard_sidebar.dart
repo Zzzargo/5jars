@@ -11,9 +11,20 @@ class DashboardSidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Container(
       width: isDrawer ? null : 250, // Drawer handles width on mobile
-      color: Theme.of(context).colorScheme.surface,
+      decoration: BoxDecoration(
+        color: cs.surfaceContainerLowest,
+        border: Border(right: BorderSide(color: cs.outlineVariant, width: 1)),
+        boxShadow: [
+          BoxShadow(
+            color: cs.shadow.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(4, 0),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           const SizedBox(height: 24),
@@ -85,7 +96,12 @@ class DashboardSidebar extends StatelessWidget {
           size: 36,
         ),
         const SizedBox(width: 12),
-        Text('Five Jars', style: theme.textTheme.displayMedium),
+        Text(
+          'Five Jars',
+          style: theme.textTheme.displayMedium?.copyWith(
+            color: theme.colorScheme.primary,
+          ),
+        ),
       ],
     );
   }

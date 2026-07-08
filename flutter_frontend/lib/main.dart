@@ -6,6 +6,7 @@ import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,8 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  timeDilation = 2.0; // TODO: Remove this line before production
 
   // Set the global logger to print in this format
   Logger.root.onRecord.listen((record) {
@@ -39,7 +42,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   const options = WindowOptions(
-    size: Size(1280, 720),
+    size: Size(800, 720),
     minimumSize: Size(640, 360),
     center: true,
     title: 'Five Jars Ultra',

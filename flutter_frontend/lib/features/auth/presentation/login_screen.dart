@@ -13,16 +13,48 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 26),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              // Just the login form
-              child: const LoginForm(),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints
+                        .maxHeight, // Forces content to fill the screen
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Hero(
+                        tag: 'logo',
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Branding(
+                            fillColor: cs.primary,
+                            isCompact: true,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: const LoginForm(),
+                      ),
+
+                      // Footer spacer to keep things balanced
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -36,8 +68,19 @@ class LoginScreen extends StatelessWidget {
           // Left side - Branding section
           Expanded(
             flex: 1,
-            child: const BrandingBackground(
-              child: Hero(tag: "branding", child: Branding()),
+            child: Hero(
+              tag: "branding_bkgr",
+              child: BrandingBackground(
+                child:
+                    // Hero(
+                    // tag: "branding",
+                    // child:
+                    const Material(
+                      type: MaterialType.transparency,
+                      child: Branding(),
+                    ),
+                // ),
+              ),
             ),
           ),
           // Right side - Login form
