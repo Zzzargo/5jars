@@ -7,7 +7,6 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_e
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 
 class LoginForm extends StatefulWidget {
@@ -45,6 +44,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final NotificationService notificationService =
         serviceLocator<NotificationService>();
 
@@ -78,7 +78,7 @@ class _LoginFormState extends State<LoginForm> {
                     'Welcome Back',
                     style: TextStyle(
                       fontSize: 32,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: cs.primary,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -95,16 +95,16 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                   const SizedBox(height: 28),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _usernameController,
                     enabled: !isLoading, // Disable input while loading
+
                     decoration: InputDecoration(
                       labelText: 'Username',
                       prefixIcon: const Icon(Icons.person_outline),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
@@ -114,6 +114,7 @@ class _LoginFormState extends State<LoginForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _passwordController,
                     enabled: !isLoading,
                     decoration: InputDecoration(
@@ -137,8 +138,6 @@ class _LoginFormState extends State<LoginForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     obscureText: _obscurePassword,
                     obscuringCharacter: '•',
@@ -150,7 +149,7 @@ class _LoginFormState extends State<LoginForm> {
                   const SizedBox(height: 12),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: PlatformTextButton(
+                    child: TextButton(
                       onPressed: () {
                         // TODO: Handle forgot password
                       },
@@ -160,19 +159,16 @@ class _LoginFormState extends State<LoginForm> {
                   const SizedBox(height: 24),
                   FractionallySizedBox(
                     widthFactor: 0.4,
-                    child: PlatformElevatedButton(
+                    child: ElevatedButton(
                       onPressed: isLoading ? null : _onLoginSubmit,
-                      material: (_, __) => MaterialElevatedButtonData(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 3,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.surface,
+
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        elevation: 3,
                       ),
+
                       child: isLoading
                           ? SizedBox(
                               height: 24,
@@ -180,7 +176,7 @@ class _LoginFormState extends State<LoginForm> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 3.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.primary,
+                                  cs.primary,
                                 ),
                               ),
                             )
@@ -205,7 +201,7 @@ class _LoginFormState extends State<LoginForm> {
                             "Don't have an account? ",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: cs.primary,
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
@@ -214,21 +210,18 @@ class _LoginFormState extends State<LoginForm> {
                         ),
                         SizedBox(width: 12),
                         Flexible(
-                          child: PlatformElevatedButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               context.go('/register');
                             },
-                            material: (_, __) => MaterialElevatedButtonData(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 2,
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surface,
+
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
                               ),
+                              elevation: 2,
                             ),
+
                             child: const Text(
                               "Register",
                               style: TextStyle(
