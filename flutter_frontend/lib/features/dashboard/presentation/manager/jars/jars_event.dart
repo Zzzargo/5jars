@@ -24,3 +24,9 @@ class JarWithdrawRequested extends JarsEvent {
 
   JarWithdrawRequested(this.jarId, this.request);
 }
+
+class DistributeIncomeRequested extends JarsEvent {
+  final MoneyOpRequest request;
+
+  DistributeIncomeRequested(this.request);
+}

@@ -31,7 +31,10 @@ public class JarsService {
 
     @Transactional
     public Jar createJar(final CreateJarRequest request, final User owner) {
-        log.info("Creating new jar '{}' for user '{}'", request.name(), owner.getUsername());
+        log.info(
+                "Creating new jar '{}' for user '{}' with coefficient {}",
+                request.name(), owner.getUsername(), request.coefficient()
+        );
 
         // Validate coefficients sum
         List<Jar> currentJars = jarsRepository.findAllByOwnerId(owner.getId());
@@ -39,8 +42,8 @@ public class JarsService {
                 .map(Jar::getCoefficient)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (totalCoeff.compareTo(new BigDecimal("100")) > 0) {
-            throw new BusinessLogicException("Jar coefficients must not sum up to more than 100");
+        if (totalCoeff.compareTo(new BigDecimal("1")) > 0) {
+            throw new BusinessLogicException("Jar coefficients must not sum up to more than 100%");
         }
 
         Jar jar = Jar.builder()
@@ -69,15 +72,13 @@ public class JarsService {
                 .map(Jar::getCoefficient)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        if (totalCoeff.compareTo(new BigDecimal("100")) != 0) {
+        if (totalCoeff.compareTo(new BigDecimal("1")) != 0) {
             throw new BusinessLogicException("Jar coefficients must sum to 100% before distributing income.");
         }
 
         for (Jar jar : jars) {
-            // AmountToAdd = Total * (Coefficient / 100)
-            BigDecimal share = totalAmount.multiply(jar.getCoefficient())
-                    .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
-
+            // AmountToAdd = Total * Coefficient
+            BigDecimal share = totalAmount.multiply(jar.getCoefficient());
             jar.setBalance(jar.getBalance().add(share));
         }
 

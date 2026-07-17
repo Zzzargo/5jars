@@ -87,5 +87,18 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
           break;
       }
     });
+
+    on<DistributeIncomeRequested>((event, emit) async {
+      final result = await _client.distributeIncome(event.request);
+
+      switch (result) {
+        case ResourceSuccess<List<JarModel>> s:
+          emit(JarsLoadSuccess(s.data));
+          notificationService.showSuccess('Income distributed successfully');
+
+        case ResourceError<List<JarModel>> e:
+          notificationService.showError(e.message);
+      }
+    });
   }
 }
