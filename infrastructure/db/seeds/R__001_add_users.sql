@@ -1,5 +1,7 @@
-INSERT INTO users (id, username, password_hash)
-VALUES
-    ('11111111-1111-1111-1111-111111111111', 'alice', 'dev_hash_alice'),
-    ('22222222-2222-2222-2222-222222222222', 'bob', 'dev_hash_bob')
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (id, username, password_hash, email)
+VALUES (
+        '67b6a5b7-a527-479d-81fd-8e5c11b025d8',
+        'test1',
+        '$2a$10$2hNCGQXx3fCKzh4uSoIGkewQxhFNuhTjNZU0dKn7tYr/KgnEW2dy.',
+        'test@example.com'
+    ) ON CONFLICT (username) DO NOTHING;
