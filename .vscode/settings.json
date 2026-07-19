@@ -2,5 +2,17 @@
     "cmake.ignoreCMakeListsMissing": true,
     "files.watcherExclude": {
         "**/target": true
-    }
+    },
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "fivejars",
+            "database": "fivejars_db",
+            "username": "fivejars_db_user"
+        }
+    ]
 }

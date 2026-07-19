@@ -78,7 +78,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // Don't let the exception be handled by the global handler, just send a failed auth response (403)
         } catch (Exception e) {
             // Catch any other JWT errors (Expired, Tampered, Malformed)
-            log.error("JWT logic failed: {}", e.getMessage());
+            log.error("JWT error: {}", e.getMessage());
             this.exceptionResolver.resolveException(request, response, null, new InvalidTokenException());
             return;
         }
