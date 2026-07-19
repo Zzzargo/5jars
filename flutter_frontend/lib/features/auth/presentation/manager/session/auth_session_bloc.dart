@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/common/resource.dart';
+import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
@@ -12,6 +13,8 @@ import 'package:logging/logging.dart';
 class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
   final SecureStorage _storage;
   final Logger _logger = Logger('AuthSessionBloc');
+  final NotificationService notificationService =
+      serviceLocator<NotificationService>();
 
   // A Completer to tell when async work is done
   final _completer = Completer<void>();
@@ -78,7 +81,9 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
             emit(AuthSessionUnauthenticated());
             _logger.info('Invalid JWT. User must log in again.');
-          // TODO: notify the user their session expired via a snackbar or smth
+            notificationService.showError(
+              'Session expired. Please log in again.',
+            );
         }
       } else {
         emit(AuthSessionUnauthenticated());

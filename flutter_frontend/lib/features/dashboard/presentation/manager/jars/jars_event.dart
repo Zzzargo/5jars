@@ -17,3 +17,16 @@ class JarDepositRequested extends JarsEvent {
 
   JarDepositRequested(this.jarId, this.request);
 }
+
+class JarWithdrawRequested extends JarsEvent {
+  final MoneyOpRequest request;
+  final String jarId;
+
+  JarWithdrawRequested(this.jarId, this.request);
+}
+
+class DistributeIncomeRequested extends JarsEvent {
+  final MoneyOpRequest request;
+
+  DistributeIncomeRequested(this.request);
+}

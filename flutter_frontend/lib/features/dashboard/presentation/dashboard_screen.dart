@@ -1,12 +1,16 @@
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/create_jar_request.dart';
+import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
-import 'package:flutter/material.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/create_jar_dialog.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/distribute_income_dialog.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -18,8 +22,9 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildDesktop(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: cs.surface,
       body: Row(
         children: [
           const DashboardSidebar(),
@@ -46,14 +51,23 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: cs.surface,
         elevation: 0,
         title: const Text(
           'My Jars',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Distribute income',
+            onPressed: () => _onDistributeIncome(context),
+            icon: Icon(Icons.payments, color: cs.primary),
+          ),
+        ],
       ),
       drawer: const Drawer(child: DashboardSidebar(isDrawer: true)),
       body: CustomScrollView(
@@ -71,9 +85,9 @@ class DashboardScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: cs.primary,
         onPressed: () => _onNewJar(context),
-        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
+        child: Icon(Icons.add, color: cs.onPrimary),
       ),
     );
   }
@@ -90,7 +104,27 @@ class DashboardScreen extends StatelessWidget {
     }
   }
 
+  void _onDistributeIncome(BuildContext context) async {
+    final MoneyOpRequest? request = await showDialog<MoneyOpRequest>(
+      context: context,
+      builder: (context) => const DistributeIncomeDialog(),
+    );
+
+    // If the user didn't cancel and the request is valid
+    if (request != null && context.mounted) {
+      context.read<JarsBloc>().add(DistributeIncomeRequested(request));
+    }
+  }
+
   Widget _buildHeader(BuildContext context, {required bool isDesktop}) {
+    final state = context.watch<AuthSessionBloc>().state;
+    final String? uname = switch (state) {
+      AuthSessionAuthenticated(:final user) => user.username,
+      _ => null,
+    };
+
+    final cs = Theme.of(context).colorScheme;
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -101,15 +135,12 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   'Welcome back,',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: cs.onSurfaceVariant, fontSize: 16),
                 ),
                 Text(
-                  'Alex Doe',
+                  uname ?? 'Unknown User',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: cs.primary,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),
@@ -118,21 +149,40 @@ class DashboardScreen extends StatelessWidget {
             ),
             const Spacer(),
             if (isDesktop)
-              ElevatedButton.icon(
-                onPressed: () => _onNewJar(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  foregroundColor: Theme.of(context).colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => _onNewJar(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: cs.primary,
+                      foregroundColor: cs.onPrimary,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add New Jar'),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: () => _onDistributeIncome(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.payments),
+                    label: const Text('Distribute Income'),
                   ),
-                ),
-                icon: const Icon(Icons.add),
-                label: const Text('Add New Jar'),
+                ],
               ),
           ],
         ),

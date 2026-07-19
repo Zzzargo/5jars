@@ -1,8 +1,14 @@
 import 'package:decimal/decimal.dart';
+import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/deposit_dialog.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/withdraw_dialog.dart';
 import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 class JarCard extends StatelessWidget {
@@ -10,6 +16,28 @@ class JarCard extends StatelessWidget {
   final VoidCallback? onTap;
 
   const JarCard({super.key, required this.jar, this.onTap});
+
+  void _onDeposit(BuildContext context) async {
+    final MoneyOpRequest? request = await showDialog<MoneyOpRequest>(
+      context: context,
+      builder: (context) => const DepositDialog(),
+    );
+
+    if (request != null && context.mounted) {
+      context.read<JarsBloc>().add(JarDepositRequested(jar.id, request));
+    }
+  }
+
+  void _onWithdraw(BuildContext context) async {
+    final MoneyOpRequest? request = await showDialog<MoneyOpRequest>(
+      context: context,
+      builder: (context) => const WithdrawDialog(),
+    );
+
+    if (request != null && context.mounted) {
+      context.read<JarsBloc>().add(JarWithdrawRequested(jar.id, request));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +83,18 @@ class JarCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            jar.name,
-                            style: tt.titleMedium,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                          Tooltip(
+                            // Hovering over the jar name shows the full name in case it's truncated
+                            message: jar.name,
+                            waitDuration: const Duration(milliseconds: 500),
+                            // preferBelow: false,
+                            verticalOffset: 12,
+                            child: Text(
+                              jar.name,
+                              style: tt.titleMedium,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
                           const SizedBox(height: 2),
                           Text(
@@ -94,12 +129,12 @@ class JarCard extends StatelessWidget {
                       _CardActionIconButton(
                         icon: Icons.add_circle_outline_rounded,
                         tooltip: 'Deposit',
-                        onPressed: () {}, // TODO: Implement deposit
+                        onPressed: () => _onDeposit(context),
                       ),
                       _CardActionIconButton(
                         icon: Icons.remove_circle_outline_rounded,
                         tooltip: 'Withdraw',
-                        onPressed: () {}, // TODO: Implement withdraw
+                        onPressed: () => _onWithdraw(context),
                       ),
                       _JarActionsMenu(jar: jar),
                     ],
@@ -153,7 +188,7 @@ class _JarActionsMenu extends StatelessWidget {
       icon: Icon(Icons.more_vert_rounded, color: cs.onSurfaceVariant),
       offset: const Offset(0, 10),
       // Use the theme's surface container for a proper elevated feel
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      color: cs.surfaceContainerHigh,
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onSelected: (action) {

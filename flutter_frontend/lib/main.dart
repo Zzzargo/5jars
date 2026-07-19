@@ -6,6 +6,7 @@ import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,8 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // timeDilation = 5.0; // TODO: Remove this line before production
 
   // Set the global logger to print in this format
   Logger.root.onRecord.listen((record) {
@@ -99,6 +102,7 @@ class AppView extends StatelessWidget {
     final themeMode = context.watch<ThemeCubit>().state;
 
     return MaterialApp.router(
+      scaffoldMessengerKey: di.snackbarKey,
       title: '5 Jars Ultra',
       routerConfig: router,
       theme: AppTheme.light(),

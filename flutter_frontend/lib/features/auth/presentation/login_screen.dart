@@ -13,16 +13,50 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 26),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              // Just the login form
-              child: const LoginForm(),
-            ),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints
+                        .maxHeight, // Forces content to fill the screen
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Hero(
+                        tag: 'logo',
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: Branding(
+                            fillColor: isDark ? cs.secondary : cs.primary,
+                            isCompact: true,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 500),
+                        child: const LoginForm(),
+                      ),
+
+                      // Footer spacer to keep things balanced
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ),
       ),
@@ -30,14 +64,28 @@ class LoginScreen extends StatelessWidget {
   }
 
   Widget _buildDesktop(BuildContext context) {
+    // final theme = Theme.of(context);
+    // final cs = theme.colorScheme;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Row(
         children: [
           // Left side - Branding section
           Expanded(
             flex: 1,
-            child: const BrandingBackground(
-              child: Hero(tag: "branding", child: Branding()),
+            child: Hero(
+              tag: "branding_bkgr",
+              child: BrandingBackground(
+                child: Center(
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: Branding(
+                      // fillColor: isDark ? cs.secondary : cs.primary,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           // Right side - Login form

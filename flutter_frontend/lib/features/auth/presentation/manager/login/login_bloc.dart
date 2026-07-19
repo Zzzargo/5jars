@@ -1,4 +1,5 @@
 import 'package:five_jars_ultra/core/common/resource.dart';
+import 'package:five_jars_ultra/features/auth/models/user_model.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/features/auth/data/auth_client.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_event.dart';
@@ -23,11 +24,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final authResult = await _authClient.login(event.username, event.password);
 
     switch (authResult) {
-      case ResourceSuccess s:
-        emit(LoginSuccess(s.data.user));
+      case ResourceSuccess<({String token, UserModel user})>():
+        emit(LoginSuccess(authResult.data.user));
 
-      case ResourceError f:
-        emit(LoginFailure(f.message));
+      case ResourceError<({String token, UserModel user})>():
+        emit(LoginFailure(authResult.message));
     }
   }
 }

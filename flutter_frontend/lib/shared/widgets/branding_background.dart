@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/shared/palette.dart';
 import 'package:flutter/material.dart';
 
 class BrandingBackground extends StatelessWidget {
@@ -8,31 +9,64 @@ class BrandingBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+
+    final List<Color> lightColors = [
+      cs.primary.withValues(alpha: 0.7),
+      cs.surface,
+    ];
+
+    final List<Color> darkColors = [
+      cs.primary.withValues(alpha: 0.25),
+      cs.surface,
+    ];
 
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        // Radial gradient creates a sophisticated "glow" from the top center
-        gradient: RadialGradient(
-          center: const Alignment(0.0, -0.7), // Spotlight starts near the top
-          radius: 1.5,
-          colors: isDark
-              ? [
-                  // Dark Mode: Deep purple core fading into the black background
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 45),
-                  Theme.of(context).colorScheme.surface,
-                ]
-              : [
-                  // Light Mode: Soft lavender core fading into the white background
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 180),
-                  Theme.of(context).colorScheme.surface,
-                ],
-          stops: const [0.0, 0.8], // Concentrates the glow at the top
-        ),
+      decoration: BoxDecoration(color: cs.surface),
+      child: Stack(
+        children: [
+          // Layer 1: Subtle Linear background to give the screen "weight"
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: isDark
+                      ? [
+                          Colors.white.withValues(alpha: 0.05),
+                          Palette.transparent,
+                        ]
+                      : [
+                          cs.primary.withValues(alpha: 0.1),
+                          Palette.transparent,
+                        ],
+                ),
+              ),
+            ),
+          ),
+
+          // Layer 2: The Spotlight (Radial)
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0.0, -0.6),
+                  radius: 1.2,
+                  colors: isDark ? darkColors : lightColors,
+                  stops: const [0, 0.9],
+                ),
+              ),
+            ),
+          ),
+
+          // THE CONTENT
+          child,
+        ],
       ),
-      child: child,
     );
   }
 }

@@ -13,46 +13,50 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
-    return AdaptiveScreen(mobile: _buildMobile, desktop: _buildDesktop);
-  }
-
-  Widget _buildMobile(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(
-          strokeWidth: 3,
-          valueColor: AlwaysStoppedAnimation<Color>(
-            Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      ),
+    return AdaptiveScreen(
+      mobile: (context) => _buildBase(context),
+      // This reminds me of currying. Shoutout to Dan Popovici
+      desktop: (context) => _buildBase(context, isDesktop: true),
     );
   }
 
-  Widget _buildDesktop(BuildContext context) {
-    return Scaffold(
-      body: BrandingBackground(
+  Widget _buildBase(BuildContext context, {bool isDesktop = false}) {
+    // Define the Logo Unit conditionally
+
+    Widget logoUnit = const Material(
+      type: MaterialType.transparency,
+      child: Branding(),
+    );
+
+    // On mobile the hero is the logo
+    if (!isDesktop) {
+      logoUnit = Hero(tag: "logo", child: logoUnit);
+    }
+
+    // Define the shared content
+    Widget content = BrandingBackground(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Hero(tag: 'branding', child: Branding()),
-
-            const SizedBox(height: 28),
-
-            SizedBox(
-              width: 40,
-              height: 40,
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Theme.of(context).colorScheme.onPrimary,
-                ),
+            logoUnit,
+            const SizedBox(height: 48),
+            CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                Theme.of(context).colorScheme.primary,
               ),
             ),
           ],
         ),
       ),
     );
+
+    // On desktop, the hero is the entire branding section, not just the logo
+    if (isDesktop) {
+      content = Hero(tag: "branding_bkgr", child: content);
+    }
+
+    return Scaffold(body: content);
   }
 }

@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "flutter_frontend (dev)",
+            "name": "dev",
             "cwd": "flutter_frontend",
             "request": "launch",
             "type": "dart",
@@ -15,12 +15,22 @@
             "flutterMode": "debug"
         },
         {
-            "name": "flutter_frontend (prod)",
+            "name": "dev (no debug)",
             "cwd": "flutter_frontend",
             "request": "launch",
             "type": "dart",
             "args": [
-                "--dart-define-from-file=config/prod.json"
+                "--dart-define-from-file=config/dev.json"
+            ],
+            "flutterMode":"release"
+        },
+        {
+            "name": "prod",
+            "cwd": "flutter_frontend",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--dart-define-from-file=config/dev.json"
             ],
             "flutterMode": "release"
         }

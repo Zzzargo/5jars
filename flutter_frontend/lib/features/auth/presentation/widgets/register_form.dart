@@ -1,3 +1,5 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_event.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_state.dart';
@@ -5,7 +7,6 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_platform_widgets/flutter_platform_widgets.dart';
 import 'package:go_router/go_router.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -52,31 +53,24 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
+    final NotificationService notificationService =
+        serviceLocator<NotificationService>();
+
+    final cs = Theme.of(context).colorScheme;
+
     return BlocConsumer<RegisterBloc, RegisterState>(
       // State management
       listener: (context, state) {
         if (state is RegisterSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                "Account created successfully! "
-                "Redirecting to your dashboard...",
-              ),
-              backgroundColor: Colors.green.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
+          notificationService.showSuccess(
+            "Account created successfully! "
+            "Redirecting to your dashboard...",
           );
 
           // Notify the session bloc about the new authenticated user
           context.read<AuthSessionBloc>().add(UserLoggedIn(state.user));
         } else if (state is RegisterFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Colors.red.shade700,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          notificationService.showError(state.message);
         }
       },
       builder: (context, state) {
@@ -99,7 +93,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     'Create Account',
                     style: TextStyle(
                       fontSize: 32,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: cs.primary,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -116,6 +110,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   const SizedBox(height: 28),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _nicknameController,
                     enabled: !isLoading,
                     decoration: InputDecoration(
@@ -124,8 +119,6 @@ class _RegisterFormState extends State<RegisterForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -140,6 +133,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _usernameController,
                     enabled: !isLoading,
                     decoration: InputDecoration(
@@ -148,8 +142,6 @@ class _RegisterFormState extends State<RegisterForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
@@ -164,6 +156,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _passwordController,
                     enabled: !isLoading,
                     decoration: InputDecoration(
@@ -186,8 +179,6 @@ class _RegisterFormState extends State<RegisterForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     obscureText: _obscurePassword,
                     obscuringCharacter: '•',
@@ -207,6 +198,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    style: TextStyle(color: cs.onSurfaceVariant),
                     controller: _confirmPasswordController,
                     enabled: !isLoading,
                     decoration: InputDecoration(
@@ -230,8 +222,6 @@ class _RegisterFormState extends State<RegisterForm> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
                     ),
                     obscureText: _obscureConfirmPassword,
                     obscuringCharacter: '•',
@@ -249,18 +239,14 @@ class _RegisterFormState extends State<RegisterForm> {
                   const SizedBox(height: 24),
                   FractionallySizedBox(
                     widthFactor: 0.4,
-                    child: PlatformElevatedButton(
+                    child: ElevatedButton(
                       onPressed: isLoading ? null : _onRegisterSubmit,
-                      material: (_, __) => MaterialElevatedButtonData(
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          elevation: 3,
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.surface,
+
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
                         ),
+                        elevation: 3,
                       ),
                       child: isLoading
                           ? SizedBox(
@@ -269,7 +255,7 @@ class _RegisterFormState extends State<RegisterForm> {
                               child: CircularProgressIndicator(
                                 strokeWidth: 3.5,
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                  Theme.of(context).colorScheme.primary,
+                                  cs.primary,
                                 ),
                               ),
                             )
@@ -294,7 +280,7 @@ class _RegisterFormState extends State<RegisterForm> {
                             "Already have an account? ",
                             style: TextStyle(
                               fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: cs.primary,
                               fontWeight: FontWeight.w500,
                             ),
                             textAlign: TextAlign.center,
@@ -303,20 +289,15 @@ class _RegisterFormState extends State<RegisterForm> {
                         ),
                         SizedBox(width: 12),
                         Flexible(
-                          child: PlatformElevatedButton(
+                          child: ElevatedButton(
                             onPressed: () {
                               context.go('/login');
                             },
-                            material: (_, __) => MaterialElevatedButtonData(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                elevation: 2,
-                                backgroundColor: Theme.of(
-                                  context,
-                                ).colorScheme.surface,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
                               ),
+                              elevation: 2,
                             ),
                             child: const Text(
                               "Log In",
