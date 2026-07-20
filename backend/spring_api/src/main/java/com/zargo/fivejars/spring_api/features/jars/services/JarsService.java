@@ -1,13 +1,15 @@
-package com.zargo.fivejars.spring_api.features.jars.service;
+package com.zargo.fivejars.spring_api.features.jars.services;
 
 import com.zargo.fivejars.spring_api.common.exceptions.BusinessLogicException;
 import com.zargo.fivejars.spring_api.common.exceptions.ResourceNotFoundException;
 import com.zargo.fivejars.spring_api.features.jars.dtos.CreateJarRequest;
+import com.zargo.fivejars.spring_api.features.jars.dtos.MoneyOpRequest;
 import com.zargo.fivejars.spring_api.features.jars.models.Jar;
-import com.zargo.fivejars.spring_api.features.jars.repository.JarsRepository;
+import com.zargo.fivejars.spring_api.features.jars.models.Transaction;
+import com.zargo.fivejars.spring_api.features.jars.models.TransactionType;
+import com.zargo.fivejars.spring_api.features.jars.repositories.JarsRepository;
+import com.zargo.fivejars.spring_api.features.jars.repositories.TransactionsRepository;
 import com.zargo.fivejars.spring_api.features.users.models.User;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JarsService {
     private final JarsRepository jarsRepository;
+    private final TransactionsRepository transactionsRepository;
 
     public List<Jar> getJars(final UUID ownerId) {
         return jarsRepository.findAllByOwnerId(ownerId);
@@ -60,7 +63,9 @@ public class JarsService {
     }
 
     @Transactional
-    public List<Jar> distributeIncome(final User user, final BigDecimal totalAmount) {
+    public List<Jar> distributeIncome(final User user, final MoneyOpRequest request) {
+        final BigDecimal totalAmount = request.amount();
+
         if (totalAmount.compareTo(new BigDecimal("0")) < 0) {
             throw new BusinessLogicException("Can't distribute a negative income");
         }
@@ -73,38 +78,71 @@ public class JarsService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (totalCoeff.compareTo(new BigDecimal("1")) != 0) {
-            throw new BusinessLogicException("Jar coefficients must sum to 100% before distributing income.");
+            throw new BusinessLogicException("Jar coefficients must sum to exactly 100% before distributing income.");
         }
+
+        UUID correlationId = UUID.randomUUID(); // Same correlation ID for all transactions
 
         for (Jar jar : jars) {
             // AmountToAdd = Total * Coefficient
-            BigDecimal share = totalAmount.multiply(jar.getCoefficient());
+            BigDecimal share = totalAmount.multiply(jar.getCoefficient())
+                    .setScale(2, RoundingMode.HALF_UP);
             jar.setBalance(jar.getBalance().add(share));
+
+            // Save the transaction
+            Transaction tx = Transaction.builder()
+                    .initiator(user)
+                    .affectedJar(jar)
+                    .amount(share)
+                    .type(TransactionType.INCOME_DISTRIBUTION)
+                    .correlationId(correlationId)
+                    .createdAt(Instant.now())
+                    .description("Income Distribution: " + request.description())
+                    .build();
+
+            transactionsRepository.save(tx);
         }
 
         return jarsRepository.saveAll(jars);
     }
 
     @Transactional
-    public Jar deposit(final UUID accId, final UUID userId, final BigDecimal amount) {
+    public Jar deposit(final UUID jarId, final User user, final MoneyOpRequest request) {
+        final BigDecimal amount = request.amount();
+
         if (amount.compareTo(new BigDecimal("0")) < 0) {
             throw new BusinessLogicException("Can't deposit a negative amount");
         }
 
-        Jar jar = jarsRepository.findByIdAndOwnerId(accId, userId).orElseThrow(
+        Jar jar = jarsRepository.findByIdAndOwnerId(jarId, user.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Jar with invalid ID")
         );
 
         jar.setBalance(jar.getBalance().add(amount));
+
+        Transaction transaction = Transaction.builder()
+                .initiator(user)
+                .affectedJar(jar)
+                .amount(amount)
+                .type(TransactionType.DEPOSIT)
+                .description(request.description())
+                .createdAt(Instant.now())
+                .correlationId(UUID.randomUUID())
+                .build();
+
+        transactionsRepository.save(transaction);
+
         return jarsRepository.save(jar);
     }
 
-    public Jar withdraw(final UUID accId, final UUID userId, final BigDecimal amount) {
+    public Jar withdraw(final UUID accId, final User user, final MoneyOpRequest request) {
+        final BigDecimal amount = request.amount();
+
         if (amount.compareTo(new BigDecimal("0")) < 0) {
             throw new BusinessLogicException("Can't withdraw a negative amount");
         }
 
-        Jar jar = jarsRepository.findByIdAndOwnerId(accId, userId).orElseThrow(
+        Jar jar = jarsRepository.findByIdAndOwnerId(accId, user.getId()).orElseThrow(
                 () -> new ResourceNotFoundException("Jar with invalid ID")
         );
 
@@ -113,6 +151,19 @@ public class JarsService {
         }
 
         jar.setBalance(jar.getBalance().subtract(amount));
+
+        Transaction transaction = Transaction.builder()
+                .initiator(user)
+                .affectedJar(jar)
+                .amount(amount)
+                .type(TransactionType.WITHDRAWAL)
+                .description(request.description())
+                .createdAt(Instant.now())
+                .correlationId(UUID.randomUUID())
+                .build();
+
+        transactionsRepository.save(transaction);
+
         return jarsRepository.save(jar);
     }
 }
