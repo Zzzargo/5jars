@@ -14,13 +14,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return AdaptiveScreen(
-      mobile: (context) => _buildBase(context),
+      mobile: _buildBase,
       // This reminds me of currying. Shoutout to Dan Popovici
-      desktop: (context) => _buildBase(context, isDesktop: true),
+      desktop: (context, isDesktop) => _buildBase(context, true),
     );
   }
 
-  Widget _buildBase(BuildContext context, {bool isDesktop = false}) {
+  Widget _buildBase(BuildContext context, bool isDesktop) {
     // Define the Logo Unit conditionally
 
     Widget logoUnit = const Material(
