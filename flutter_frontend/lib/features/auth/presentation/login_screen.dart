@@ -20,45 +20,55 @@ class LoginScreen extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 26),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints
-                        .maxHeight, // Forces content to fill the screen
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Hero(
-                        tag: 'logo',
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: Branding(
-                            fillColor: isDark ? cs.secondary : cs.primary,
-                            isCompact: true,
+        child: Stack(
+          children: [
+            Center(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 26),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints
+                            .maxHeight, // Forces content to fill the screen
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Hero(
+                            tag: 'logo',
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: Branding(
+                                fillColor: isDark ? cs.secondary : cs.primary,
+                                isCompact: true,
+                              ),
+                            ),
                           ),
-                        ),
+
+                          const SizedBox(height: 32),
+
+                          ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 500),
+                            child: const LoginForm(),
+                          ),
+
+                          // Footer spacer to keep things balanced
+                          const SizedBox(height: 20),
+                        ],
                       ),
+                    ),
+                  );
+                },
+              ),
+            ),
 
-                      const SizedBox(height: 32),
-
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 500),
-                        child: const LoginForm(),
-                      ),
-
-                      // Footer spacer to keep things balanced
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: const SafeArea(child: ThemeSwitch()),
+            ),
+          ],
         ),
       ),
     );

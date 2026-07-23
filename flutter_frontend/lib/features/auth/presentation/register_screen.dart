@@ -16,14 +16,24 @@ class RegisterScreen extends StatelessWidget {
   Widget _buildMobile(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 26),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: const RegisterForm(),
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 26),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: const RegisterForm(),
+                ),
+              ),
             ),
-          ),
+
+            Positioned(
+              bottom: 20,
+              right: 20,
+              child: const SafeArea(child: ThemeSwitch()),
+            ),
+          ],
         ),
       ),
     );
