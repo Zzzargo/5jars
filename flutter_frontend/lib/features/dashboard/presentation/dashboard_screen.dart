@@ -6,7 +6,6 @@ import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jar
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/distribute_income_dialog.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
@@ -27,7 +26,6 @@ class DashboardScreen extends StatelessWidget {
       backgroundColor: cs.surface,
       body: Row(
         children: [
-          const DashboardSidebar(),
           Expanded(
             child: CustomScrollView(
               slivers: [
@@ -68,8 +66,11 @@ class DashboardScreen extends StatelessWidget {
             icon: Icon(Icons.payments, color: cs.primary),
           ),
         ],
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
       ),
-      drawer: const Drawer(child: DashboardSidebar(isDrawer: true)),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
