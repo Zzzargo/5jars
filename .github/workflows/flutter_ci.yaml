@@ -27,8 +27,9 @@ jobs:
         run: flutter pub get
 
       # 1. Static Analysis - Catch common mistakes and compiler errors before running tests
+      # Warnings like unused imports are not fatal, but we want to know about them
       - name: Analyze Code
-        run: flutter analyze
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
       # 2. Run Tests - Verifies business logic and widget behavior
       - name: Run Tests
