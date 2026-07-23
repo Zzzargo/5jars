@@ -1,0 +1,40 @@
+name: Five Jars Ultra CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  flutter_verify:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: flutter_frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # 1. Static Analysis - Catch common mistakes and compiler errors before running tests
+      - name: Analyze Code
+        run: flutter analyze
+
+      # 2. Run Tests - Verifies business logic and widget behavior
+      - name: Run Tests
+        run: flutter test
+
+      # 3. Build Web - A "Smoke Test" to ensure it actually compiles
+      # We use web because it's the fastest way to verify a full build in CI
+      - name: Build Web Smoke Test
+        run: flutter build web --no-pub
