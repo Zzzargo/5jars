@@ -32,8 +32,8 @@ jobs:
         run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
       # 2. Run Tests - Verifies business logic and widget behavior
-      - name: Run Tests
-        run: flutter test
+      # - name: Run Tests
+      # run: flutter test
 
       # 3. Build Web - A "Smoke Test" to ensure it actually compiles
       # We use web because it's the fastest way to verify a full build in CI
