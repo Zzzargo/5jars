@@ -21,7 +21,7 @@ class DashboardScreen extends StatelessWidget {
     return AdaptiveScreen(desktop: _buildDesktop, mobile: _buildMobile);
   }
 
-  Widget _buildDesktop(BuildContext context) {
+  Widget _buildDesktop(BuildContext context, bool isDesktop) {
     final cs = Theme.of(context).colorScheme;
     return Scaffold(
       backgroundColor: cs.surface,
@@ -50,7 +50,7 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMobile(BuildContext context) {
+  Widget _buildMobile(BuildContext context, bool isDesktop) {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
