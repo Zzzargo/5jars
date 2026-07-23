@@ -13,7 +13,7 @@ class RegisterScreen extends StatelessWidget {
     return AdaptiveScreen(mobile: _buildMobile, desktop: _buildDesktop);
   }
 
-  Widget _buildMobile(BuildContext context, bool isDesktop) {
+  Widget _buildMobile(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -39,7 +39,7 @@ class RegisterScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktop(BuildContext context, bool isDesktop) {
+  Widget _buildDesktop(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
