@@ -12,6 +12,9 @@ class DashboardSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final themeCubit = context.watch<ThemeCubit>();
+    final themeState = themeCubit.state;
+
     return Container(
       width: isDrawer ? null : 250, // Drawer handles width on mobile
       decoration: BoxDecoration(
@@ -46,21 +49,16 @@ class DashboardSidebar extends StatelessWidget {
             label: 'Transactions',
             onTap: () => _handleNavigation(context),
           ),
-          _SidebarItem(
-            icon: context.watch<ThemeCubit>().state == ThemeMode.dark
-                ? Icons.light_mode_rounded
-                : Icons.dark_mode_rounded,
-            label: context.watch<ThemeCubit>().state == ThemeMode.dark
-                ? 'Light Mode'
-                : 'Dark Mode',
-            onTap: () => {
-              context.read<ThemeCubit>().state == ThemeMode.dark
-                  ? context.read<ThemeCubit>().setLight()
-                  : context.read<ThemeCubit>().setDark(),
-            },
-          ),
 
           const Spacer(),
+
+          _SidebarItem(
+            icon: themeState == ThemeMode.dark
+                ? Icons.light_mode_rounded
+                : Icons.dark_mode_rounded,
+            label: themeState == ThemeMode.dark ? 'Light Mode' : 'Dark Mode',
+            onTap: () => themeCubit.toggle(context),
+          ),
 
           _SidebarItem(
             icon: Icons.logout_rounded,
@@ -124,7 +122,7 @@ class _SidebarItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListTile(
         onTap: onTap,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

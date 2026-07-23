@@ -1,8 +1,9 @@
+import 'package:five_jars_ultra/features/auth/presentation/widgets/register_form.dart';
+import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 import 'package:five_jars_ultra/shared/widgets/branding.dart';
 import 'package:five_jars_ultra/shared/widgets/branding_background.dart';
+import 'package:five_jars_ultra/shared/widgets/theme_switch.dart';
 import 'package:flutter/material.dart';
-import 'package:five_jars_ultra/shared/adaptive_screen.dart';
-import 'package:five_jars_ultra/features/auth/presentation/widgets/register_form.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -50,21 +51,30 @@ class RegisterScreen extends StatelessWidget {
           // Right side - Register form
           Expanded(
             flex: 1,
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(42),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: 480,
-                    minWidth: 320,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [const RegisterForm()],
+            child: Stack(
+              children: [
+                Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(42),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 480,
+                        minWidth: 320,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [const RegisterForm()],
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: const SafeArea(child: ThemeSwitch()),
+                ),
+              ],
             ),
           ),
         ],
