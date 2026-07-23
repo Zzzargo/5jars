@@ -85,7 +85,7 @@ class AppRouter {
       ),
 
       // Private routes have the common sidebar
-      StatefulShellRoute.indexedStack(
+      StatefulShellRoute.indexedStak(
         builder: (context, state, navigationShell) {
           final isDesktop = MediaQuery.of(context).size.width > 896;
 
