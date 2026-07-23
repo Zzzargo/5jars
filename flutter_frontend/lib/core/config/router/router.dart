@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/config/router/go_router_refresher.dart';
 import 'package:five_jars_ultra/core/config/router/routes.dart';
 import 'package:five_jars_ultra/core/state/app_state.dart';
@@ -5,17 +6,17 @@ import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/login_screen.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/login/login_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/register/register_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
+import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 import 'package:five_jars_ultra/features/auth/presentation/register_screen.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:five_jars_ultra/shared/splash_screen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:five_jars_ultra/core/config/injection_container.dart';
-import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
-import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 
 class AppRouter {
   final AppStateCubit _appStateCubit;
@@ -70,20 +71,6 @@ class AppRouter {
       ),
       GoRoute(
         path: AppRoutes.login,
-
-        // pageBuilder: (context, state) => CustomTransitionPage(
-        //   key: state.pageKey,
-        //   transitionDuration: const Duration(milliseconds: 1200),
-        //   reverseTransitionDuration: const Duration(milliseconds: 1200),
-        //   child: BlocProvider(
-        //     create: (_) => serviceLocator<LoginBloc>(),
-        //     child: const LoginScreen(),
-        //   ),
-        //   transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        //     // While the hero travels, the rest of the screen fades
-        //     return FadeTransition(opacity: animation, child: child);
-        //   },
-        // ),
         builder: (context, state) => BlocProvider(
           create: (_) => serviceLocator<LoginBloc>(),
           child: const LoginScreen(),
@@ -96,14 +83,53 @@ class AppRouter {
           child: const RegisterScreen(),
         ),
       ),
-      GoRoute(
-        path: AppRoutes.dashboard,
-        builder: (context, state) => BlocProvider(
-          create: (context) =>
-              // Fetch jars immediately when the dashboard is opened
-              serviceLocator<JarsBloc>()..add(JarsFetchRequested()),
-          child: const DashboardScreen(),
-        ),
+
+      // Private routes have the common sidebar
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          final isDesktop = MediaQuery.of(context).size.width > 896;
+
+          return Scaffold(
+            // On Mobile use the drawer
+            drawer: isDesktop
+                ? null
+                : const Drawer(child: DashboardSidebar(isDrawer: true)),
+            body: Row(
+              children: [
+                // On Desktop the sidebar is permanent
+                if (isDesktop) const DashboardSidebar(),
+                Expanded(
+                  // This is where the screens swap
+                  child: navigationShell,
+                ),
+              ],
+            ),
+          );
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.dashboard,
+                builder: (context, state) => BlocProvider(
+                  create: (context) =>
+                      // Fetch jars immediately when the dashboard is opened
+                      serviceLocator<JarsBloc>()..add(JarsFetchRequested()),
+                  child: const DashboardScreen(),
+                ),
+              ),
+            ],
+          ),
+          // TODO: Add branches for global transactions view and settings screens
+          // StatefulShellBranch(
+          //   routes: [
+          //     GoRoute(
+          //       path: AppRoutes.transactions,
+          //       builder: (context, state) => const GlobalHistoryScreen(),
+          //     ),
+          //   ],
+          // ),
+        ],
       ),
     ],
   );
