@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
     return AdaptiveScreen(mobile: _buildMobile, desktop: _buildDesktop);
   }
 
-  Widget _buildMobile(BuildContext context, bool isDesktop) {
+  Widget _buildMobile(BuildContext context) {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -74,7 +74,11 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktop(BuildContext context, bool isDesktop) {
+  Widget _buildDesktop(BuildContext context) {
+    // final theme = Theme.of(context);
+    // final cs = theme.colorScheme;
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       body: Row(
         children: [
