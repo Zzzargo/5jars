@@ -49,21 +49,23 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context, bool isDesktop) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final tt = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'My Jars',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: tt.displayMedium?.copyWith(color: cs.onSecondaryContainer),
         ),
         actions: [
           IconButton(
             tooltip: 'Distribute income',
             onPressed: () => _onDistributeIncome(context),
-            icon: Icon(Icons.payments, color: cs.primary),
+            icon: Icon(Icons.payments, color: cs.primary, size: 32),
           ),
         ],
         leading: IconButton(

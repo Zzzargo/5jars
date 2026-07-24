@@ -117,18 +117,26 @@ class _SidebarItem extends StatelessWidget {
     final ColorScheme cs = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ListTile(
-        onTap: onTap,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        tileColor: isActive
-            ? cs.primary.withValues(alpha: 0.2)
-            : Colors.transparent,
-        leading: Icon(icon, color: isActive ? cs.primary : cs.onSurfaceVariant),
-        title: Text(
-          label,
-          style: TextStyle(
+      child: Material(
+        color: cs.surfaceContainerLowest,
+        child: ListTile(
+          onTap: onTap,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          tileColor: isActive
+              ? cs.primary.withValues(alpha: 0.2)
+              : Colors.transparent,
+          leading: Icon(
+            icon,
             color: isActive ? cs.primary : cs.onSurfaceVariant,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+          ),
+          title: Text(
+            label,
+            style: TextStyle(
+              color: isActive ? cs.primary : cs.onSurfaceVariant,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
