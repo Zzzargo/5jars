@@ -5,10 +5,10 @@ import com.zargo.fivejars.spring_api.common.exceptions.ResourceNotFoundException
 import com.zargo.fivejars.spring_api.features.jars.dtos.CreateJarRequest;
 import com.zargo.fivejars.spring_api.features.jars.dtos.MoneyOpRequest;
 import com.zargo.fivejars.spring_api.features.jars.models.Jar;
-import com.zargo.fivejars.spring_api.features.jars.models.Transaction;
-import com.zargo.fivejars.spring_api.features.jars.models.TransactionType;
-import com.zargo.fivejars.spring_api.features.jars.repositories.JarsRepository;
-import com.zargo.fivejars.spring_api.features.jars.repositories.TransactionsRepository;
+import com.zargo.fivejars.spring_api.features.transactions.models.Transaction;
+import com.zargo.fivejars.spring_api.features.transactions.models.TransactionType;
+import com.zargo.fivejars.spring_api.features.jars.repository.JarsRepository;
+import com.zargo.fivejars.spring_api.features.transactions.repository.TransactionsRepository;
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

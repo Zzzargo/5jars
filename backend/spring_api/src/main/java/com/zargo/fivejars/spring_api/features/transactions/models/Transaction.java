@@ -1,5 +1,6 @@
-package com.zargo.fivejars.spring_api.features.jars.models;
+package com.zargo.fivejars.spring_api.features.transactions.models;
 
+import com.zargo.fivejars.spring_api.features.jars.models.Jar;
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import jakarta.persistence.*;
 import lombok.*;
