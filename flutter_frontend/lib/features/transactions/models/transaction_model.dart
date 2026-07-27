@@ -28,9 +28,7 @@ class TransactionModel {
       jarId: json['jar_id'],
       jarName: json['jar_name'],
       amount: Decimal.parse(json['amount'].toString()),
-      type: TransactionType.values.firstWhere(
-        (e) => e.name.toUpperCase() == json['type'],
-      ),
+      type: TransactionType.fromApi(json['type']),
       description: json['description'],
       correlationId: json['correlation_id'],
       createdAt: DateTime.parse(json['created_at']),
