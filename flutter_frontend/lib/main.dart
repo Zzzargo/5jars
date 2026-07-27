@@ -1,22 +1,22 @@
-import 'package:five_jars_ultra/core/state/theme_cubit.dart';
-import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
+import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
 import 'package:five_jars_ultra/core/config/router/router.dart';
 import 'package:five_jars_ultra/core/state/app_state_cubit.dart';
+import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
+import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
-import 'package:flutter/services.dart';
-import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // timeDilation = 5.0; // TODO: Remove this line before production
+  timeDilation = 3.0; // TODO: Remove this line before production
 
   // Set the global logger to print in this format
   Logger.root.onRecord.listen((record) {

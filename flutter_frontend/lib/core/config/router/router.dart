@@ -10,9 +10,13 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 import 'package:five_jars_ultra/features/auth/presentation/register_screen.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/dashboard_screen.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
+import 'package:five_jars_ultra/features/settings/presentation/settings_screen.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/global_transactions_screen.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:five_jars_ultra/shared/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -120,15 +124,27 @@ class AppRouter {
               ),
             ],
           ),
-          // TODO: Add branches for global transactions view and settings screens
-          // StatefulShellBranch(
-          //   routes: [
-          //     GoRoute(
-          //       path: AppRoutes.transactions,
-          //       builder: (context, state) => const GlobalHistoryScreen(),
-          //     ),
-          //   ],
-          // ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.transactions,
+                builder: (context, state) => BlocProvider(
+                  create: (context) =>
+                      serviceLocator<TransactionsBloc>()
+                        ..add(TransactionsFetchRequested()),
+                  child: const GlobalTransactionsScreen(),
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.settings,
+                builder: (context, state) => const SettingsScreen(),
+              ),
+            ],
+          ),
         ],
       ),
     ],

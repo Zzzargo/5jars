@@ -3,8 +3,8 @@ import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/dashboard/data/jars_client.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_state.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class JarsBloc extends Bloc<JarsEvent, JarsState> {

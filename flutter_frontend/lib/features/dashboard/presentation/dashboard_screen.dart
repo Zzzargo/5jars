@@ -2,11 +2,10 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/create_jar_request.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_distribution_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/distribute_income_dialog.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
@@ -27,7 +26,6 @@ class DashboardScreen extends StatelessWidget {
       backgroundColor: cs.surface,
       body: Row(
         children: [
-          const DashboardSidebar(),
           Expanded(
             child: CustomScrollView(
               slivers: [
@@ -51,25 +49,30 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMobile(BuildContext context, bool isDesktop) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final tt = theme.textTheme;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'My Jars',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: tt.displayMedium?.copyWith(color: cs.onSecondaryContainer),
         ),
         actions: [
           IconButton(
             tooltip: 'Distribute income',
             onPressed: () => _onDistributeIncome(context),
-            icon: Icon(Icons.payments, color: cs.primary),
+            icon: Icon(Icons.payments, color: cs.primary, size: 32),
           ),
         ],
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
       ),
-      drawer: const Drawer(child: DashboardSidebar(isDrawer: true)),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(

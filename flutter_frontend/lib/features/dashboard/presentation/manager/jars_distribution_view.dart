@@ -1,5 +1,5 @@
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_state.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_state.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_distribution_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
