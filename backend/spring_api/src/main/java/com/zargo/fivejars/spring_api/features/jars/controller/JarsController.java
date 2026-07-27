@@ -4,7 +4,7 @@ import com.zargo.fivejars.spring_api.features.jars.dtos.CreateJarRequest;
 import com.zargo.fivejars.spring_api.features.jars.dtos.JarResponse;
 import com.zargo.fivejars.spring_api.features.jars.dtos.MoneyOpRequest;
 import com.zargo.fivejars.spring_api.features.jars.models.Jar;
-import com.zargo.fivejars.spring_api.features.jars.service.JarsService;
+import com.zargo.fivejars.spring_api.features.jars.services.JarsService;
 import com.zargo.fivejars.spring_api.features.users.models.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +56,7 @@ public class JarsController {
             @AuthenticationPrincipal User currentUser
             ) {
         log.info("User {} distributing income: {}", currentUser.getUsername(), request.amount());
-        List<Jar> updatedJars = jarsService.distributeIncome(currentUser, request.amount());
+        List<Jar> updatedJars = jarsService.distributeIncome(currentUser, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         updatedJars.stream()
@@ -71,7 +71,7 @@ public class JarsController {
             @Valid @RequestBody MoneyOpRequest request,
             @AuthenticationPrincipal User currentUser
     ) {
-        Jar jar = jarsService.deposit(id, currentUser.getId(), request.amount());
+        Jar jar = jarsService.deposit(id, currentUser, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Jar.toResponse(jar));
     }
@@ -82,7 +82,7 @@ public class JarsController {
             @Valid @RequestBody MoneyOpRequest request,
             @AuthenticationPrincipal User currentUser
     ) {
-        Jar jar = jarsService.withdraw(id, currentUser.getId(), request.amount());
+        Jar jar = jarsService.withdraw(id, currentUser, request);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Jar.toResponse(jar));
     }
