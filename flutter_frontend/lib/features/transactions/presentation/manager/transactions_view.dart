@@ -1,17 +1,17 @@
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_state.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/widgets/jars_grid.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_state.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/widgets/transactions_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class JarsView extends StatelessWidget {
-  const JarsView({super.key});
+class TransactionsView extends StatelessWidget {
+  const TransactionsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<JarsBloc, JarsState>(
+    return BlocBuilder<TransactionsBloc, TransactionsState>(
       builder: (context, state) {
-        if (state is JarsLoading) {
+        if (state is TransactionsLoading) {
           return const SliverToBoxAdapter(
             child: Center(
               child: Padding(
@@ -22,7 +22,7 @@ class JarsView extends StatelessWidget {
           );
         }
 
-        if (state is JarsLoadFailure) {
+        if (state is TransactionsLoadFailure) {
           return SliverToBoxAdapter(
             child: Center(
               child: Column(
@@ -39,8 +39,8 @@ class JarsView extends StatelessWidget {
           );
         }
 
-        if (state is JarsLoadSuccess) {
-          return JarsGrid(jars: state.jars);
+        if (state is TransactionsLoadSuccess) {
+          return TransactionsGrid(transactions: state.transactions);
         }
 
         return const SliverToBoxAdapter(child: SizedBox.shrink());

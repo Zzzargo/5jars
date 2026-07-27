@@ -2,10 +2,10 @@ import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/create_jar_request.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_distribution_view.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_distribution_view.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_view.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/create_jar_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/distribute_income_dialog.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';

@@ -1,8 +1,8 @@
 import 'package:decimal/decimal.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_bloc.dart';
-import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/deposit_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/withdraw_dialog.dart';
 import 'package:five_jars_ultra/shared/app_theme.dart';

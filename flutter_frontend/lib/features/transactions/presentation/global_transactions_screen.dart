@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_view.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -25,11 +26,17 @@ class GlobalTransactionsScreen extends StatelessWidget {
               style: tt.displayMedium?.copyWith(color: cs.onSecondaryContainer),
             ),
             const SizedBox(height: 24),
-            const Expanded(
-              child: Center(
-                child: Text("Transaction history will be loaded here"),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                FilterChip(label: Text("Jar"), onSelected: (value) {}),
+                const SizedBox(width: 8),
+                FilterChip(label: Text("Type"), onSelected: (value) {}),
+                const SizedBox(width: 8),
+                FilterChip(label: Text("Date"), onSelected: (value) {}),
+              ],
             ),
+            Expanded(child: CustomScrollView(slivers: [TransactionsView()])),
           ],
         ),
       ),

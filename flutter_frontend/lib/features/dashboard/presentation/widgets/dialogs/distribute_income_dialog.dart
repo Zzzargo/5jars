@@ -54,7 +54,9 @@ class _DistributeIncomeDialogState extends State<DistributeIncomeDialog> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _descController,
-              decoration: const InputDecoration(labelText: 'Description(Optional)'),
+              decoration: const InputDecoration(
+                labelText: 'Description(Optional)',
+              ),
             ),
           ],
         ),
