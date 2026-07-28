@@ -61,8 +61,13 @@ class GlobalTransactionsScreen extends StatelessWidget {
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
       ),
-      body: const Center(
-        child: Text("Transaction history will be loaded here"),
+      body: CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: EdgeInsets.all(16),
+            sliver: TransactionsView(),
+          ),
+        ],
       ),
     );
   }

@@ -1,7 +1,13 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/router/routes.dart';
 import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/sidebar_destinations.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,6 +73,21 @@ class DashboardSidebar extends StatelessWidget {
               isActive: location.startsWith(dest.path),
               onTap: () {
                 if (isDrawer) Navigator.pop(context);
+
+                // Trigger data refetch for certain destinations
+                switch (dest.path) {
+                  case AppRoutes.dashboard:
+                    serviceLocator<JarsBloc>().add(JarsFetchRequested());
+                    break;
+                  case AppRoutes.transactions:
+                    serviceLocator<TransactionsBloc>().add(
+                      TransactionsFetchRequested(),
+                    );
+                    break;
+                  default:
+                    break;
+                }
+
                 context.go(dest.path);
               },
             ),

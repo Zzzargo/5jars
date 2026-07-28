@@ -115,8 +115,8 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.dashboard,
-                builder: (context, state) => BlocProvider(
-                  create: (context) =>
+                builder: (context, state) => BlocProvider.value(
+                  value:
                       // Fetch jars immediately when the dashboard is opened
                       serviceLocator<JarsBloc>()..add(JarsFetchRequested()),
                   child: const DashboardScreen(),
@@ -128,10 +128,9 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.transactions,
-                builder: (context, state) => BlocProvider(
-                  create: (context) =>
-                      serviceLocator<TransactionsBloc>()
-                        ..add(TransactionsFetchRequested()),
+                builder: (context, state) => BlocProvider.value(
+                  value: serviceLocator<TransactionsBloc>()
+                    ..add(TransactionsFetchRequested()),
                   child: const GlobalTransactionsScreen(),
                 ),
               ),
