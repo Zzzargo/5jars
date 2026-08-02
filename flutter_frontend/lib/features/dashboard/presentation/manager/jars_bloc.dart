@@ -5,6 +5,8 @@ import 'package:five_jars_ultra/features/dashboard/data/jars_client.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_state.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class JarsBloc extends Bloc<JarsEvent, JarsState> {
@@ -57,6 +59,11 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
             }).toList();
 
             emit(JarsLoadSuccess(updatedList));
+
+            // Trigger a refresh of the transactions list after a successful deposit
+            final TransactionsBloc transactionsBloc =
+                serviceLocator<TransactionsBloc>();
+            transactionsBloc.add(TransactionsFetchRequested());
           }
           break;
 
@@ -79,6 +86,9 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
             }).toList();
 
             emit(JarsLoadSuccess(updatedList));
+            final TransactionsBloc transactionsBloc =
+                serviceLocator<TransactionsBloc>();
+            transactionsBloc.add(TransactionsFetchRequested());
           }
           break;
 
@@ -95,6 +105,10 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
         case ResourceSuccess<List<JarModel>> s:
           emit(JarsLoadSuccess(s.data));
           notificationService.showSuccess('Income distributed successfully');
+          final TransactionsBloc transactionsBloc =
+              serviceLocator<TransactionsBloc>();
+          transactionsBloc.add(TransactionsFetchRequested());
+          break;
 
         case ResourceError<List<JarModel>> e:
           notificationService.showError(e.message);
