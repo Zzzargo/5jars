@@ -56,10 +56,12 @@ Future<void> init() async {
 
   assert(serviceLocator.isRegistered<AuthClient>());
   serviceLocator.registerFactory(() => LoginBloc(serviceLocator()));
-
   serviceLocator.registerFactory(() => RegisterBloc(serviceLocator()));
-  serviceLocator.registerFactory(() => JarsBloc(serviceLocator()));
-  serviceLocator.registerFactory(() => TransactionsBloc(serviceLocator()));
+
+  serviceLocator.registerLazySingleton(() => JarsBloc(serviceLocator()));
+  serviceLocator.registerLazySingleton(
+    () => TransactionsBloc(serviceLocator()),
+  );
 
   // Router configuration
   assert(serviceLocator.isRegistered<AuthSessionBloc>());
