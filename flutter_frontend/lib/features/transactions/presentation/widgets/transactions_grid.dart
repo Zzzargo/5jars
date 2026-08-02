@@ -17,9 +17,9 @@ class TransactionsGrid extends StatelessWidget {
 
     return SliverGrid(
       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: 450,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
+        maxCrossAxisExtent: 500,
+        mainAxisSpacing: 20,
+        crossAxisSpacing: 32,
         mainAxisExtent: 120, // Fixed height for each card to prevent overflow
       ),
       delegate: SliverChildBuilderDelegate(

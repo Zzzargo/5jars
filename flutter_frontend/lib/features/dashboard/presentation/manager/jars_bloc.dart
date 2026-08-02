@@ -100,5 +100,13 @@ class JarsBloc extends Bloc<JarsEvent, JarsState> {
           notificationService.showError(e.message);
       }
     });
+
+    on<JarsResetRequested>((event, emit) {
+      emit(JarsInitial());
+    });
+  }
+
+  void reset() {
+    add(JarsResetRequested());
   }
 }

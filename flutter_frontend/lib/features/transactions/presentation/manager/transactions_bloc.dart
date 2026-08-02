@@ -23,5 +23,13 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
           emit(TransactionsLoadFailure(e.message));
       }
     });
+
+    on<TransactionsResetRequested>((event, emit) {
+      emit(TransactionsInitial());
+    });
+  }
+
+  void reset() {
+    add(TransactionsResetRequested());
   }
 }

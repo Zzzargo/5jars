@@ -1,13 +1,15 @@
 import 'dart:async';
 
-import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/common/resource.dart';
+import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/config/notification_service.dart';
-import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:five_jars_ultra/core/config/storage.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_state.dart';
+import 'package:five_jars_ultra/features/dashboard/data/users_client.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:logging/logging.dart';
 
 class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
@@ -36,6 +38,11 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
     on<UserLoggedOut>((event, emit) async {
       await _storage.clearAll();
       emit(AuthSessionUnauthenticated());
+
+      // Reset the state of private BLoCs to their initial states
+      serviceLocator<JarsBloc>().reset();
+      serviceLocator<TransactionsBloc>().reset();
+
       _logger.info('User logged out');
     });
   }
@@ -81,7 +88,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
             emit(AuthSessionUnauthenticated());
             _logger.info('Invalid JWT. User must log in again.');
-            notificationService.showError(
+            notificationService.showWarning(
               'Session expired. Please log in again.',
             );
         }

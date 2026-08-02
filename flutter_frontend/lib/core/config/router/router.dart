@@ -12,11 +12,13 @@ import 'package:five_jars_ultra/features/auth/presentation/register_screen.dart'
 import 'package:five_jars_ultra/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
+import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_state.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dashboard_sidebar.dart';
 import 'package:five_jars_ultra/features/settings/presentation/settings_screen.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/global_transactions_screen.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_state.dart';
 import 'package:five_jars_ultra/shared/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -93,20 +95,38 @@ class AppRouter {
         builder: (context, state, navigationShell) {
           final isDesktop = MediaQuery.of(context).size.width > 896;
 
-          return Scaffold(
-            // On Mobile use the drawer
-            drawer: isDesktop
-                ? null
-                : const Drawer(child: DashboardSidebar(isDrawer: true)),
-            body: Row(
-              children: [
-                // On Desktop the sidebar is permanent
-                if (isDesktop) const DashboardSidebar(),
-                Expanded(
-                  // This is where the screens swap
-                  child: navigationShell,
-                ),
-              ],
+          final jarsBloc = serviceLocator<JarsBloc>();
+          final transactionsBloc = serviceLocator<TransactionsBloc>();
+
+          // Trigger data fetch for initial states of the private BLoCs
+          if (jarsBloc.state is JarsInitial) {
+            jarsBloc.add(JarsFetchRequested());
+          }
+
+          if (transactionsBloc.state is TransactionsInitial) {
+            transactionsBloc.add(TransactionsFetchRequested());
+          }
+
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: serviceLocator<JarsBloc>()),
+              BlocProvider.value(value: serviceLocator<TransactionsBloc>()),
+            ],
+            child: Scaffold(
+              // On Mobile use the drawer
+              drawer: isDesktop
+                  ? null
+                  : const Drawer(child: DashboardSidebar(isDrawer: true)),
+              body: Row(
+                children: [
+                  // On Desktop the sidebar is permanent
+                  if (isDesktop) const DashboardSidebar(),
+                  Expanded(
+                    // This is where the screens swap
+                    child: navigationShell,
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -115,12 +135,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.dashboard,
-                builder: (context, state) => BlocProvider(
-                  create: (context) =>
-                      // Fetch jars immediately when the dashboard is opened
-                      serviceLocator<JarsBloc>()..add(JarsFetchRequested()),
-                  child: const DashboardScreen(),
-                ),
+                builder: (context, state) => const DashboardScreen(),
               ),
             ],
           ),
@@ -128,12 +143,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.transactions,
-                builder: (context, state) => BlocProvider(
-                  create: (context) =>
-                      serviceLocator<TransactionsBloc>()
-                        ..add(TransactionsFetchRequested()),
-                  child: const GlobalTransactionsScreen(),
-                ),
+                builder: (context, state) => const GlobalTransactionsScreen(),
               ),
             ],
           ),

@@ -5,6 +5,8 @@ sealed class JarsEvent {}
 
 class JarsFetchRequested extends JarsEvent {}
 
+class JarsResetRequested extends JarsEvent {}
+
 class NewJarRequested extends JarsEvent {
   final CreateJarRequest createRequest;
 
