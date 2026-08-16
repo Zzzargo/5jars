@@ -8,9 +8,15 @@ class TransactionsClient {
 
   TransactionsClient(this._apiClient);
 
-  Future<Resource<List<TransactionModel>>> getAllTransactions() async {
+  Future<Resource<List<TransactionModel>>> getAllTransactions({
+    int page = 0,
+    int pageSize = 20,
+  }) async {
     try {
-      final response = await _apiClient.get('/transactions');
+      final response = await _apiClient.get(
+        '/transactions',
+        query: {'page': page, 'size': pageSize},
+      );
       final data = response.data as List<dynamic>;
       final List<TransactionModel> transactions = data
           .map(

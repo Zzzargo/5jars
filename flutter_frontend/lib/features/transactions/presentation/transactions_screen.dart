@@ -1,9 +1,47 @@
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_view.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/widgets/transactions_more_indicator.dart';
 import 'package:five_jars_ultra/shared/adaptive_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class GlobalTransactionsScreen extends StatelessWidget {
-  const GlobalTransactionsScreen({super.key});
+class TransactionsScreen extends StatefulWidget {
+  const TransactionsScreen({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _TransactionsScreenState();
+}
+
+class _TransactionsScreenState extends State<TransactionsScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isAtBottom) {
+      context.read<TransactionsBloc>().add(MoreTransactionsRequested());
+    }
+  }
+
+  bool get _isAtBottom {
+    if (!_scrollController.hasClients) return false;
+
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    // Trigger when 90% through the list for smooth UX
+    return currentScroll >= (maxScroll * 0.9);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +74,15 @@ class GlobalTransactionsScreen extends StatelessWidget {
                 FilterChip(label: Text("Date"), onSelected: (value) {}),
               ],
             ),
-            Expanded(child: CustomScrollView(slivers: [TransactionsView()])),
+            Expanded(
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  const TransactionsView(),
+                  const TransactionsMoreIndicator(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -62,11 +108,13 @@ class GlobalTransactionsScreen extends StatelessWidget {
         ),
       ),
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
-          SliverPadding(
+          const SliverPadding(
             padding: EdgeInsets.all(16),
             sliver: TransactionsView(),
           ),
+          const TransactionsMoreIndicator(),
         ],
       ),
     );
