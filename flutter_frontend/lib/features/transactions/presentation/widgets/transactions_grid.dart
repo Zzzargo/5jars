@@ -7,8 +7,6 @@ class TransactionsGrid extends StatelessWidget {
 
   const TransactionsGrid({super.key, required this.transactions});
 
-  // TODO: add pagination
-
   @override
   Widget build(BuildContext context) {
     if (transactions.isEmpty) {
