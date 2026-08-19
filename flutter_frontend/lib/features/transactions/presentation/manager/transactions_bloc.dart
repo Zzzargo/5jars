@@ -2,6 +2,7 @@ import 'package:five_jars_ultra/core/common/resource.dart';
 import 'package:five_jars_ultra/core/config/injection_container.dart';
 import 'package:five_jars_ultra/core/config/notification_service.dart';
 import 'package:five_jars_ultra/features/transactions/data/transactions_client.dart';
+import 'package:five_jars_ultra/features/transactions/models/transactions_filters.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,14 +17,45 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   TransactionsBloc(this._client) : super(TransactionsInitial()) {
     // First fetch
     on<TransactionsFetchRequested>((event, emit) async {
+      final filters = (state is TransactionsLoadSuccess)
+          ? (state as TransactionsLoadSuccess).filters
+          : const TransactionsFilters();
+
       emit(TransactionsLoading());
-      final result = await _client.getAllTransactions();
+      final result = await _client.getAllTransactions(
+        page: 0,
+        filters: filters,
+      );
 
       switch (result) {
         case ResourceSuccess s:
           emit(
             TransactionsLoadSuccess(
               transactions: s.data,
+              filters: filters,
+              currentPage: 0,
+              hasReachedMax: s.data.length < _pageSize,
+            ),
+          );
+        case ResourceError e:
+          emit(TransactionsLoadFailure(e.message));
+      }
+    });
+
+    on<TransactionsFilterChanged>((event, emit) async {
+      emit(TransactionsLoading());
+
+      final result = await _client.getAllTransactions(
+        page: 0,
+        filters: event.filters,
+      );
+
+      switch (result) {
+        case ResourceSuccess s:
+          emit(
+            TransactionsLoadSuccess(
+              transactions: s.data,
+              filters: event.filters,
               currentPage: 0,
               hasReachedMax: s.data.length < _pageSize,
             ),
@@ -57,6 +89,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
             TransactionsLoadSuccess(
               transactions: List.from(currentState.transactions)
                 ..addAll(s.data),
+              filters: currentState.filters,
               currentPage: nextPage,
               hasReachedMax: s.data.length < _pageSize,
               isFetchingMore: false,

@@ -16,7 +16,7 @@ import 'package:window_manager/window_manager.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  timeDilation = 3.0; // TODO: Remove this line before production
+  timeDilation = 1.0; // TODO: Remove this line before production
 
   // Set the global logger to print in this format
   Logger.root.onRecord.listen((record) {
