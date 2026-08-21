@@ -21,7 +21,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
           ? (state as TransactionsLoadSuccess).filters
           : const TransactionsFilters();
 
-      emit(TransactionsLoading());
+      emit(TransactionsLoading(filters));
       final result = await _client.getAllTransactions(
         page: 0,
         filters: filters,
@@ -43,7 +43,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     });
 
     on<TransactionsFilterChanged>((event, emit) async {
-      emit(TransactionsLoading());
+      emit(TransactionsLoading(event.filters));
 
       final result = await _client.getAllTransactions(
         page: 0,

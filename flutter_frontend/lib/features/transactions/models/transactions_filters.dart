@@ -16,17 +16,17 @@ class TransactionsFilters {
 
   // A private sentinel that means "explicitly set to null"
   // Needed to allow null filters when using copyWith
-  static const _unset = Object();
+  static const _unset = _Sentinel();
 
   TransactionsFilters copyWith({
     Object? jarId = _unset,
-    Object? type,
+    Object? type = _unset,
     String? sortBy,
     bool? descending,
   }) {
     return TransactionsFilters(
-      jarId: jarId == _unset ? this.jarId : jarId as String?,
-      type: type == _unset ? this.type : type as TransactionType?,
+      jarId: identical(jarId, _unset) ? this.jarId : jarId as String?,
+      type: identical(type, _unset) ? this.type : type as TransactionType?,
       sortBy: sortBy ?? this.sortBy,
       descending: descending ?? this.descending,
     );
@@ -35,7 +35,11 @@ class TransactionsFilters {
   // Convert to Query Parameters for the Client
   Map<String, dynamic> toMap() => {
     if (jarId != null) 'jarId': jarId,
-    if (type != null) 'type': type!.name.toUpperCase(),
+    if (type != null) 'type': type!.apiValue,
     'sort': '$sortBy,${descending ? 'desc' : 'asc'}',
   };
+}
+
+class _Sentinel {
+  const _Sentinel();
 }

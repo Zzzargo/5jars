@@ -60,6 +60,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final tt = theme.textTheme;
 
     final state = context.watch<TransactionsBloc>().state;
+    final filters = (state is TransactionsLoadSuccess)
+        ? state.filters
+        : const TransactionsFilters();
 
     return Scaffold(
       body: Padding(
@@ -72,7 +75,17 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               style: tt.displayMedium?.copyWith(color: cs.onSecondaryContainer),
             ),
             const SizedBox(height: 24),
-            _buildFilterBar(context, state),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _buildFilterBar(context, state),
+                _buildSortArea(context, filters),
+              ],
+            ),
+
+            const Divider(height: 16),
+
             Expanded(
               child: CustomScrollView(
                 controller: _scrollController,
@@ -94,6 +107,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     final cs = theme.colorScheme;
     final tt = theme.textTheme;
 
+    final filters = (state is TransactionsLoadSuccess)
+        ? state.filters
+        : const TransactionsFilters();
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: cs.surface,
@@ -113,6 +130,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: _buildFilterBar(context, state),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildSortArea(context, filters),
           ),
 
           const Divider(height: 16),
@@ -134,59 +155,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     );
   }
 
-  Widget _buildFilterBar(BuildContext context, TransactionsState state) {
-    final filters = (state is TransactionsLoadSuccess)
-        ? state.filters
-        : const TransactionsFilters();
-
-    final jarsState = serviceLocator<JarsBloc>().state;
-    final jars = (jarsState is JarsLoadSuccess) ? jarsState.jars : [];
+  Widget _buildSortArea(BuildContext context, TransactionsFilters filters) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        crossAxisAlignment: WrapCrossAlignment.center,
-        children: [
-          // JAR DROPDOWN
-          _FilterDropdown<String?>(
-            label: "Account",
-            value: filters.jarId,
-            displayValue: filters.jarId == null
-                ? "All Jars"
-                : jars.any((j) => j.id == filters.jarId)
-                ? jars.firstWhere((j) => j.id == filters.jarId).name
-                : "Selected Jar",
-            items: [
-              const PopupMenuItem(value: null, child: Text("All Jars")),
-              ...jars.map(
-                (j) => PopupMenuItem(value: j.id, child: Text(j.name)),
-              ),
-            ],
-            onSelected: (id) => context.read<TransactionsBloc>().add(
-              TransactionsFilterChanged(filters.copyWith(jarId: id)),
-            ),
-          ),
-
-          // TYPE DROPDOWN
-          _FilterDropdown<TransactionType?>(
-            label: "Type",
-            value: filters.type,
-            displayValue: filters.type?.name.toUpperCase() ?? "All Types",
-            items: [
-              const PopupMenuItem(value: null, child: Text("All Types")),
-              ...TransactionType.values.map(
-                (t) =>
-                    PopupMenuItem(value: t, child: Text(t.name.toUpperCase())),
-              ),
-            ],
-            onSelected: (type) => context.read<TransactionsBloc>().add(
-              TransactionsFilterChanged(filters.copyWith(type: type)),
-            ),
-          ),
-
-          // SORT TOGGLE (Sleeker Action Button)
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child:
+          // Sort toggle
           TextButton.icon(
             onPressed: () => context.read<TransactionsBloc>().add(
               TransactionsFilterChanged(
@@ -195,17 +171,80 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
             ),
             icon: Icon(
               filters.descending ? Icons.south_rounded : Icons.north_rounded,
-              size: 18,
+              size: 20,
             ),
-            label: Text(filters.descending ? "Newest" : "Oldest"),
+            label: Text(filters.descending ? "Newest first" : "Oldest first"),
             style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.primary,
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.primary.withValues(alpha: 0.08),
+              foregroundColor: cs.primary,
+              backgroundColor: cs.primary.withValues(alpha: 0.08),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              enabledMouseCursor: SystemMouseCursors.click,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildFilterBar(BuildContext context, TransactionsState state) {
+    final filters = (state is TransactionsLoadSuccess)
+        ? state.filters
+        : const TransactionsFilters();
+
+    final jarsState = serviceLocator<JarsBloc>().state;
+    final jars = (jarsState is JarsLoadSuccess) ? jarsState.jars : [];
+
+    const clearFilter =
+        Object(); // Sentinel that means "clear this filter". I'm getting tired boss
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0),
+      child: Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          // Filter by jar
+          _FilterDropdown<Object?>(
+            label: "Jar",
+            value: filters.jarId ?? clearFilter,
+            displayValue: filters.jarId == null
+                ? "All Jars"
+                : jars.any((j) => j.id == filters.jarId)
+                ? jars.firstWhere((j) => j.id == filters.jarId).name
+                : "Selected Jar",
+            items: [
+              const PopupMenuItem(value: clearFilter, child: Text("All Jars")),
+              ...jars.map(
+                (j) => PopupMenuItem(value: j.id, child: Text(j.name)),
+              ),
+            ],
+            onSelected: (value) => context.read<TransactionsBloc>().add(
+              TransactionsFilterChanged(
+                filters.copyWith(
+                  jarId: value == clearFilter ? null : value as String?,
+                ),
+              ),
+            ),
+          ),
+
+          // Filter by type
+          _FilterDropdown<Object?>(
+            label: "Type",
+            value: filters.type ?? clearFilter,
+            displayValue: filters.type?.displayName ?? "All Types",
+            items: [
+              const PopupMenuItem(value: clearFilter, child: Text("All Types")),
+              ...TransactionType.values.map(
+                (t) => PopupMenuItem(value: t, child: Text(t.displayName)),
+              ),
+            ],
+            onSelected: (type) => context.read<TransactionsBloc>().add(
+              TransactionsFilterChanged(
+                filters.copyWith(
+                  type: type == clearFilter ? null : type as TransactionType?,
+                ),
               ),
             ),
           ),
@@ -232,50 +271,64 @@ class _FilterDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final tt = theme.textTheme;
+
+    final buttonRadius =
+        (theme.popupMenuTheme.shape as RoundedRectangleBorder?)?.borderRadius
+            .resolve(Directionality.of(context)) ??
+        BorderRadius.zero;
 
     return PopupMenuButton<T>(
+      borderRadius: buttonRadius,
       onSelected: onSelected,
-      itemBuilder: (context) => items,
-      offset: const Offset(0, 45),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: cs.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: cs.primary,
-                    fontWeight: FontWeight.bold,
+      itemBuilder: (context) => items.map((item) {
+        if (item is PopupMenuItem<T>) {
+          return PopupMenuItem<T>(
+            value: item.value,
+            enabled: item.enabled,
+            mouseCursor: SystemMouseCursors
+                .click, // Had to do this to explicitly set the cursor
+            child: item.child,
+          );
+        }
+        return item;
+      }).toList(),
+      offset: const Offset(0, 12), // ~Floating effect
+      tooltip: "", // Remove tooltip
+      position: PopupMenuPosition.under,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: cs.surfaceContainerLow,
+            borderRadius: buttonRadius,
+            border: Border.all(color: cs.outlineVariant.withValues(alpha: 0.5)),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: tt.labelSmall?.copyWith(color: cs.primary),
                   ),
-                ),
-                Text(
-                  displayValue,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Icon(
-              Icons.expand_more_rounded,
-              size: 20,
-              color: cs.onSurfaceVariant,
-            ),
-          ],
+                  Text(displayValue, style: tt.labelMedium),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Icon(
+                Icons.expand_more_rounded,
+                size: 20,
+                color: cs.onSurfaceVariant,
+              ),
+            ],
+          ),
         ),
       ),
     );

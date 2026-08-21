@@ -5,7 +5,11 @@ sealed class TransactionsState {}
 
 class TransactionsInitial extends TransactionsState {}
 
-class TransactionsLoading extends TransactionsState {}
+class TransactionsLoading extends TransactionsState {
+  final TransactionsFilters filters;
+  // Don't lose the filters between state changes
+  TransactionsLoading(this.filters);
+}
 
 class TransactionsLoadSuccess extends TransactionsState {
   final List<TransactionModel> transactions;
