@@ -17,11 +17,16 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
   TransactionsBloc(this._client) : super(TransactionsInitial()) {
     // First fetch
     on<TransactionsFetchRequested>((event, emit) async {
-      final filters = (state is TransactionsLoadSuccess)
-          ? (state as TransactionsLoadSuccess).filters
-          : const TransactionsFilters();
+      final TransactionsFilters filters = switch (state) {
+        TransactionsLoadSuccess(:final filters) => filters,
+        TransactionsLoading(:final filters) => filters,
+        _ => const TransactionsFilters(),
+      };
 
-      emit(TransactionsLoading(filters));
+      emit(
+        TransactionsLoading(filters),
+      ); // Keep the filters in the loading state to avoid losing them
+
       final result = await _client.getAllTransactions(
         page: 0,
         filters: filters,
@@ -81,6 +86,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
       final result = await _client.getAllTransactions(
         page: nextPage,
         pageSize: _pageSize,
+        filters: currentState.filters,
       );
 
       switch (result) {
