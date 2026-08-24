@@ -37,7 +37,7 @@ class TransactionCard extends StatelessWidget {
     return Card(
       child: InkWell(
         // TODO: show a dialog with transaction details when tapped
-        onTap: () {},
+        onTap: () => {},
         borderRadius: cardRadius,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

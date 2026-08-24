@@ -1,14 +1,20 @@
 import 'package:decimal/decimal.dart';
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/router/routes.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
 import 'package:five_jars_ultra/features/dashboard/models/jar_model.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_bloc.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/manager/jars_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/deposit_dialog.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/dialogs/withdraw_dialog.dart';
+import 'package:five_jars_ultra/features/transactions/models/transactions_filters.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:five_jars_ultra/shared/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class JarCard extends StatelessWidget {
@@ -194,8 +200,15 @@ class _JarActionsMenu extends StatelessWidget {
       onSelected: (action) {
         switch (action) {
           case _JarAction.history:
-            // TODO: Navigate to history
+            // Update the fiters and make the data load
+            serviceLocator<TransactionsBloc>().add(
+              TransactionsFilterChanged(TransactionsFilters(jarId: jar.id)),
+            );
+
+            // Go to the transactions screen
+            context.go(AppRoutes.transactions);
             break;
+
           case _JarAction.edit:
             // TODO: Open edit dialog
             break;

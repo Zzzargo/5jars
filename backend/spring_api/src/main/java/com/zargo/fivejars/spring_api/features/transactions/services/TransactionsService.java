@@ -2,14 +2,15 @@ package com.zargo.fivejars.spring_api.features.transactions.services;
 
 import com.zargo.fivejars.spring_api.features.transactions.models.Transaction;
 import com.zargo.fivejars.spring_api.features.transactions.dtos.TransactionResponse;
+import com.zargo.fivejars.spring_api.features.transactions.models.TransactionType;
+import com.zargo.fivejars.spring_api.features.transactions.repository.TransactionSpecifications;
 import com.zargo.fivejars.spring_api.features.transactions.repository.TransactionsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,20 +18,25 @@ import java.util.UUID;
 public class TransactionsService {
     private final TransactionsRepository transactionRepository;
 
-    public List<TransactionResponse> getGlobalHistory(final UUID userId, final Pageable pageable) {
-        return transactionRepository.findAllByInitiatorIdOrderByCreatedAtDesc(userId, pageable)
-                .getContent()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
+    public Slice<TransactionResponse> getTransactions(
+            final UUID userId,
+            final UUID jarId,
+            final TransactionType type,
+            final Pageable pageable
+    ) {
+        // A user should only ever see their own transactions
+        Specification<Transaction> spec = Specification.where(TransactionSpecifications.hasInitiatorId(userId));
 
-    public List<TransactionResponse> getJarHistory(final UUID userId, final UUID jarId, final Pageable pageable) {
-        return transactionRepository.findAllByAffectedJarIdAndInitiatorIdOrderByCreatedAtDesc(jarId, userId, pageable)
-                .getContent()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+        // Add optional filters
+        if (jarId != null) {
+            spec = spec.and(TransactionSpecifications.hasJarId(jarId));
+        }
+        if (type != null) {
+            spec = spec.and(TransactionSpecifications.hasType(type));
+        }
+
+        return transactionRepository.findAll(spec, pageable)
+                .map(this::mapToResponse);
     }
 
     private TransactionResponse mapToResponse(final Transaction tx) {
