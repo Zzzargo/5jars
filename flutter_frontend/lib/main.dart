@@ -1,3 +1,4 @@
+import 'package:five_jars_ultra/core/config/app_bloc_observer.dart';
 import 'package:five_jars_ultra/core/config/env_config.dart';
 import 'package:five_jars_ultra/core/config/injection_container.dart' as di;
 import 'package:five_jars_ultra/core/config/router/router.dart';
@@ -28,12 +29,14 @@ void main() async {
     );
   });
 
+  Bloc.observer = AppBlocObserver();
+
   // Initialize Dependency Injections the Holy Grail
   await di.init();
 
   // Use the get_it initalized config to set the logger level
   final envConfig = di.serviceLocator<EnvConfig>();
-  Logger.root.level = envConfig.env == 'prod' ? Level.WARNING : Level.ALL;
+  Logger.root.level = envConfig.env == 'prod' ? Level.WARNING : Level.FINE;
 
   // Ensure portrait orientation
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

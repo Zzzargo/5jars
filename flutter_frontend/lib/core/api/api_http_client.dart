@@ -27,7 +27,7 @@ class ApiHttpClient {
       LogInterceptor(
         requestBody: true,
         responseBody: true,
-        logPrint: (obj) => _logger.info(obj),
+        logPrint: (obj) => _logger.finest(obj),
       ),
     ]);
   }

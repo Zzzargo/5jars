@@ -25,7 +25,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
   Future<void> get isReady => _completer.future;
 
   AuthSessionBloc(this._storage) : super(AuthSessionNone()) {
-    _logger.fine('Created');
+    _logger.config('Created');
 
     // Check for a jwt on startup
     on<AppStarted>(_onAppStarted);
@@ -73,7 +73,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
 
             if (authResult.data.username != localUsername) {
               // Update the local username (most likely the user changed name)
-              _logger.info(
+              _logger.warning(
                 'Updating stale local username:'
                 ' $localUsername -> ${authResult.data.username}',
               );
@@ -87,7 +87,7 @@ class AuthSessionBloc extends Bloc<AuthSessionEvent, AuthSessionState> {
             await _storage.clearAll();
 
             emit(AuthSessionUnauthenticated());
-            _logger.info('Invalid JWT. User must log in again.');
+            _logger.warning('Invalid JWT. User must log in again.');
             notificationService.showWarning(
               'Session expired. Please log in again.',
             );

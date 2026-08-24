@@ -83,5 +83,5 @@ Future<void> init() async {
 
   Logger(
     'InjectionContainer',
-  ).info('Dependency injection container initialized');
+  ).config('Dependency injection container initialized');
 }
