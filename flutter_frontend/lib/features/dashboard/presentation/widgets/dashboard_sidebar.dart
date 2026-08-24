@@ -1,7 +1,12 @@
+import 'package:five_jars_ultra/core/config/injection_container.dart';
+import 'package:five_jars_ultra/core/config/router/routes.dart';
 import 'package:five_jars_ultra/core/state/theme_cubit.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_bloc.dart';
 import 'package:five_jars_ultra/features/auth/presentation/manager/session/auth_session_event.dart';
 import 'package:five_jars_ultra/features/dashboard/presentation/widgets/sidebar_destinations.dart';
+import 'package:five_jars_ultra/features/transactions/models/transactions_filters.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_bloc.dart';
+import 'package:five_jars_ultra/features/transactions/presentation/manager/transactions_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -67,6 +72,13 @@ class DashboardSidebar extends StatelessWidget {
               isActive: location.startsWith(dest.path),
               onTap: () {
                 if (isDrawer) Navigator.pop(context);
+
+                if (dest.path == AppRoutes.transactions) {
+                  // Reset filters when going to the transactions screen from the sidebar (UX)
+                  serviceLocator<TransactionsBloc>().add(
+                    TransactionsFilterChanged(const TransactionsFilters()),
+                  );
+                }
 
                 context.go(dest.path);
               },
