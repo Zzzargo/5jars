@@ -30,7 +30,8 @@ dependencies:
   fl_chart: ^1.2.0
   shared_preferences: ^2.5.5
   window_manager: ^0.5.1
-
+  bloc_concurrency: ^0.3.0
+  rxdart: ^0.28.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
