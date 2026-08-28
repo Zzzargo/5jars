@@ -53,6 +53,9 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       body: const Center(child: Text("Settings will be loaded here")),
+      // TODO: Change nickname
+      // TODO: Maybe change username
+      // TODO: Change password
     );
   }
 }

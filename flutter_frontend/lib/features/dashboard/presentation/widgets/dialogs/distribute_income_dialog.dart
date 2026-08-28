@@ -2,6 +2,7 @@ import 'package:decimal/decimal.dart';
 import 'package:five_jars_ultra/features/dashboard/dtos/money_op_request.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class DistributeIncomeDialog extends StatefulWidget {
   const DistributeIncomeDialog({super.key});
@@ -13,7 +14,7 @@ class DistributeIncomeDialog extends StatefulWidget {
 class _DistributeIncomeDialogState extends State<DistributeIncomeDialog> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
-  final _descController = TextEditingController(text: 'Monthly Income');
+  final _descController = TextEditingController();
 
   @override
   void dispose() {
@@ -24,6 +25,11 @@ class _DistributeIncomeDialogState extends State<DistributeIncomeDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final currencyFormat = NumberFormat.simpleCurrency(
+      locale: 'ro_MD',
+      name: 'RON',
+    );
+
     return AlertDialog(
       title: const Text('Distribute Income'),
       content: Form(
@@ -38,9 +44,9 @@ class _DistributeIncomeDialogState extends State<DistributeIncomeDialog> {
             TextFormField(
               controller: _amountController,
               autofocus: true,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Total Amount',
-                prefixText: '\$ ',
+                prefixText: '${currencyFormat.currencyName} ',
                 border: OutlineInputBorder(),
               ),
               keyboardType: const TextInputType.numberWithOptions(
@@ -55,7 +61,7 @@ class _DistributeIncomeDialogState extends State<DistributeIncomeDialog> {
             TextFormField(
               controller: _descController,
               decoration: const InputDecoration(
-                labelText: 'Description(Optional)',
+                labelText: 'Description (Optional)',
               ),
             ),
           ],

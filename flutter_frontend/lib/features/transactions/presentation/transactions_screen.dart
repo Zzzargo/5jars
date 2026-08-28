@@ -36,7 +36,11 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   void _onScroll() {
     if (_isAtBottom) {
-      context.read<TransactionsBloc>().add(MoreTransactionsRequested());
+      final transactionsBloc = context.read<TransactionsBloc>();
+      final state = transactionsBloc.state;
+      if (state is TransactionsLoadSuccess && !state.isFetchingMore) {
+        transactionsBloc.add(MoreTransactionsRequested());
+      }
     }
   }
 
