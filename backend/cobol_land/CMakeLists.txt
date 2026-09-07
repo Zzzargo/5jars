@@ -1,27 +1,54 @@
 cmake_minimum_required(VERSION 3.22)
+
 project(FiveJarsBackend LANGUAGES C)
 
-# Paths
-set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+# Directory containing COBOL sources
+set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Find all COBOL sources
-file(GLOB COBOL_SOURCES "${SOURCE_DIR}/*.cob")
+file(GLOB_RECURSE COBOL_SOURCES CONFIGURE_DEPENDS
+    "${SOURCE_DIR}/*.cbl"
+)
 
-# Find all C sources
-file(GLOB C_WRAPPERS "${SOURCE_DIR}/*.c")
+# Find GnuCOBOL compiler and runtime
+find_program(COBOL_COMPILER NAMES cobc REQUIRED)
+find_library(COBOL_RUNTIME_LIBRARY NAMES cob REQUIRED)
 
-# Compile C wrappers as object library
-add_library(c_wrappers OBJECT ${C_WRAPPERS})
+message(STATUS "GnuCOBOL compiler: ${COBOL_COMPILER}")
+message(STATUS "COBOL sources: ${COBOL_SOURCES}")
+message(STATUS "GnuCOBOL runtime library: ${COBOL_RUNTIME_LIBRARY}")
 
-# CMake doesn't f w COBOL sources so add them manually
-foreach(cob_file ${COBOL_SOURCES})
-    get_filename_component(cob_name ${cob_file} NAME_WE)
+if(NOT COBOL_SOURCES)
+    message(FATAL_ERROR "No COBOL source files found in ${SOURCE_DIR}")
+endif()
 
-    add_custom_target(${cob_name} ALL
-        # Compile COBOL with C wrapper objects
-        COMMAND cobc -x ${cob_file} $<TARGET_OBJECTS:c_wrappers> -o ${CMAKE_CURRENT_BINARY_DIR}/${cob_name}
-        # Rebuild if COBOL or C changes
-        DEPENDS ${cob_file} $<TARGET_OBJECTS:c_wrappers>
-        COMMENT "Building COBOL program ${cob_name}"
+# Compile each COBOL source file
+set(COBOL_OBJECTS)
+
+foreach(COBOL_SOURCE IN LISTS COBOL_SOURCES)
+    file(RELATIVE_PATH COBOL_REL_PATH "${SOURCE_DIR}" "${COBOL_SOURCE}")
+    string(REPLACE "/" "_" COBOL_OBJECT_BASENAME "${COBOL_REL_PATH}")
+    string(REGEX REPLACE "\\.cbl$" ".o" COBOL_OBJECT_BASENAME "${COBOL_OBJECT_BASENAME}")
+    set(COBOL_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/${COBOL_OBJECT_BASENAME}")
+
+    add_custom_command(
+        OUTPUT "${COBOL_OBJECT}"
+        COMMAND "${COBOL_COMPILER}"
+            -c
+            -o "${COBOL_OBJECT}"
+            "${COBOL_SOURCE}"
+        DEPENDS "${COBOL_SOURCE}"
+        COMMENT "Compiling COBOL object: ${COBOL_REL_PATH}"
+        VERBATIM
     )
+
+    list(APPEND COBOL_OBJECTS "${COBOL_OBJECT}")
 endforeach()
+
+# Final link is done by the C compiler/linker through CMake.
+add_library(fivejars_cobol_kernel SHARED ${COBOL_OBJECTS})
+set_target_properties(fivejars_cobol_kernel PROPERTIES
+    LINKER_LANGUAGE C
+    OUTPUT_NAME fivejars_cobol_kernel
+)
+target_link_libraries(fivejars_cobol_kernel PRIVATE ${COBOL_RUNTIME_LIBRARY})

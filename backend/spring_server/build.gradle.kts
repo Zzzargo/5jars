@@ -6,7 +6,7 @@ plugins {
 
 group = "com.zargo.fivejars"
 version = "0.0.1-SNAPSHOT"
-description = "spring_api"
+description = "spring_server"
 
 java {
     toolchain {
