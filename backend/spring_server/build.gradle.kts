@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.zargo.fivejars"
-version = "0.0.1-SNAPSHOT"
+version = "0.1.0"
 description = "spring_server"
 
 java {
@@ -50,4 +50,6 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
