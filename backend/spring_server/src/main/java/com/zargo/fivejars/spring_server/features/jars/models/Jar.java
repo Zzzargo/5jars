@@ -39,7 +39,7 @@ public class Jar {
     @Setter
     private BigDecimal coefficient;
 
-    @Column(precision = 15, scale = 4, nullable = false)
+    @Column(precision = 15, scale = 2, nullable = false)
     @Setter
     private BigDecimal balance;
 

@@ -28,6 +28,7 @@ public class Transaction {
     @JoinColumn(name = "affected_jar_id")
     private Jar affectedJar;
 
+    @Column(precision = 15, scale = 2, nullable = false)
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
