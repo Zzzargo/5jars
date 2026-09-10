@@ -1,19 +1,35 @@
 package com.zargo.fivejars.spring_server.cobol_bridge;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CobolEngineTest {
     private CobolEngine engine;
-    @BeforeEach
+    @BeforeAll
     public void setup() {
         this.engine = new CobolEngine();
+    }
+
+    @AfterAll
+    public void tearDown() {
+        engine.close();
+    }
+
+    @Test
+    @DisplayName("Should instantiate the engine and shut it off without problems")
+    void shouldTurnOnOffWithoutErrors() {
+        System.err.println("HI IN RED! IF THERE IS NO OTHER RED TEXT YOU'RE ONE LUCKY BASTARD!");
+    }
+
+    @Test
+    @DisplayName("Should get the string \"Hi from COBOL!\" from COBOL")
+    void shouldGetAStringFromCobol() {
+        var string = engine.checkString();
+        assertEquals("Hi from COBOL!", string);
     }
 
     @Test
@@ -69,12 +85,5 @@ public class CobolEngineTest {
         BigDecimal res = engine.deposit(currBalance, amountToDeposit);
 
         assertEquals(0, new BigDecimal("777822217100.570").compareTo(res));
-    }
-
-    @Test
-    @DisplayName("Should get the string \"Hi from COBOL!\" from COBOL")
-    void shouldGetAStringFromCobol() {
-        var string = engine.checkString();
-        assertEquals("Hi from COBOL!", string);
     }
 }
