@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
@@ -52,8 +53,15 @@ public class CobolEngine implements SmartLifecycle {
         this.cleanupHandle = linker.downcallHandle(cleanupMemorySegment, cleanupDescriptor);
 
         // Load the shared library
-        // TODO: get the library from the COBOL root directory (use an envvar or smth)
-        System.load(Path.of("libfivejars_cobol_kernel.so").toAbsolutePath().toString());
+        String kernelLibPathEnv = System.getenv("COBOL_KERNEL_PATH");
+        if (kernelLibPathEnv != null && !kernelLibPathEnv.isBlank()) {
+            Path p = Path.of(kernelLibPathEnv);
+            if (Files.exists(p)) {
+                System.load(p.toAbsolutePath().toString());
+            } else {
+                throw new RuntimeException("Could not find COBOL kernel library at " + p.toAbsolutePath());
+            }
+        }
 
         this.depositHandle = linker.downcallHandle(
                 lookup.find("DEPOSIT").orElseThrow(),

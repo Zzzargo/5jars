@@ -53,6 +53,8 @@ tasks.withType<Test> {
 
     // Prevent libcob from playing too much with the sigsegv
     environment("COB_SET_SIGNAL", "N")
+    environment("COBOL_KERNEL_PATH", project.layout.projectDirectory
+        .file("../cobol_land/build//libfivejars_cobol_kernel.so").asFile.absolutePath)
 
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
