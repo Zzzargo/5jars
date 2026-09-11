@@ -1,12 +1,16 @@
 package com.zargo.fivejars.spring_server.cobol_bridge;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DisplayName("COBOL Math Engine Tests")
 public class CobolEngineTest {
     private CobolEngine engine;
     @BeforeAll
@@ -16,7 +20,7 @@ public class CobolEngineTest {
 
     @AfterAll
     public void tearDown() {
-        engine.close();
+        engine.stop();
     }
 
     @Test
@@ -32,58 +36,42 @@ public class CobolEngineTest {
         assertEquals("Hi from COBOL!", string);
     }
 
-    @Test
-    @DisplayName("591.19 + 8.81 should be equal to 600.00")
-    void simpleAdditionShouldEqual600() {
-        BigDecimal currBalance = new BigDecimal("591.19");
-        BigDecimal amountToDeposit = new BigDecimal("8.81");
+    @ParameterizedTest(name = "[{index}] {0} + {1} = {2}")
+    @CsvSource({
+            "591.19,                8.81,                600.00",
+            "1.01,                  2.2,                3.21",
+            "0.00,                  0.00,                0.00",
+            "150.50,                0.00,                150.50",
+            "-5.21,                 2.21,               -3.00",
+            "-100.00,             100.00,                0.00",
 
-        BigDecimal res = engine.deposit(currBalance, amountToDeposit);
+            // Sub-cent rounding (Half-Up to 2 decimal places)
+            "2.014,                 2.986,               5.00",
+            "0.005,                 0.000,               0.01",
 
-        assertEquals(0, new BigDecimal("600.00").compareTo(res));
+            // Large financial numbers within S9(13)V99 (13 digits integer, 2 decimals)
+            "-1520382765446.207,   2298204982546.777,   777822217100.57",
+            "9999999999999.98,      0.01,                9999999999999.99"
+    })
+    @DisplayName("Check deposit (basic addition) integrity")
+    void verifyDepositCalculations(String balance, String amount, String expected) {
+        BigDecimal currBalance = new BigDecimal(balance);
+        BigDecimal amountToDeposit = new BigDecimal(amount);
+        BigDecimal expectedResult = new BigDecimal(expected);
+
+        BigDecimal actualResult = engine.deposit(currBalance, amountToDeposit);
+
+        assertEquals(0, expectedResult.compareTo(actualResult),
+                () -> String.format("Expected %s but received %s for inputs (%s + %s)",
+                        expectedResult, actualResult, balance, amount));
+
+        assertEquals(2, actualResult.scale(), "Result scale must strictly equal 2 decimal places");
     }
 
     @Test
-    @DisplayName("1.01 + 2.2 should be equal to 3.21")
-    void shouldHandleDecimalsCorrectly() {
-        BigDecimal currBalance = new BigDecimal("1.01");
-        BigDecimal amountToDeposit = new BigDecimal("2.2");
-
-        BigDecimal res = engine.deposit(currBalance, amountToDeposit);
-
-        assertEquals(0, new BigDecimal("3.21").compareTo(res));
-    }
-
-    @Test
-    @DisplayName("2.014 + 2.986 should be equal to 5.00")
-    void shouldRoundFinerDecimalsCorrectly() {
-        BigDecimal currBalance = new BigDecimal("2.014");
-        BigDecimal amountToDeposit = new BigDecimal("2.986");
-
-        BigDecimal res = engine.deposit(currBalance, amountToDeposit);
-
-        assertEquals(0, new BigDecimal("5.00").compareTo(res));
-    }
-
-    @Test
-    @DisplayName("-5.21 + 2.21 should be equal to -3.00")
-    void shouldAddNegativeNumbersCorrectly() {
-        BigDecimal currBalance = new BigDecimal("-5.21");
-        BigDecimal amountToDeposit = new BigDecimal("2.21");
-
-        BigDecimal res = engine.deposit(currBalance, amountToDeposit);
-
-        assertEquals(0, new BigDecimal("-3.00").compareTo(res));
-    }
-
-    @Test
-    @DisplayName("-1520382765446.207 + 2298204982546.777 should be equal to 777822217100.570")
-    void testLargeSignRoundingDecimalExcess() {
-        BigDecimal currBalance = new BigDecimal("-1520382765446.207");
-        BigDecimal amountToDeposit = new BigDecimal("2298204982546.777");
-
-        BigDecimal res = engine.deposit(currBalance, amountToDeposit);
-
-        assertEquals(0, new BigDecimal("777822217100.570").compareTo(res));
+    @DisplayName("Should reject null arguments before allocating native off-heap memory")
+    void shouldThrowOnNullInput() {
+        assertThrows(NullPointerException.class, () -> engine.deposit(null, BigDecimal.TEN));
+        assertThrows(NullPointerException.class, () -> engine.deposit(BigDecimal.TEN, null));
     }
 }

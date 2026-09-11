@@ -51,5 +51,8 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
 
+    // Prevent libcob from playing too much with the sigsegv
+    environment("COB_SET_SIGNAL", "N")
+
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }

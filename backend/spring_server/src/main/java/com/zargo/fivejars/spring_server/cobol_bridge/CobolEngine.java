@@ -1,7 +1,7 @@
 package com.zargo.fivejars.spring_server.cobol_bridge;
 
 import com.zargo.fivejars.spring_server.common.exceptions.CobolExecutionException;
-import jakarta.annotation.PreDestroy;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 import java.lang.foreign.*;
@@ -10,16 +10,21 @@ import java.math.BigDecimal;
 import java.nio.file.Path;
 
 @Component
-public class CobolEngine implements AutoCloseable {
+public class CobolEngine implements SmartLifecycle {
     // All COBOL PICs used for money are S9(13)V99 =>
     //      15 digits + 1 sign = 16 / 2 = 8 bytes for a number in COMP-3 format
     private static final int COMP3_NUMS_DIGITS = 15;
     private static final int COMP3_NUMS_DECIMALS = 2;
     private static final int COMP3_NUMS_BYTELEN = (COMP3_NUMS_DIGITS + 1) / 2;
 
-    private final MethodHandle cleanupHandle;
-    private final MethodHandle depositHandle;
     private final MethodHandle testStringHandle;
+    private final MethodHandle depositHandle;
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Lifecycle: because the COBOL engine calls cob_stop_run() which can ultimately stop the JVM
+    // Gotta make sure the engine is deconstructed dead last
+    private boolean isRunning = false;
+    private final MethodHandle cleanupHandle;
 
     public CobolEngine() {
         final SymbolLookup lookup = SymbolLookup.loaderLookup();
@@ -62,16 +67,40 @@ public class CobolEngine implements AutoCloseable {
     }
 
     @Override
-    @PreDestroy
-    public void close() {
-        try {
-            this.cleanupHandle.invokeExact(0);
-        } catch (Throwable e) {
-            System.out.println("Error calling \"cob_stop_run\": " + e.getMessage());
+    public void start() {
+        this.isRunning = true;
+    }
+
+    @Override
+    public void stop() {
+        if (this.isRunning) {
+            this.isRunning = false;
+            try {
+                this.cleanupHandle.invokeExact(0);
+            } catch (Throwable e) {
+                // Could ignore that but it can be useful
+                System.out.println("Error calling \"cob_stop_run\": " + e.getMessage());
+            }
         }
     }
 
-    public BigDecimal deposit(final BigDecimal balance, final BigDecimal amount) {
+    @Override
+    public boolean isRunning() {
+        return this.isRunning;
+    }
+
+    @Override
+    public int getPhase() {
+        // Integer.MIN_VALUE ensures this bean is stopped LAST during context shutdown
+        return Integer.MIN_VALUE;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    public BigDecimal deposit(final BigDecimal balance, final BigDecimal amount) throws RuntimeException {
+        if (balance == null || amount == null) {
+            throw new NullPointerException("Balance or amount is null");
+        }
         try (Arena arena = Arena.ofConfined()) {
             MemorySegment balanceSeg = arena.allocateFrom(
                     ValueLayout.JAVA_BYTE, CobolConverter.decimalToComp3(
