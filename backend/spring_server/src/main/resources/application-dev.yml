@@ -20,6 +20,9 @@ spring:
       fail-on-unknown-properties: false
 
 app:
+  cobol:
+    kernel-path: ${COBOL_KERNEL_PATH:../cobol_land/build/libfivejars_cobol_kernel.so}
+
   cors:
     allowed-origins:
       - "http://localhost:*"  # Any app on the host machine

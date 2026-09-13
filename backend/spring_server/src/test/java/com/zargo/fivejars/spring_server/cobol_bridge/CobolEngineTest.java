@@ -15,7 +15,7 @@ public class CobolEngineTest {
     private CobolEngine engine;
     @BeforeAll
     public void setup() {
-        this.engine = new CobolEngine();
+        this.engine = new CobolEngine("");
     }
 
     @AfterAll

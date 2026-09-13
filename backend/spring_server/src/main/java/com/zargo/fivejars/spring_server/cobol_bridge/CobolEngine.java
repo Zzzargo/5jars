@@ -1,6 +1,8 @@
 package com.zargo.fivejars.spring_server.cobol_bridge;
 
 import com.zargo.fivejars.spring_server.common.exceptions.CobolExecutionException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
@@ -9,8 +11,10 @@ import java.lang.invoke.MethodHandle;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 
 @Component
+@Slf4j
 public class CobolEngine implements SmartLifecycle {
     // All COBOL PICs used for money are S9(13)V99 =>
     //      15 digits + 1 sign = 16 / 2 = 8 bytes for a number in COMP-3 format
@@ -27,51 +31,69 @@ public class CobolEngine implements SmartLifecycle {
     private boolean isRunning = false;
     private final MethodHandle cleanupHandle;
 
-    public CobolEngine() {
-        final SymbolLookup lookup = SymbolLookup.loaderLookup();
+    public CobolEngine(@Value("${app.cobol.kernel-path}") String cobolKernelPath) {
         final Linker linker = Linker.nativeLinker();
 
-        // Load the cobol runtime library. The loadLibrary method searches in common system library paths
-        System.loadLibrary("cob");
+        this.loadLibraries(cobolKernelPath);
+
+        // A loader lookup works only with the libraries that were loaded prior to the lookup's creation
+        final SymbolLookup loadedLibrariesLookup = SymbolLookup.loaderLookup();
 
         // Initialize the COBOL runtime. void cob_init(const int, char **)
-        final MemorySegment initMemorySegment = lookup.find("cob_init").orElseThrow();
+        final MemorySegment initMemorySegment = loadedLibrariesLookup.find("cob_init").orElseThrow();
         final FunctionDescriptor initDescriptor = FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT, ValueLayout.ADDRESS);
         final MethodHandle initHandle = linker.downcallHandle(initMemorySegment, initDescriptor);
         try {
             initHandle.invokeExact(0, MemorySegment.NULL);
         } catch (Throwable e) {
-            System.out.println("Error calling \"cob_init\": " + e.getMessage());
+            log.error("Error calling \"cob_init\": {}", e.getMessage());
+            throw new NoSuchElementException("cob_init not found");
         }
 
         // To successfully destroy the CobolEngine instance the launched COBOL runtime needs to be cleaned up
         // void cob_stop_run(int ret_code) exits the program
         // int cob_tidy() only deallocates resources set up by the runtime
         // Don't know why but cob_tidy just keeps throwing segfaults at me while cob_stop_run is kind, so I choose that
-        final MemorySegment cleanupMemorySegment = lookup.find("cob_stop_run").orElseThrow();
+        final MemorySegment cleanupMemorySegment = loadedLibrariesLookup.find("cob_stop_run").orElseThrow();
         final FunctionDescriptor cleanupDescriptor = FunctionDescriptor.ofVoid(ValueLayout.JAVA_INT);
         this.cleanupHandle = linker.downcallHandle(cleanupMemorySegment, cleanupDescriptor);
 
-        // Load the shared library
-        String kernelLibPathEnv = System.getenv("COBOL_KERNEL_PATH");
-        if (kernelLibPathEnv != null && !kernelLibPathEnv.isBlank()) {
-            Path p = Path.of(kernelLibPathEnv);
-            if (Files.exists(p)) {
-                System.load(p.toAbsolutePath().toString());
-            } else {
-                throw new RuntimeException("Could not find COBOL kernel library at " + p.toAbsolutePath());
-            }
-        }
-
         this.depositHandle = linker.downcallHandle(
-                lookup.find("DEPOSIT").orElseThrow(),
+                loadedLibrariesLookup.find("DEPOSIT").orElseThrow(),
                 FunctionDescriptor.ofVoid(ValueLayout.ADDRESS, ValueLayout.ADDRESS, ValueLayout.ADDRESS)
         );
 
         this.testStringHandle = linker.downcallHandle(
-                lookup.find("COBOL__TEST").orElseThrow(),
+                loadedLibrariesLookup.find("COBOL__TEST").orElseThrow(),
                 FunctionDescriptor.ofVoid((ValueLayout.ADDRESS))
         );
+    }
+
+    private void loadLibraries(final String cobolKernelPath) {
+        // Load the cobol runtime library. The loadLibrary method searches in common system library paths
+        System.loadLibrary("cob");
+
+        // Load the custom shared library
+        if (cobolKernelPath == null || cobolKernelPath.isBlank()) {
+            log.warn("COBOL kernel path was not injected via app config. Searching for env var...");
+            String kernelLibPathEnv = System.getenv("COBOL_KERNEL_PATH");
+
+            if (kernelLibPathEnv != null && !kernelLibPathEnv.isBlank()) {
+                Path p = Path.of(kernelLibPathEnv);
+                if (Files.exists(p)) {
+                    System.load(p.toAbsolutePath().toString());
+                    log.info("COBOL kernel library loaded from env var path: {}", p.toAbsolutePath());
+                } else {
+                    throw new RuntimeException("COBOL kernel library at " + p.toAbsolutePath() + "doesn't exist");
+                }
+            } else {
+                throw new NullPointerException("COBOL kernel path not found neither in env vars");
+            }
+        } else {
+            Path p = Path.of(cobolKernelPath).toAbsolutePath();
+            System.load(p.toString());
+            log.info("COBOL kernel library loaded from app property path: {}", p);
+        }
     }
 
     @Override

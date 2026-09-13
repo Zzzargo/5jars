@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
 plugins {
     java
     id("org.springframework.boot") version "4.0.2"
@@ -53,6 +55,16 @@ tasks.withType<Test> {
 
     // Prevent libcob from playing too much with the sigsegv
     environment("COB_SET_SIGNAL", "N")
+    environment("COBOL_KERNEL_PATH", project.layout.projectDirectory
+        .file("../cobol_land/build//libfivejars_cobol_kernel.so").asFile.absolutePath)
+
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.named<BootRun>("bootRun") {
+    // Prevent libcob from playing too much with the sigsegv
+    environment("COB_SET_SIGNAL", "N")
+    // This is a fallback. The variable should also be in application-dev.yml
     environment("COBOL_KERNEL_PATH", project.layout.projectDirectory
         .file("../cobol_land/build//libfivejars_cobol_kernel.so").asFile.absolutePath)
 
