@@ -1,5 +1,6 @@
 package com.zargo.fivejars.spring_server.features.jars.services;
 
+import com.zargo.fivejars.spring_server.cobol_bridge.CobolEngine;
 import com.zargo.fivejars.spring_server.common.exceptions.BusinessLogicException;
 import com.zargo.fivejars.spring_server.common.exceptions.ResourceNotFoundException;
 import com.zargo.fivejars.spring_server.features.jars.dtos.CreateJarRequest;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class JarsService {
     private final JarsRepository jarsRepository;
     private final TransactionsRepository transactionsRepository;
+    private final CobolEngine cobolEngine;
 
     public List<Jar> getJars(final UUID ownerId) {
         return jarsRepository.findAllByOwnerId(ownerId);
@@ -118,7 +120,9 @@ public class JarsService {
                 () -> new ResourceNotFoundException("Jar with invalid ID")
         );
 
-        jar.setBalance(jar.getBalance().add(amount));
+        BigDecimal newBalance = cobolEngine.deposit(jar.getBalance(), amount);
+
+        jar.setBalance(newBalance);
 
         Transaction transaction = Transaction.builder()
                 .initiator(user)
