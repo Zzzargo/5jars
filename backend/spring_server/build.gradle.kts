@@ -1,0 +1,72 @@
+import org.springframework.boot.gradle.tasks.run.BootRun
+
+plugins {
+    java
+    id("org.springframework.boot") version "4.0.2"
+    id("io.spring.dependency-management") version "1.1.7"
+}
+
+group = "com.zargo.fivejars"
+version = "0.1.0"
+description = "spring_server"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom(configurations.annotationProcessor.get())
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")
+    implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    compileOnly("org.projectlombok:lombok")
+    runtimeOnly("org.postgresql:postgresql")
+    annotationProcessor("org.projectlombok:lombok")
+    testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+
+    // Prevent libcob from playing too much with the sigsegv
+    environment("COB_SET_SIGNAL", "N")
+    environment("COBOL_KERNEL_PATH", project.layout.projectDirectory
+        .file("../cobol_land/build//libfivejars_cobol_kernel.so").asFile.absolutePath)
+
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.named<BootRun>("bootRun") {
+    // Prevent libcob from playing too much with the sigsegv
+    environment("COB_SET_SIGNAL", "N")
+    // This is a fallback. The variable should also be in application-dev.yml
+    environment("COBOL_KERNEL_PATH", project.layout.projectDirectory
+        .file("../cobol_land/build//libfivejars_cobol_kernel.so").asFile.absolutePath)
+
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}

@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: spring_api
+
+  datasource:
+    url: ${DB_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    enabled: true
+    locations: filesystem:../../infrastructure/db/migrations,filesystem:../../infrastructure/db/seeds
+
+  jackson:
+    # camelCase(Java) -> snake_case(JSON)
+    property-naming-strategy: SNAKE_CASE
+    # allow extra fields on requests
+    deserialization:
+      fail-on-unknown-properties: false
+
+app:
+  cobol:
+    kernel-path: ${COBOL_KERNEL_PATH:../cobol_land/build/libfivejars_cobol_kernel.so}
+
+  cors:
+    allowed-origins:
+      - "http://localhost:*"  # Any app on the host machine
+      - "http://127.0.0.1:*"
+      - "http://10.0.2.2:*"  # Standard for Android emulators
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: ${JWT_EXPIRATION}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      probes:
+        enabled: true

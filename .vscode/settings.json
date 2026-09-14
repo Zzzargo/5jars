@@ -14,5 +14,7 @@
             "database": "fivejars_db",
             "username": "fivejars_db_user"
         }
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
 }
